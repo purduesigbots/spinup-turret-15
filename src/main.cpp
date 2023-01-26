@@ -25,6 +25,8 @@ void on_center_button() {
  */
 void initialize() {
   arms::init();
+  arms::odom::reset({0, 0}, 0.0); // start position
+  pros::delay(2000);
 
   pros::lcd::initialize();
   pros::lcd::set_text(1, "Hello PROS User!");
@@ -78,18 +80,23 @@ void autonomous() {}
  */
 void opcontrol() {
   pros::Controller master(pros::E_CONTROLLER_MASTER);
+  using namespace arms::chassis;
 
-  //   arms::chassis::move({0, 40}, 100);
+//   move(48, 70);
+  turn(90, arms::ASYNC);
 
   while (true) {
-    pros::lcd::print(0, "%d %d %d",
-                     (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-                     (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-                     (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-    int left = master.get_analog(ANALOG_LEFT_Y);
-    int right = master.get_analog(ANALOG_RIGHT_X);
 
-    arms::chassis::arcade(left, right);
+    // int left = master.get_analog(ANALOG_LEFT_Y);
+    // int right = master.get_analog(ANALOG_RIGHT_X);
+    // arms::chassis::arcade(left, right);
+
+    pros::lcd::set_text(2,
+                        "heading: " + std::to_string(arms::odom::getHeading()));
+
+    // printf("left encoder %f\n", arms::odom::getLeftEncoder());
+    // printf("right encoder %f\n", arms::odom::getRightEncoder());
+    // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
 
     pros::delay(20);
   }

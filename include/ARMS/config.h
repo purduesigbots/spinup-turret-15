@@ -6,7 +6,7 @@
 namespace arms {
 
 // Debug
-#define ODOM_DEBUG 0
+#define ODOM_DEBUG 1
 
 // Negative numbers mean reversed motor
 #define LEFT_MOTORS 1, 13, -14
@@ -14,18 +14,18 @@ namespace arms {
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
-#define TPI 1        // Encoder ticks per inch of forward robot movement
-#define MIDDLE_TPI 1 // Ticks per inch for the middle wheel
+#define TPI 330.00       // Encoder ticks per inch of forward robot movement
+#define MIDDLE_TPI 330.0 // Ticks per inch for the middle wheel
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  0 // The distance between left and right wheels (or tracker wheels)
+  5.64 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
-  0 // Distance from middle wheel to the robot turning center
+  4.75 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
-#define ENCODER_PORTS 1, 3, 7                // Port 0 for disabled,
+#define ENCODER_PORTS 3, 7, 1                // Port 0 for disabled,
 #define EXPANDER_PORT 0                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
@@ -36,13 +36,13 @@ namespace arms {
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling
 #define SETTLE_THRESH_ANGULAR 1 // amount of angular movement for settling
 #define SETTLE_TIME 250         // amount of time to count as settled
-#define LINEAR_KP 1
-#define LINEAR_KI 0
-#define LINEAR_KD 0
+#define LINEAR_KP 3
+#define LINEAR_KI 0.01
+#define LINEAR_KD 1.7
 #define TRACKING_KP 60 // point tracking turning strength
-#define ANGULAR_KP 1
-#define ANGULAR_KI 0
-#define ANGULAR_KD 0
+#define ANGULAR_KP 1.67
+#define ANGULAR_KI 0.1
+#define ANGULAR_KD 1.5
 #define MIN_ERROR                                                              \
   5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)
