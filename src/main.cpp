@@ -82,22 +82,31 @@ void opcontrol() {
   pros::Controller master(pros::E_CONTROLLER_MASTER);
   using namespace arms::chassis;
 
-//   move(48, 70);
-  turn(90, arms::ASYNC);
+  move(30, 70);
+  move(-4, 50, arms::REVERSE);
+  turn(89);
+  move(-6, 50, arms::REVERSE);
+  move(5, 50, arms::REVERSE);
+  turn(51, arms::RELATIVE);
+  move(36, 70);
+  turn(-90, arms::RELATIVE);
+  move(5, 50);
+  
 
-  while (true) {
+  // while (true) {
 
-    // int left = master.get_analog(ANALOG_LEFT_Y);
-    // int right = master.get_analog(ANALOG_RIGHT_X);
-    // arms::chassis::arcade(left, right);
+  //   int left = master.get_analog(ANALOG_LEFT_Y);
+  //   int right = master.get_analog(ANALOG_RIGHT_X);
+  //   arms::chassis::arcade(left, right);
 
-    pros::lcd::set_text(2,
-                        "heading: " + std::to_string(arms::odom::getHeading()));
+  //   pros::lcd::set_text(2,
+  //                       "heading: " +
+  //                       std::to_string(arms::odom::getHeading()));
 
-    // printf("left encoder %f\n", arms::odom::getLeftEncoder());
-    // printf("right encoder %f\n", arms::odom::getRightEncoder());
-    // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
+  //   // printf("left encoder %f\n", arms::odom::getLeftEncoder());
+  //   // printf("right encoder %f\n", arms::odom::getRightEncoder());
+  //   // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
 
-    pros::delay(20);
-  }
+  //   pros::delay(20);
+  // }
 }
