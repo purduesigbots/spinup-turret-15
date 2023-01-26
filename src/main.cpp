@@ -1,5 +1,6 @@
 #include "main.h"
 #include "ARMS/config.h"
+#include "subsystems.h"
 
 /**
  * A callback function for LLEMU's center button.
@@ -82,31 +83,53 @@ void opcontrol() {
   pros::Controller master(pros::E_CONTROLLER_MASTER);
   using namespace arms::chassis;
 
-  move(30, 70);
-  move(-4, 50, arms::REVERSE);
-  turn(89);
-  move(-6, 50, arms::REVERSE);
-  move(5, 50, arms::REVERSE);
-  turn(51, arms::RELATIVE);
-  move(36, 70);
-  turn(-90, arms::RELATIVE);
-  move(5, 50);
-  
+  // move(30, 70);
+  // move(-4, 50, arms::REVERSE);
+  // turn(89);
+  // move(-6, 50, arms::REVERSE);
+  // move(5, 50, arms::REVERSE);
+  // turn(51, arms::RELATIVE);
+  // move(36, 70);
+  // turn(-90, arms::RELATIVE);
+  // move(5, 50);
 
-  // while (true) {
+  while (true) {
 
-  //   int left = master.get_analog(ANALOG_LEFT_Y);
-  //   int right = master.get_analog(ANALOG_RIGHT_X);
-  //   arms::chassis::arcade(left, right);
+    int left = master.get_analog(ANALOG_LEFT_Y);
+    int right = master.get_analog(ANALOG_RIGHT_X);
+    arms::chassis::arcade(left, right);
 
-  //   pros::lcd::set_text(2,
-  //                       "heading: " +
-  //                       std::to_string(arms::odom::getHeading()));
+    pros::lcd::set_text(2,
+                        "heading: " + std::to_string(arms::odom::getHeading()));
 
-  //   // printf("left encoder %f\n", arms::odom::getLeftEncoder());
-  //   // printf("right encoder %f\n", arms::odom::getRightEncoder());
-  //   // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
+    if (master.get_digital(DIGITAL_R1)) { // intake
+      intake::move(100);
+    } else if (master.get_digital(DIGITAL_R2)) { // outake
+      intake::move(-100);
+    } else { // idle
+      intake::move(0);
+    }
 
-  //   pros::delay(20);
-  // }
+    if (master.get_digital(DIGITAL_L1)) { // Turret Left
+      turret::move(100);
+    } else if (master.get_digital(DIGITAL_L2)) { // Turret Right
+      turret::move(-100);
+    } else { // idle
+      turret::move(0);
+    }
+
+    if (master.get_digital(DIGITAL_X)) { // intake
+      roller::move(100);
+    } else if (master.get_digital(DIGITAL_B)) { // outake
+      roller::move(-100);
+    } else { // idle
+      roller::move(0);
+    }
+
+    // printf("left encoder %f\n", arms::odom::getLeftEncoder());
+    // printf("right encoder %f\n", arms::odom::getRightEncoder());
+    // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
+
+    pros::delay(20);
+  }
 }
