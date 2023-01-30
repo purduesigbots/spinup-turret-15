@@ -1,5 +1,6 @@
 #include "main.h"
 #include "ARMS/config.h"
+#include "ARMS/odom.h"
 #include "subsystems.h"
 
 /**
@@ -96,7 +97,7 @@ void opcontrol() {
   // turn(-90, arms::RELATIVE);
   // move(5, 50);
   flywheel::move(90);
-
+  int counter = 0;
   while (true) {
 
     int left = master.get_analog(ANALOG_LEFT_Y);
@@ -148,11 +149,11 @@ void opcontrol() {
 			flywheel::move(flywheel::speed-5);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
-
-    // printf("left encoder %f\n", arms::odom::getLeftEncoder());
-    // printf("right encoder %f\n", arms::odom::getRightEncoder());
-    // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
-
+    if(counter++ %3 == 0){
+    printf("heading %f ", arms::odom::getHeading());
+    printf("x %f ", arms::odom::getPosition().x);
+    printf("y %f\n", arms::odom::getPosition().y);
+    }
     pros::delay(20);
   }
 }

@@ -6,7 +6,7 @@
 namespace arms {
 
 // Debug
-#define ODOM_DEBUG 1
+#define ODOM_DEBUG 0
 
 // Negative numbers mean reversed motor
 #define LEFT_MOTORS 1, 13, -14
@@ -14,7 +14,7 @@ namespace arms {
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
-#define TPI 330.00       // Encoder ticks per inch of forward robot movement
+#define TPI 319.00       // Encoder ticks per inch of forward robot movement
 #define MIDDLE_TPI 330.0 // Ticks per inch for the middle wheel
 
 // Tracking wheel distances
