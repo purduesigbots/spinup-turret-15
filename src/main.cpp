@@ -25,9 +25,12 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+  sylib::initialize();
+
   arms::init();
   arms::odom::reset({0, 0}, 0.0); // start position
   pros::delay(2000);
+  Task flywheel(flywheel::task);
 
   pros::lcd::initialize();
   pros::lcd::set_text(1, "Hello PROS User!");
@@ -92,6 +95,7 @@ void opcontrol() {
   // move(36, 70);
   // turn(-90, arms::RELATIVE);
   // move(5, 50);
+  flywheel::move(90);
 
   while (true) {
 
@@ -125,6 +129,25 @@ void opcontrol() {
     } else { // idle
       roller::move(0);
     }
+
+    // Flywheel control
+		if (master.get_digital_new_press(DIGITAL_A)) {
+			if (flywheel::speed == 0) {
+				flywheel::move(90); // max = 200
+			} else {
+				flywheel::move(0); 
+			}
+		}
+		
+		if (master.get_digital_new_press(DIGITAL_UP)) {
+			flywheel::move(flywheel::speed+10);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+		}
+
+		if (master.get_digital_new_press(DIGITAL_DOWN)) {
+			flywheel::move(flywheel::speed-5);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+		}
 
     // printf("left encoder %f\n", arms::odom::getLeftEncoder());
     // printf("right encoder %f\n", arms::odom::getRightEncoder());
