@@ -31,8 +31,12 @@ void initialize() {
 
   pros::lcd::initialize();
   pros::lcd::set_text(1, "Hello PROS User!");
+  pros::lcd::set_background_color(LV_COLOR_BLACK);
+  pros::lcd::set_text_color(LV_COLOR_WHITE);
 
   pros::lcd::register_btn1_cb(on_center_button);
+
+  roller::init();
 }
 
 /**
@@ -98,10 +102,7 @@ void opcontrol() {
     int left = master.get_analog(ANALOG_LEFT_Y);
     int right = master.get_analog(ANALOG_RIGHT_X);
     arms::chassis::arcade(left, right);
-
-    pros::lcd::set_text(2,
-                        "heading: " + std::to_string(arms::odom::getHeading()));
-
+    
     if (master.get_digital(DIGITAL_R1)) { // intake
       intake::move(100);
     } else if (master.get_digital(DIGITAL_R2)) { // outake
@@ -124,6 +125,10 @@ void opcontrol() {
       roller::move(-100);
     } else { // idle
       roller::move(0);
+    }
+
+    if (master.get_digital_new_press(DIGITAL_A)) {
+      roller::toggle_turn_roller();
     }
 
     // printf("left encoder %f\n", arms::odom::getLeftEncoder());

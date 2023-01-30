@@ -23,12 +23,50 @@ void move(double speed) {
 namespace roller {
 
 Motor motor(7, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Optical optical(4);
 
 double speed = 0;
+bool turning_roller = false;
+int roller_turning_speed = 80;
+bool last_hue = false;
+
+bool isRed() {
+    double color = optical.get_hue();
+    if (color > 180) {
+        return (color - 360 > -30);
+    } else {
+        return color < 30;
+    }
+}
+
+void toggle_turn_roller() {
+    turning_roller = !turning_roller;
+    last_hue = isRed();
+}
 
 void move(double speed) {
-    motor.move_voltage(120 * speed);
     roller::speed = speed;
+}
+
+void task() {
+    while (true) {
+        lcd::set_text(0, "Optical: " + std::to_string(optical.get_hue()));
+        if (turning_roller) {
+            motor.move(roller_turning_speed);
+            if (last_hue ^ isRed()) {
+                turning_roller = false;
+                motor.move(-20);
+            }
+        } else {
+            motor.move(120 * speed);
+        }
+        pros::delay(10);
+    }
+}
+
+void init() {
+    optical.set_led_pwm(100);
+    pros::Task roller_task(task);
 }
 
 } // roller

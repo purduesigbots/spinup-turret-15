@@ -14,8 +14,11 @@ void move(double speed);
 
 namespace roller {
 extern Motor motor;
+extern Optical optical;
 extern double speed;
 void move(double speed);
+void toggle_turn_roller();
+void init();
 } // namespace roller
 
 namespace turret {
