@@ -7,7 +7,7 @@
 #define FPS 30.0 // FPS of the camera
 #define FRAME_TIMING (1000.0/FPS)
 #define GOAL_CENTER_X 260 // X coordinate for the goal to be centered.
-#define HORIZ_PIXEL_TO_DEG 0.16 // Constant to convert difference in x coordinate to difference in degrees. Calculated as horizontal FOV / horizontal resolution.
+#define HORIZ_PIXEL_TO_DEG 0.10 // Constant to convert difference in x coordinate to difference in degrees. Calculated as horizontal FOV / horizontal resolution.
 #define ODOM_UPDATE_SPEED 10.0 // Speed in ms of the odom update loop
 #define LATENCY_FRAMES 3
 
