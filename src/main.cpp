@@ -1,6 +1,5 @@
 #include "main.h"
 #include "ARMS/config.h"
-#include "ARMS/odom.h"
 #include "subsystems.h"
 
 /**
@@ -105,16 +104,13 @@ void opcontrol() {
 	// move(5, 50);
 
 	// flywheel::move(90);
-
-	int counter = 0;
 	while (true) {
 
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
-		arms::chassis::arcade(left, right);
+		arcade(left, right);
 
-		pros::lcd::set_text(2,
-		                    "heading: " + std::to_string(arms::odom::getHeading()));
+		pros::lcd::set_text(0, "Distance: " + std::to_string(arms::odom::getPosition().x));
 
 		if (master.get_digital(DIGITAL_R1)) { // intake
 			intake::move(100);
@@ -132,17 +128,17 @@ void opcontrol() {
 			turret::move(0);
 		}
 
-    if (master.get_digital(DIGITAL_X)) { // intake
-      roller::move(100);
-    } else if (master.get_digital(DIGITAL_B)) { // outake
-      roller::move(-100);
-    } else { // idle
-      roller::move(0);
-    }
+		if (master.get_digital(DIGITAL_X)) { // intake
+			roller::move(100);
+		} else if (master.get_digital(DIGITAL_B)) { // outake
+			roller::move(-100);
+		} else { // idle
+			roller::move(0);
+		}
 
-    if (master.get_digital_new_press(DIGITAL_A)) {
-      roller::toggle_turn_roller();
-    }
+		if (master.get_digital_new_press(DIGITAL_A)) {
+		roller::toggle_turn_roller();
+		}
 		if (master.get_digital(DIGITAL_X)) { // intake
 			roller::move(100);
 		} else if (master.get_digital(DIGITAL_B)) { // outake
@@ -168,11 +164,6 @@ void opcontrol() {
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
 			flywheel::move(flywheel::speed - 5);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
-		}
-		if (counter++ % 3 == 0) {
-			printf("heading %f ", arms::odom::getHeading());
-			printf("x %f ", arms::odom::getPosition().x);
-			printf("y %f\n", arms::odom::getPosition().y);
 		}
 		pros::delay(20);
 	}
