@@ -1,6 +1,7 @@
 #include "main.h"
 #include "ARMS/config.h"
 #include "ARMS/odom.h"
+#include "pros/misc.h"
 #include "subsystems.h"
 
 /**
@@ -114,13 +115,20 @@ void opcontrol() {
 
 		if (master.get_digital(DIGITAL_R1)) { // intake
 			intake::move(100);
+      printf("pressed");
 		} else if (master.get_digital(DIGITAL_R2)) { // outake
 			intake::move(-100);
 		} else { // idle
 			intake::move(0);
 		}
 
-		if (master.get_digital(DIGITAL_L1)) { // Turret Left
+		if (master.get_digital_new_press(DIGITAL_LEFT)) { // Turret Left
+     
+			disklift::toggle_move();
+      
+    }
+
+    if (master.get_digital(DIGITAL_L1)) { // Turret Left
 			turret::move(100);
 		} else if (master.get_digital(DIGITAL_L2)) { // Turret Right
 			turret::move(-100);
@@ -154,7 +162,7 @@ void opcontrol() {
 			flywheel::move(flywheel::speed - 5);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
-		if (counter++ % 3 == 0) {
+		if (counter++ % 100000 == 0) {
 			printf("heading %f ", arms::odom::getHeading());
 			printf("x %f ", arms::odom::getPosition().x);
 			printf("y %f\n", arms::odom::getPosition().y);
@@ -162,3 +170,4 @@ void opcontrol() {
 		pros::delay(20);
 	}
 }
+
