@@ -85,6 +85,22 @@ void move(double speed) {
 
 } // turret
 
+namespace disklift {
+    Motor lift_motor(10, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+    double lift_pos[] = {-15, 55, 68, 78};
+    int i = 0;
+
+    void move(double speed);
+    void move_to(double position,double speed){
+       lift_motor.move_absolute(position, speed);
+    }
+    void toggle_move(){
+        i++;
+        if (i > 3)
+            i = 0;
+        lift_motor.move_absolute(lift_pos[i], 100);
+    }
+}
 
 namespace flywheel {
 // flywheel tuning
@@ -116,7 +132,7 @@ sylib::SpeedControllerInfo motor_speed_controller (
 // pros::Motor flywheel2(1, 1);
 // pros::Motor_Group motor({flywheel1, flywheel2});
 sylib::Motor flywheel1(9, 200, false, motor_speed_controller);
-sylib::Motor flywheel2(10, 200, true, motor_speed_controller);
+sylib::Motor flywheel2(11, 200, true, motor_speed_controller);
 double speed = 0;
 
 void move(double speed) {
