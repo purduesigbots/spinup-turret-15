@@ -49,7 +49,7 @@ void move(double speed) {
 
 namespace disklift {
     Motor lift_motor(10, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
-    double lift_pos = 127;
+    double lift_pos = 75;
     bool lift_on = false;
     void move(double speed);
     void move_to(double position,double speed){
