@@ -1,5 +1,6 @@
 #include "main.h"
 #include "ARMS/config.h"
+#include "ARMS/odom.h"
 #include "subsystems.h"
 
 /**
@@ -9,13 +10,13 @@
  * "I was pressed!" and nothing.
  */
 void on_center_button() {
-  static bool pressed = false;
-  pressed = !pressed;
-  if (pressed) {
-    pros::lcd::set_text(2, "I was pressed!");
-  } else {
-    pros::lcd::clear_line(2);
-  }
+	static bool pressed = false;
+	pressed = !pressed;
+	if (pressed) {
+		pros::lcd::set_text(2, "I was pressed!");
+	} else {
+		pros::lcd::clear_line(2);
+	}
 }
 
 /**
@@ -25,9 +26,12 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-  arms::init();
-  arms::odom::reset({0, 0}, 0.0); // start position
-  pros::delay(2000);
+	sylib::initialize();
+
+	arms::init();
+	arms::odom::reset({0, 0}, 0.0); // start position
+	pros::delay(2000);
+	Task flywheel(flywheel::task);
 
   pros::lcd::initialize();
   pros::lcd::set_text(1, "Hello PROS User!");
@@ -44,7 +48,8 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -55,7 +60,8 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -68,7 +74,8 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -84,40 +91,46 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-  pros::Controller master(pros::E_CONTROLLER_MASTER);
-  using namespace arms::chassis;
+	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	using namespace arms::chassis;
 
-  // move(30, 70);
-  // move(-4, 50, arms::REVERSE);
-  // turn(89);
-  // move(-6, 50, arms::REVERSE);
-  // move(5, 50, arms::REVERSE);
-  // turn(51, arms::RELATIVE);
-  // move(36, 70);
-  // turn(-90, arms::RELATIVE);
-  // move(5, 50);
+	// move(30, 70);
+	// move(-4, 50, arms::REVERSE);
+	// turn(89);
+	// move(-6, 50, arms::REVERSE);
+	// move(5, 50, arms::REVERSE);
+	// turn(51, arms::RELATIVE);
+	// move(36, 70);
+	// turn(-90, arms::RELATIVE);
+	// move(5, 50);
 
-  while (true) {
+	// flywheel::move(90);
 
-    int left = master.get_analog(ANALOG_LEFT_Y);
-    int right = master.get_analog(ANALOG_RIGHT_X);
-    arms::chassis::arcade(left, right);
-    
-    if (master.get_digital(DIGITAL_R1)) { // intake
-      intake::move(100);
-    } else if (master.get_digital(DIGITAL_R2)) { // outake
-      intake::move(-100);
-    } else { // idle
-      intake::move(0);
-    }
+	int counter = 0;
+	while (true) {
 
-    if (master.get_digital(DIGITAL_L1)) { // Turret Left
-      turret::move(100);
-    } else if (master.get_digital(DIGITAL_L2)) { // Turret Right
-      turret::move(-100);
-    } else { // idle
-      turret::move(0);
-    }
+		int left = master.get_analog(ANALOG_LEFT_Y);
+		int right = master.get_analog(ANALOG_RIGHT_X);
+		arms::chassis::arcade(left, right);
+
+		pros::lcd::set_text(2,
+		                    "heading: " + std::to_string(arms::odom::getHeading()));
+
+		if (master.get_digital(DIGITAL_R1)) { // intake
+			intake::move(100);
+		} else if (master.get_digital(DIGITAL_R2)) { // outake
+			intake::move(-100);
+		} else { // idle
+			intake::move(0);
+		}
+
+		if (master.get_digital(DIGITAL_L1)) { // Turret Left
+			turret::move(100);
+		} else if (master.get_digital(DIGITAL_L2)) { // Turret Right
+			turret::move(-100);
+		} else { // idle
+			turret::move(0);
+		}
 
     if (master.get_digital(DIGITAL_X)) { // intake
       roller::move(100);
@@ -130,11 +143,37 @@ void opcontrol() {
     if (master.get_digital_new_press(DIGITAL_A)) {
       roller::toggle_turn_roller();
     }
+		if (master.get_digital(DIGITAL_X)) { // intake
+			roller::move(100);
+		} else if (master.get_digital(DIGITAL_B)) { // outake
+			roller::move(-100);
+		} else { // idle
+			roller::move(0);
+		}
 
-    // printf("left encoder %f\n", arms::odom::getLeftEncoder());
-    // printf("right encoder %f\n", arms::odom::getRightEncoder());
-    // printf("middle encoder %f\n", arms::odom::getMiddleEncoder());
+		// Flywheel control
+		if (master.get_digital_new_press(DIGITAL_A)) {
+			if (flywheel::speed == 0) {
+				flywheel::move(90); // max = 200
+			} else {
+				flywheel::move(0);
+			}
+		}
 
-    pros::delay(20);
-  }
+		if (master.get_digital_new_press(DIGITAL_UP)) {
+			flywheel::move(flywheel::speed + 10);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+		}
+
+		if (master.get_digital_new_press(DIGITAL_DOWN)) {
+			flywheel::move(flywheel::speed - 5);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+		}
+		if (counter++ % 3 == 0) {
+			printf("heading %f ", arms::odom::getHeading());
+			printf("x %f ", arms::odom::getPosition().x);
+			printf("y %f\n", arms::odom::getPosition().y);
+		}
+		pros::delay(20);
+	}
 }
