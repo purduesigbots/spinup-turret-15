@@ -11,8 +11,6 @@ using namespace pros;
 
 namespace disklift {
     extern Motor lift_motor;
-    extern double lift_pos;
-    extern bool lift_on;
     void move(double speed);
     void move_to(double position,double speed);
     void toggle_move();

@@ -49,22 +49,19 @@ void move(double speed) {
 
 namespace disklift {
     Motor lift_motor(10, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
-    double lift_pos = 75;
-    bool lift_on = false;
+    double lift_pos[] = {0, 55, 68, 78};
+    int i = 0;
+
     void move(double speed);
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
     void toggle_move(){
-    if(!lift_on){
-        lift_motor.move_absolute(lift_pos, 20);
-        lift_on = true;
+        i++;
+        if (i > 3)
+            i = 0;
+        lift_motor.move_absolute(lift_pos[i], 100);
     }
-    else{
-        lift_motor.move_absolute(0, 20);
-        lift_on = false;
-    }
-}
 }
 
 namespace flywheel {
