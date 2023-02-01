@@ -108,6 +108,9 @@ void opcontrol() {
 	// move(5, 50);
 
 	// flywheel::move(90);
+
+	int discLiftCounter = 0;
+	bool prevDLButton = false;
 	while (true) {
 
 		int left = master.get_analog(ANALOG_LEFT_Y);
@@ -125,19 +128,41 @@ void opcontrol() {
 			intake::move(0);
 		}
 
-		if (master.get_digital_new_press(DIGITAL_LEFT)) { // Turret Left
-     
-			disklift::toggle_move();
-      
-    	}
-
-    	if (master.get_digital(DIGITAL_L1)) { // Turret Left
-			turret::move(100);
-		} else if (master.get_digital(DIGITAL_L2)) { // Turret Right
-			turret::move(-100);
-		} else { // idle
-			turret::move(0);
+		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
+			discLiftCounter = 0; 
+    	} 
+		if (master.get_digital(DIGITAL_L2)) {
+			discLiftCounter++;
+			if (discLiftCounter < 10){
+				disklift::discLiftUp();
+				intake::move(100);
+			} else {
+				disklift::discLiftHold();
+			}
+		} else{
+			disklift::discLiftDown();
 		}
+		
+
+		if (master.get_digital(DIGITAL_L1)){
+			flywheel::fire();
+		} else if (prevDLButton){
+			// fire button just released, reset disc lift counter in case it's still requested to push up the next disc!!
+			discLiftCounter = 0;
+		} else {
+			flywheel::stopIndexer();
+		}
+		prevDLButton = master.get_digital(DIGITAL_L1); // Store previous button state
+		
+
+		// NO LONGER NECCESSARY - JBH 2/1/2023
+    	// if (master.get_digital(DIGITAL_L1)) { // Turret Left
+		// 	turret::move(100);
+		// } else if (master.get_digital(DIGITAL_L2)) { // Turret Right
+		// 	turret::move(-100);
+		// } else { // idle
+		// 	turret::move(0);
+		// }
 
 		if (master.get_digital(DIGITAL_X)) { // intake
 			roller::move(100);
@@ -147,9 +172,9 @@ void opcontrol() {
 			roller::move(0);
 		}
 
-		if (master.get_digital_new_press(DIGITAL_A)) {
-		roller::toggle_turn_roller();
-		}
+		// if (master.get_digital_new_press(DIGITAL_A)) {
+		// roller::toggle_turn_roller();
+		// }
 		if (master.get_digital(DIGITAL_X)) { // intake
 			roller::move(100);
 		} else if (master.get_digital(DIGITAL_B)) { // outake

@@ -86,19 +86,38 @@ void move(double speed) {
 } // turret
 
 namespace disklift {
-    Motor lift_motor(10, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
-    double lift_pos[] = {-15, 55, 68, 78};
-    int i = 0;
-
+    pros::Motor lift_motor(10, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+    double lift_pos[] = {-15, 55, 68, 78}; //(DEPRECATED) -JBH 2/1/23
+    int i = 0; // (DEPRECATED) -JBH 2/1/23
+    double liftDownPos = -16;
     void move(double speed);
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
-    void toggle_move(){
-        i++;
-        if (i > 3)
-            i = 0;
-        lift_motor.move_absolute(lift_pos[i], 100);
+    void discLiftUp(){
+        //When called, move disc lift up w/ short time burst
+        if(lift_motor.get_position() < 35){
+            lift_motor.move_voltage(12000);
+        } 
+        else {
+            lift_motor.move_voltage(8000);
+        }
+    }
+    void discLiftHold(){
+        //When called, hold disc lift in place (enough force to give indexer effective traction)
+        if(lift_motor.get_position() < 35){
+            discLiftUp();
+        } else{
+            lift_motor.move_voltage(2200);
+        }
+    }
+    void discLiftDown(){
+        if(std::abs(liftDownPos - lift_motor.get_position()) < 3){
+            // Acceptable tolerance, avoid burnout
+            lift_motor.move_voltage(0);
+        } else{
+            lift_motor.move_absolute(liftDownPos,100);
+        }
     }
 }
 
@@ -132,7 +151,8 @@ sylib::SpeedControllerInfo motor_speed_controller (
 // pros::Motor flywheel2(1, 1);
 // pros::Motor_Group motor({flywheel1, flywheel2});
 sylib::Motor flywheel1(9, 200, false, motor_speed_controller);
-sylib::Motor flywheel2(11, 200, true, motor_speed_controller);
+sylib::Motor flywheel2(6, 200, true, motor_speed_controller);
+pros::Motor indexer (2, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 double speed = 0;
 
 void move(double speed) {
@@ -174,7 +194,9 @@ void task() {
 
     flywheel1.set_braking_mode(kV5MotorBrakeModeCoast);
     flywheel2.set_braking_mode(kV5MotorBrakeModeCoast);
+
     bool stopped = false;
+
     while(1) {
 
         sylib::delay_until(&clock,10);
@@ -195,6 +217,17 @@ void task() {
         flywheel1.set_velocity_custom_controller(speed);
         flywheel2.set_velocity_custom_controller(speed);
     }
+
+
+    
+}
+
+void fire(){
+    indexer.move_voltage(12000);
+}
+
+void stopIndexer(){
+    indexer.move_voltage(0);
 }
 
 }

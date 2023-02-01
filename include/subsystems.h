@@ -1,8 +1,7 @@
 #ifndef _SUBSYSTEMS_H_
 #define _SUBSYSTEMS_H_
 
-#include "api.h"
-#include "pros/motors.h"
+#include "main.h"
 
 using namespace pros;
 
@@ -10,11 +9,11 @@ using namespace pros;
 
 
 namespace disklift {
-    extern Motor lift_motor;
-    void move(double speed);
-    void move_to(double position,double speed);
-    void toggle_move();
-}
+extern Motor lift_motor;
+extern void discLiftUp();
+extern void discLiftHold();
+extern void discLiftDown();
+} // namespace disklift
 
 
 
@@ -47,11 +46,14 @@ void move(double speed);
 namespace flywheel {
 extern sylib::Motor flywheel1;
 extern sylib::Motor flywheel2;
+extern pros::Motor indexer;
 extern double speed;
 void move(double speed);
 bool at_speed();
 void wait_until_fired();
 void wait_until_at_speed();
+void fire();
+void stopIndexer();
 void task();
 }
 
