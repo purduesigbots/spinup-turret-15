@@ -77,6 +77,8 @@ namespace turret {
 Motor motor(5, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 
 double speed = 0;
+double target_angle = 0;
+double current_angle = 0;
 
 void move(double speed) {
     motor.move_voltage(120 * speed);
