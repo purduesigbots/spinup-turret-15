@@ -85,6 +85,13 @@ void move(double speed) {
     turret::speed = speed;
 }
 
+void task() {
+    while (true) {
+        current_angle = motor.get_position() * 0.01;
+        motor.move_voltage(120 * (speed + (target_angle-current_angle) * 1));
+    }
+}
+
 } // turret
 
 namespace disklift {
