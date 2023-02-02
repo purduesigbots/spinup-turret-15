@@ -3,6 +3,7 @@
 #include "ARMS/odom.h"
 #include "pros/misc.h"
 #include "subsystems.h"
+#include "vision.h"
 
 /**
  * A callback function for LLEMU's center button.
@@ -33,6 +34,7 @@ void initialize() {
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
 	Task flywheel(flywheel::task);
+	Task vision(vision::task);
 
   pros::lcd::initialize();
   pros::lcd::set_text(1, "Hello PROS User!");

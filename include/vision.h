@@ -34,6 +34,7 @@ namespace vision {
     extern uint64_t color;
     extern uint64_t lr;
     extern uint64_t height;
+    void task();
 }
 
 #endif
