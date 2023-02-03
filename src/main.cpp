@@ -148,6 +148,7 @@ void opcontrol() {
 
 		if (master.get_digital(DIGITAL_L1)){
 			flywheel::fire();
+			disklift::discLiftHold();
 		} else if (prevDLButton){
 			// fire button just released, reset disc lift counter in case it's still requested to push up the next disc!!
 			discLiftCounter = 0;

@@ -95,7 +95,7 @@ void task() {
 } // turret
 
 namespace disklift {
-    pros::Motor lift_motor(8, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+    pros::Motor lift_motor(21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
     double lift_pos[] = {-15, 55, 68, 78}; //(DEPRECATED) -JBH 2/1/23
     int i = 0; // (DEPRECATED) -JBH 2/1/23
     double liftDownPos = -16;
