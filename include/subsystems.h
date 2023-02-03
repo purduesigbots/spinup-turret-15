@@ -46,8 +46,8 @@ void move(double speed);
 } // namespace turret
 
 namespace flywheel {
-extern sylib::Motor flywheel1;
-extern sylib::Motor flywheel2;
+extern sylib::Motor left_flywheel;
+extern sylib::Motor right_flywheel;
 extern pros::Motor indexer;
 extern double speed;
 void move(double speed);

@@ -6,8 +6,8 @@
 // intake -------------------------------------------------------------------------
 namespace intake {
 
-Motor left_motor(12, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
-Motor right_motor(20, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor left_motor(11, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor right_motor(19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 
 double speed = 0;
 
@@ -22,8 +22,8 @@ void move(double speed) {
 // roller -------------------------------------------------------------------------
 namespace roller {
 
-Motor motor(7, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-Optical optical(4);
+Motor motor(6, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Optical optical(5);
 
 double speed = 0;
 bool turning_roller = false;
@@ -74,7 +74,7 @@ void init() {
 // turret -------------------------------------------------------------------------
 namespace turret {
 
-Motor motor(5, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor motor(7, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 
 double speed = 0;
 double target_angle = 0;
@@ -95,7 +95,7 @@ void task() {
 } // turret
 
 namespace disklift {
-    pros::Motor lift_motor(10, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+    pros::Motor lift_motor(8, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
     double lift_pos[] = {-15, 55, 68, 78}; //(DEPRECATED) -JBH 2/1/23
     int i = 0; // (DEPRECATED) -JBH 2/1/23
     double liftDownPos = -16;
@@ -159,9 +159,9 @@ sylib::SpeedControllerInfo motor_speed_controller (
 // pros::Motor flywheel1(9);
 // pros::Motor flywheel2(1, 1);
 // pros::Motor_Group motor({flywheel1, flywheel2});
-sylib::Motor flywheel1(9, 200, false, motor_speed_controller);
-sylib::Motor flywheel2(6, 200, true, motor_speed_controller);
-pros::Motor indexer (2, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
+sylib::Motor left_flywheel(9, 200, false, motor_speed_controller);
+sylib::Motor right_flywheel(10, 200, true, motor_speed_controller);
+pros::Motor indexer (14, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 double speed = 0;
 
 void move(double speed) {
@@ -201,8 +201,8 @@ void wait_until_at_speed() {
 void task() {    
     uint32_t clock = sylib::millis();
 
-    flywheel1.set_braking_mode(kV5MotorBrakeModeCoast);
-    flywheel2.set_braking_mode(kV5MotorBrakeModeCoast);
+    left_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
+    right_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
 
     bool stopped = false;
 
@@ -211,20 +211,20 @@ void task() {
         sylib::delay_until(&clock,10);
 
 
-        average = flywheel1.get_velocity();
+        average = left_flywheel.get_velocity();
         //printf("%.2f,%d\n",average, flywheel1.get_applied_voltage()/120);
 
         if(speed == 0) {
-            flywheel1.stop();
-            flywheel2.stop();
+            left_flywheel.stop();
+            right_flywheel.stop();
             continue;
         }
 
         
        
         // if autonomous, use sylib controller
-        flywheel1.set_velocity_custom_controller(speed);
-        flywheel2.set_velocity_custom_controller(speed);
+        left_flywheel.set_velocity_custom_controller(speed);
+        right_flywheel.set_velocity_custom_controller(speed);
     }
 
 
