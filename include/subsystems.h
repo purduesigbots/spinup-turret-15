@@ -13,6 +13,7 @@ extern Motor lift_motor;
 extern void discLiftUp();
 extern void discLiftHold();
 extern void discLiftDown();
+extern void calculatePos();
 } // namespace disklift
 
 

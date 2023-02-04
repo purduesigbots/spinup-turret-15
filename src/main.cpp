@@ -133,19 +133,16 @@ void opcontrol() {
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
     	} 
-		if (master.get_digital(DIGITAL_L2)) {
-			discLiftCounter++;
-			if (discLiftCounter < 10){
-				disklift::discLiftUp();
-				intake::move(100);
-			} else {
-				disklift::discLiftHold();
-			}
-		} else{
+		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
+			disklift::discLiftUp();
+		} else if (!master.get_digital(DIGITAL_L1)){
 			disklift::discLiftDown();
 		}
 		
 
+		if(master.get_digital_new_press(DIGITAL_L1)){
+			disklift::calculatePos();
+		}
 		if (master.get_digital(DIGITAL_L1)){
 			flywheel::fire();
 			disklift::discLiftHold();

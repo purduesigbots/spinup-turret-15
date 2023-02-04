@@ -1,7 +1,9 @@
 #include "main.h"
+#include "math.h"
 #include "pros/misc.hpp"
 #include "pros/motors.h"
 #include "subsystems.h"
+#include <cmath>
 
 // intake -------------------------------------------------------------------------
 namespace intake {
@@ -97,30 +99,43 @@ void task() {
 namespace disklift {
     pros::Motor lift_motor(21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
     double lift_pos[] = {-15, 55, 68, 78}; //(DEPRECATED) -JBH 2/1/23
+    int deltaDown = 2;
+    int newPos = 0;
     int i = 0; // (DEPRECATED) -JBH 2/1/23
-    double liftDownPos = -16;
+    double liftDownPos = -13;
     void move(double speed);
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
     void discLiftUp(){
-        //When called, move disc lift up w/ short time burst
-        if(lift_motor.get_position() < 35){
-            lift_motor.move_voltage(12000);
-        } 
-        else {
-            lift_motor.move_voltage(8000);
-        }
+        lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        // if(lift_motor.get_position() < 70){
+        //     lift_motor.move_voltage(12000);
+        // } else{
+        //     newPos = 78;
+        //     lift_motor.move_absolute(78,100);
+        // }
+        lift_motor.move_voltage(12000);
+    }
+    void calculatePos(){
+        // if(lift_motor.get_position() > 72){
+        //     //3 discs in mag
+        //     newPos = lift_motor.get_position() - 5;
+        // } else if(lift_motor.get_position() > 60){
+        //     newPos = lift_motor.get_position() - 9;
+        // } else{
+        //     newPos = lift_motor.get_position() - 5;
+        // }
+        newPos = lift_motor.get_position();
     }
     void discLiftHold(){
+        lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         //When called, hold disc lift in place (enough force to give indexer effective traction)
-        if(lift_motor.get_position() < 35){
-            discLiftUp();
-        } else{
-            lift_motor.move_voltage(2200);
-        }
+        // lift_motor.move_absolute(newPos,100);
+        lift_motor.move_voltage(6000);
     }
     void discLiftDown(){
+        lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         if(std::abs(liftDownPos - lift_motor.get_position()) < 3){
             // Acceptable tolerance, avoid burnout
             lift_motor.move_voltage(0);
