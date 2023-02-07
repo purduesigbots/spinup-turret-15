@@ -102,7 +102,7 @@ namespace disklift {
     int deltaDown = 2;
     int newPos = 0;
     int i = 0; // (DEPRECATED) -JBH 2/1/23
-    double liftDownPos = -13;
+    double liftDownPos = -1;
     void move(double speed);
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
@@ -136,7 +136,7 @@ namespace disklift {
     }
     void discLiftDown(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(std::abs(liftDownPos - lift_motor.get_position()) < 3){
+        if(!(lift_motor.get_position() > liftDownPos)){
             // Acceptable tolerance, avoid burnout
             lift_motor.move_voltage(0);
         } else{
@@ -222,28 +222,18 @@ void task() {
     bool stopped = false;
 
     while(1) {
-
         sylib::delay_until(&clock,10);
-
-
         average = left_flywheel.get_velocity();
         //printf("%.2f,%d\n",average, flywheel1.get_applied_voltage()/120);
-
         if(speed == 0) {
             left_flywheel.stop();
             right_flywheel.stop();
             continue;
         }
-
-        
-       
         // if autonomous, use sylib controller
         left_flywheel.set_velocity_custom_controller(speed);
         right_flywheel.set_velocity_custom_controller(speed);
     }
-
-
-    
 }
 
 void fire(){

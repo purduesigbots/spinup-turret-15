@@ -121,20 +121,19 @@ void opcontrol() {
 
 		pros::lcd::set_text(0, "Distance: " + std::to_string(arms::odom::getPosition().x));
 
-		if (master.get_digital(DIGITAL_R1)) { // intake
-			intake::move(100);
-      		printf("pressed");
-		} else if (master.get_digital(DIGITAL_R2)) { // outake
-			intake::move(-100);
-		} else { // idle
-			intake::move(0);
-		}
+		
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			disklift::discLiftUp();
+			if(discLiftCounter < 10){
+				intake::move(100);
+			} else{
+				intake::move(0);
+			}
+			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
 			disklift::discLiftDown();
 		}
@@ -146,14 +145,22 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_L1)){
 			flywheel::fire();
 			disklift::discLiftHold();
-		} else if (prevDLButton){
-			// fire button just released, reset disc lift counter in case it's still requested to push up the next disc!!
-			discLiftCounter = 0;
 		} else {
 			flywheel::stopIndexer();
 		}
-		prevDLButton = master.get_digital(DIGITAL_L1); // Store previous button state
 		
+		if (master.get_digital(DIGITAL_R1)) { // intake
+			intake::move(100);
+			roller::move(100);
+      		printf("pressed");
+		} else if (master.get_digital(DIGITAL_R2)) { // outake
+			intake::move(-100);
+			roller::move(-100);
+		} else if (!master.get_digital(DIGITAL_L2)) { // idle
+			intake::move(0);
+			roller::move(0);
+		}
+
 
 		// NO LONGER NECCESSARY - JBH 2/1/2023
     	// if (master.get_digital(DIGITAL_L1)) { // Turret Left
@@ -164,24 +171,6 @@ void opcontrol() {
 		// 	turret::move(0);
 		// }
 
-		if (master.get_digital(DIGITAL_X)) { // intake
-			roller::move(100);
-		} else if (master.get_digital(DIGITAL_B)) { // outake
-			roller::move(-100);
-		} else { // idle
-			roller::move(0);
-		}
-
-		// if (master.get_digital_new_press(DIGITAL_A)) {
-		// roller::toggle_turn_roller();
-		// }
-		if (master.get_digital(DIGITAL_X)) { // intake
-			roller::move(100);
-		} else if (master.get_digital(DIGITAL_B)) { // outake
-			roller::move(-100);
-		} else { // idle
-			roller::move(0);
-		}
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
