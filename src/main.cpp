@@ -5,8 +5,8 @@
 #include "subsystems.h"
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
+#include "vision.h"
 
-std::map<uint8_t, int32_t> comms_data;
 /**
  * A callback function for LLEMU's center button.
  *
