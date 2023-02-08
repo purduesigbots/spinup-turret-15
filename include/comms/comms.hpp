@@ -6,6 +6,7 @@ namespace comms {
         public: 
             ReceiveComms(uint8_t port, int baud, uint8_t start_char, uint8_t end_char);
             uint64_t get_data(char name);
+            void set_data(char name, uint64_t data);
             void start();
             void pause();
 

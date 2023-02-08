@@ -3,8 +3,10 @@
 #include "ARMS/odom.h"
 #include "pros/misc.h"
 #include "subsystems.h"
-#include "vision.h"
+#include "comms/comms.hpp"
+#include "LatPullDown/Oak_1_latency_compensator.hpp"
 
+std::map<uint8_t, int32_t> comms_data;
 /**
  * A callback function for LLEMU's center button.
  *
@@ -35,6 +37,7 @@ void initialize() {
 	pros::delay(2000);
 	Task flywheel(flywheel::task);
 	Task vision(vision::task);
+
 
   pros::lcd::initialize();
   pros::lcd::set_text(1, "Hello PROS User!");
@@ -113,6 +116,7 @@ void opcontrol() {
 
 	int discLiftCounter = 0;
 	bool prevDLButton = false;
+
 	while (true) {
 
 		int left = master.get_analog(ANALOG_LEFT_Y);
@@ -120,9 +124,7 @@ void opcontrol() {
 		arcade(left, right);
 
 		pros::lcd::set_text(0, "Distance: " + std::to_string(arms::odom::getPosition().x));
-
 		
-
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
     	} 
@@ -162,11 +164,10 @@ void opcontrol() {
 		}
 
 
-		// NO LONGER NECCESSARY - JBH 2/1/2023
-    	// if (master.get_digital(DIGITAL_L1)) { // Turret Left
-		// 	turret::move(100);
-		// } else if (master.get_digital(DIGITAL_L2)) { // Turret Right
-		// 	turret::move(-100);
+    	// if (master.get_digital(DIGITAL_A)) { // Turret Left
+		// 	turret::move(127);
+		// } else if (master.get_digital(DIGITAL_X)) { // Turret Right
+		// 	turret::move(-127);
 		// } else { // idle
 		// 	turret::move(0);
 		// }
