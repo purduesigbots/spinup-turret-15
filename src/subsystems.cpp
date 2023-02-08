@@ -84,7 +84,7 @@ double current_angle = 0;
 
 void move(double speed) {
     motor.move(127 * speed);
-    turret::speed = speed;
+    turret::speed = 127 * speed;
 }
 
 void task() {

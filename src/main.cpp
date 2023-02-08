@@ -37,6 +37,7 @@ void initialize() {
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
 	Task flywheel(flywheel::task);
+	vision::init();
 	Task vision(vision::task);
 
 

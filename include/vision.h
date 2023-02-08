@@ -2,6 +2,7 @@
 #define _VISION_H_
 
 namespace vision {
+    void init();
     void task();
 }
 

@@ -44,58 +44,62 @@
 
 namespace vision {
 
-    comms::ReceiveComms communication(8, 115200, START_CHAR, END_CHAR);
+    std::shared_ptr<comms::ReceiveComms> communication;
+
+    void init() {
+        communication = std::make_shared<comms::ReceiveComms>(8, 115200, START_CHAR, END_CHAR);
+    }
 
     void task() {
-        communication.start();
+        communication->start();
+        float previous_speed = 0;
 
-        printf("Vision Task Started\n");
+        while(true) {
+            uint64_t color = communication->get_data(GOAL_COLOR);
+            uint64_t lr = communication->get_data(LEFT_RIGHT);
+            uint64_t height = communication->get_data(HEIGHT);
+            
 
-        uint64_t color = communication.get_data(GOAL_COLOR);
-		uint64_t lr = communication.get_data(LEFT_RIGHT);
-		uint64_t height = communication.get_data(HEIGHT);
+            float speed = (140 - (float)lr) / 140 * 100;
 
-        float speed = (140 - (float)lr) / 140 * 100;
-		
-		// // save speeds in an array and set speed to the previous speed if color is 3
-		// float previous_speed;
-		// if (color == 3 || color == 2) {
-		// 	printf("Previous Speed Used \n");
-		// 	speed = previous_speed;
-		// } else {
-		// 	previous_speed = speed;
-		// }
+            float min_speed = 10.0;
+            float deadzone = 3.0;
 
-		// float min_speed = 0.20;
 
-		// if(speed < 0.0){
-		// 	if(speed > -min_speed) {
-		// 		speed = -min_speed;
-		// 	}
-		// 	// if(turret.rotation(deg) <= tar_angle - deadzone) {speed = 0.0;}
-		// } else if(speed > 0.0) {
-		// 	if(speed < min_speed) {
-		// 		speed = min_speed;
-		// 	}
-		// 	// if(turret.rotation(deg) > tar_angle + deadzone) {speed = 0.0;}
-		// } else {
-		// 	speed = 0.0;
-		// }
-		
-		// 0 is red
-		// 1 is blue
-		// 3 is nothing detected
+            if(speed < 0.0){
+            	if(speed > -min_speed) {
+            		speed = -min_speed;
+            	}
+            	if(fabs(lr-140) <= deadzone) {
+                    speed = 0.0;
+                }
+            } else if(speed > 0.0) {
+            	if(speed < min_speed) {
+            		speed = min_speed;
+            	}
+                if(fabs(lr-140) > deadzone) {
+                    speed = 0.0;
+                }
+            } else {
+            	speed = 0.0;
+            }
+            
+            // 0 is red
+            // 1 is blue
+            // 3 is nothing detected
 
-		if (color == 0) {
-			speed = 0;
-		} 
+            if (color == 0) {
+                speed = 0;
+            } 
 
-		printf("Color:      %llu\n", color);
-		printf("Left/Right: %llu\n", lr);
-		printf("Height:     %llu\n", height);
-		printf("Speed:      %f\n", speed);
-		printf("----------------\n");
+            printf("Color:      %llu\n", color);
+            printf("Left/Right: %llu\n", lr);
+            printf("Height:     %llu\n", height);
+            printf("Speed:      %f\n", turret::speed);
+            printf("----------------\n");
 
-		turret::move(speed * -1);
+            turret::move(speed * -1);
+            pros::delay(10);
+        }
     }
 }
