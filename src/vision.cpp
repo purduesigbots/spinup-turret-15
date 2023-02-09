@@ -97,7 +97,7 @@ void task() {
     printf("Speed:      %f\n", turret::speed);
     printf("----------------\n");
 
-    turret::move(speed * -1);
+    turret::move(speed);
     pros::delay(10);
   }
 }
