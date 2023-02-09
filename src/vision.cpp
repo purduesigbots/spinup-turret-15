@@ -41,7 +41,8 @@
 // 	10, // get odom position every 10ms
 // 	get_turret_pose, // function to get pose of the turret
 // 	get_goal_vector, // function to calulate the vector to the goal based on
-// the distance 	get_latency // function to get the latency of the current frame
+// the distance 	get_latency // function to get the latency of the
+// current frame
 // 	);
 
 namespace vision {
@@ -57,6 +58,11 @@ void task() {
   communication->start();
   float previous_speed = 0;
 
+  float previous_height;
+  float previous_lr;
+  float previous_color;
+  float counter = 0;
+
   while (true) {
     uint64_t color = communication->get_data(GOAL_COLOR);
     uint64_t lr = communication->get_data(LEFT_RIGHT);
@@ -64,24 +70,24 @@ void task() {
 
     float speed = (140 - (float)lr) / 140 * 100;
 
-    float min_speed = 10.0;
-    float deadzone = 3.0;
+    // float min_speed = 10.0;
+    // float deadzone = 3.0;
 
-    if (speed < 0.0) {
-      if (speed > -min_speed) {
-        speed = -min_speed;
-      }
-    } else if (speed > 0.0) {
-      if (speed < min_speed) {
-        speed = min_speed;
-      }
-    } else {
-      speed = 0.0;
-    }
+    // if (speed < 0.0) {
+    //   if (speed > -min_speed) {
+    //     speed = -min_speed;
+    //   }
+    // } else if (speed > 0.0) {
+    //   if (speed < min_speed) {
+    //     speed = min_speed;
+    //   }
+    // } else {
+    //   speed = 0.0;
+    // }
 
-    if (lr - 140 <= deadzone) {
-      speed = 0.0;
-    }
+    // if (lr - 140 <= deadzone) {
+    //   speed = 0.0;
+    // }
 
     // 0 is red
     // 1 is blue
@@ -95,6 +101,19 @@ void task() {
     printf("Left/Right: %llu\n", lr);
     printf("Height:     %llu\n", height);
     printf("Speed:      %f\n", turret::speed);
+    printf("Time:       %f\n", counter);
+
+    if (previous_height != height || previous_lr != lr ||
+        previous_speed != speed || previous_color != color) {
+      counter = 0;
+    } else {
+      counter += 10;
+    }
+
+    previous_height = height;
+    previous_lr = lr;
+    previous_speed = speed;
+    previous_color = color;
     printf("----------------\n");
 
     turret::move(speed);
