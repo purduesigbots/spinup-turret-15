@@ -44,6 +44,7 @@ extern double current_angle;
 void move(double speed);
 void home();
 double get_position();
+double get_angle();
 } // namespace turret
 
 namespace flywheel {

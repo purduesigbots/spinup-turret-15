@@ -94,9 +94,16 @@ void task() {
     }
 }
 
+const double LIMIT = 5.79;
+const double RANGE = 138.35;
+
 // create function to return motor position
 double get_position() {
     return motor.get_position();
+}
+
+double get_angle() {
+    return -(motor.get_position() / (2 * LIMIT / RANGE));
 }
 
 void home() {
@@ -108,11 +115,13 @@ void home() {
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
-
-    motor.tare_position();
-    motor.move_absolute(-6.0, 400);
+    motor.move_relative(-6.0, 400);
 
     pros::delay(1000);
+    motor.move(0);
+
+    motor.tare_position();
+    pros::delay(100);
 }
 
 
