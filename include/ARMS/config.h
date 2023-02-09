@@ -19,13 +19,13 @@ namespace arms {
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  5.64 // The distance between left and right wheels (or tracker wheels)
+  5.98 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
   4.75 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
-#define ENCODER_PORTS 3, 7, 1                // Port 0 for disabled,
+#define ENCODER_PORTS 3, 7, -1                // Port 0 for disabled,
 #define EXPANDER_PORT 0                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
