@@ -16,43 +16,12 @@
 
 const double IMAGE_HEIGHT = 416;
 const double GOAL_HEIGHT = 13.87;
-const double FOCAL_LENGTH = 0.1893701; 
+const double FOCAL_LENGTH = 0.5; 
 
 // Important, this is the size of the physical sensor, not its height off the
 // ground! 
 // https://stackoverflow.com/questions/50125574/calculate-image-size-of-an-object-from-real-size
 const double SENSOR_HEIGHT = 0.3074803;
-
-// std::tuple<double,double,double> get_turret_pose() {
-// 	// get odom x,y, and heading
-// 	// get turret heading
-// 	arms::Point p =  arms::odom::getPosition();
-// 	//-7.5
-// 	//7.2
-// 	return std::make_tuple(p.x, p.y, arms::odom::getHeading() -
-// turret::get_position());
-// }
-
-// std::tuple<double,double> get_goal_vector(std::tuple<double,double,double>
-// pose) {
-// 	// get goal distance
-// 	// calculate vector to the goal
-// 	return std::make_tuple(0,0);
-// }
-
-// double get_latency() {
-// 	// get latency from the ReceiveComms class
-// 	return 35;
-// }
-
-// Oak_1_latency_compensator latency_compensator(
-// 	5, // max buffer of 7
-// 	10, // get odom position every 10ms
-// 	get_turret_pose, // function to get pose of the turret
-// 	get_goal_vector, // function to calulate the vector to the goal based on
-// the distance 	get_latency // function to get the latency of the
-// current frame
-// 	);
 
 namespace vision {
 
@@ -138,7 +107,9 @@ void task() {
     printf("Color:      %llu\n", color);
     printf("Left/Right: %llu\n", lr);
     printf("Height:     %llu\n", height);
-    printf("Speed:      %f\n", turret::speed);
+    printf("Turn Degrees: %f\n", turn_degrees);
+    printf("Goal Distance: %f\n", get_goal_distance());
+    printf("Turrent Angle %f\n", turret::get_angle());
     printf("Time:       %f\n", counter);
 
     if (previous_height != height || previous_lr != lr ||
@@ -154,7 +125,12 @@ void task() {
     previous_color = color;
     printf("----------------\n");
 
-    turret::move(turn_degrees);
+    if(fabs(turret::get_angle()) > 80)
+    {
+      turn_degrees = 0;
+    }
+
+    // turret::move(-1 * turn_degrees);
     
     pros::delay(10);
   }
