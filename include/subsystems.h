@@ -42,7 +42,7 @@ extern double speed;
 extern double target_angle;
 extern double current_angle;
 void move(double speed);
-
+double get_position();
 
 } // namespace turret
 
