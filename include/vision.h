@@ -4,6 +4,9 @@
 namespace vision {
     void init();
     void task();
+
+    double get_goal_distance();
+    
 }
 
 #endif
