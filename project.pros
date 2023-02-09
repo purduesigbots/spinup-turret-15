@@ -36,8 +36,8 @@
                 "py/object": "pros.conductor.templates.local_template.LocalTemplate",
                 "supported_kernels": "^3.7.3",
                 "system_files": [
-                    "firmware\\LatPullDown.a",
-                    "include\\LatPullDown\\Oak_1_latency_compensator.hpp"
+                    "include\\LatPullDown\\Oak_1_latency_compensator.hpp",
+                    "firmware\\LatPullDown.a"
                 ],
                 "target": "v5",
                 "user_files": [],
