@@ -52,7 +52,6 @@ void move(double speed) {
 
 void task() {
     while (true) {
-        lcd::set_text(0, "Optical: " + std::to_string(optical.get_hue()));
         if (turning_roller) {
             motor.move(roller_turning_speed);
             if (last_hue ^ isRed()) {

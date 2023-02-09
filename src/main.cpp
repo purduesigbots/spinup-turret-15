@@ -125,7 +125,9 @@ void opcontrol() {
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
 
-		pros::lcd::set_text(0, "Distance: " + std::to_string(arms::odom::getPosition().x));
+		pros::lcd::set_text(0, "Heading: " + std::to_string(arms::odom::getHeading()));
+		pros::lcd::set_text(1, "X: " + std::to_string(arms::odom::getPosition().x));
+		pros::lcd::set_text(2, "Y: " + std::to_string(arms::odom::getPosition().y));
 		
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
