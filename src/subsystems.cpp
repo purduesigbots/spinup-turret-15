@@ -76,6 +76,7 @@ void init() {
 namespace turret {
 
 Motor motor(7, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
+pros::ADIDigitalIn limit_switch('e');
 
 double speed = 0;
 double target_angle = 0;
@@ -96,6 +97,22 @@ void task() {
 // create function to return motor position
 double get_position() {
     return motor.get_position();
+}
+
+void home() {
+    motor.move(80);
+
+    while(!limit_switch.get_value()) {
+        pros::delay(20);
+    }
+
+    // Stop the motor so it doesn't break the ring gear
+    motor.move(0);
+
+    motor.tare_position();
+    motor.move_absolute(-6.0, 400);
+
+    pros::delay(1000);
 }
 
 

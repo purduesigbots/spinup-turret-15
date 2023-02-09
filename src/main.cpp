@@ -32,6 +32,7 @@ void on_center_button() {
  */
 void initialize() {
 	sylib::initialize();
+	turret::home();
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
@@ -41,14 +42,15 @@ void initialize() {
 	Task vision(vision::task);
 
 
-  pros::lcd::initialize();
-  pros::lcd::set_text(1, "Hello PROS User!");
-  pros::lcd::set_background_color(LV_COLOR_BLACK);
-  pros::lcd::set_text_color(LV_COLOR_WHITE);
+	pros::lcd::initialize();
+	pros::lcd::set_text(1, "Hello PROS User!");
+	pros::lcd::set_background_color(LV_COLOR_BLACK);
+	pros::lcd::set_text_color(LV_COLOR_WHITE);
 
-  pros::lcd::register_btn1_cb(on_center_button);
+	pros::lcd::register_btn1_cb(on_center_button);
 
-  roller::init();
+	roller::init();
+
 }
 
 /**
