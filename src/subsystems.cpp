@@ -83,8 +83,8 @@ double target_angle = 0;
 double current_angle = 0;
 
 void move(double speed) {
-    motor.move(127 * speed);
-    turret::speed = 127 * speed;
+    motor.move(speed);
+    turret::speed = speed;
 }
 
 void task() {
@@ -103,7 +103,7 @@ double get_position() {
 }
 
 double get_angle() {
-    return -(motor.get_position() / (2 * LIMIT / RANGE));
+    return (motor.get_position() / (2 * LIMIT / RANGE));
 }
 
 void home() {

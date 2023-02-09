@@ -44,7 +44,7 @@ std::tuple<double, double, double> get_turret_pose() {
   arms::Point p = arms::odom::getPosition();
   //-7.5
   //7.2
-  return std::make_tuple(p.x, p.y, arms::odom::getHeading() - turret::get_position());
+  return std::make_tuple(p.x, p.y, arms::odom::getHeading() + turret::get_angle());
 }
 
 double get_latency() {
@@ -100,7 +100,6 @@ void task() {
     // 3 is nothing detected
 
     double turn_degrees = latency_compensator.get_new_goal_distance();
-
     if (color == 0) {
       speed = 0;
     }
@@ -111,6 +110,7 @@ void task() {
     printf("Turn Degrees: %f\n", turn_degrees);
     printf("Goal Distance: %f\n", get_goal_distance());
     printf("Turrent Angle %f\n", turret::get_angle());
+    printf("Turrent Pose %f\n", std::get<2>(get_turret_pose()));
     printf("Time:       %f\n", counter);
 
     if (previous_height != height || previous_lr != lr ||
@@ -126,12 +126,13 @@ void task() {
     previous_color = color;
     printf("----------------\n");
 
-    if(fabs(turret::get_angle()) > 80)
-    {
-      turn_degrees = 0;
+    if(fabs(turret::get_angle()) >= 75 ) {
+      turn_degrees = std::min(turn_degrees, 0.0);
+    } else if(fabs(turret::get_angle()) <= -75) {
+      turn_degrees = std::max(turn_degrees, 0.0);
     }
 
-    // turret::move(-1 * turn_degrees);
+    turret::move(turn_degrees * 20);
     
     pros::delay(10);
   }

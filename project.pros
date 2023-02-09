@@ -28,7 +28,7 @@
                 "version": "3.1.1"
             },
             "LatPullDown": {
-                "location": "C:\\Users\\btdav\\AppData\\Roaming\\PROS\\templates\\LatPullDown@1.0.0",
+                "location": "/Users/kunwarsahni/Library/Application Support/PROS/templates/LatPullDown@1.0.0",
                 "metadata": {
                     "origin": "local"
                 },
