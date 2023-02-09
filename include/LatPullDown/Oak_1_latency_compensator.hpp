@@ -1,6 +1,5 @@
 #ifndef OAK_1_COMPENSATOR_HPP
 #define OAK_1_COMPENSATOR_HPP
-#include <queue>
 #include "main.h"
 
 class Oak_1_latency_compensator
