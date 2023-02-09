@@ -35,7 +35,7 @@ void init() {
 }
 
 double get_goal_gamma() {
-  return atan((GOAL_WIDTH/communication->get_data(WIDTH) * (208-communication->get_data(LEFT_RIGHT)))/get_goal_distance()) * 180 * M_1_PI;
+  return atan2((GOAL_WIDTH/(double)communication->get_data(WIDTH) * (265 - (double)communication->get_data(LEFT_RIGHT))), get_goal_distance()) * (180 * M_1_PI);
 }
 
 double get_goal_distance()
@@ -57,7 +57,12 @@ double get_latency() {
   return 40; // 40ms latency
 }
 
-Oak_1_latency_compensator latency_compensator(
+Oak_1_latency_compensator* latency_compensator;
+
+void task() {
+  communication->start();
+
+  latency_compensator = new Oak_1_latency_compensator(
     7, // max buffer of 7
     10, // get odom position every 10ms
     get_turret_pose, // function to get pose of the turret
@@ -66,8 +71,6 @@ Oak_1_latency_compensator latency_compensator(
     false
 );
 
-void task() {
-  communication->start();
   float previous_speed = 0;
 
   float previous_height;
@@ -79,48 +82,25 @@ void task() {
     uint64_t color = communication->get_data(GOAL_COLOR);
     uint64_t lr = communication->get_data(LEFT_RIGHT);
     uint64_t height = communication->get_data(HEIGHT);
+    uint64_t width = communication->get_data(WIDTH);
 
-    float speed = (140 - (float)lr) / 140 * 100;
-
-    // float min_speed = 10.0;
-    // float deadzone = 3.0;
-
-    // if (speed < 0.0) {
-    //   if (speed > -min_speed) {
-    //     speed = -min_speed;
-    //   }
-    // } else if (speed > 0.0) {
-    //   if (speed < min_speed) {
-    //     speed = min_speed;
-    //   }
-    // } else {
-    //   speed = 0.0;
-    // }
-
-    // if (lr - 140 <= deadzone) {
-    //   speed = 0.0;
-    // }
-
-    // 0 is red
-    // 1 is blue
-    // 3 is nothing detected
-
-    double turn_degrees = latency_compensator.get_new_goal_distance();
+    double turn_degrees = latency_compensator->get_new_goal_distance(get_goal_gamma());
     if (color == 0) {
-      speed = 0;
+      turn_degrees = 0;
     }
 
     printf("Color:      %llu\n", color);
     printf("Left/Right: %llu\n", lr);
     printf("Height:     %llu\n", height);
+    printf("Width:      %llu\n", width);
+    printf("Gamma:      %f\n", get_goal_gamma());
     printf("Turn Degrees: %f\n", turn_degrees);
     printf("Goal Distance: %f\n", get_goal_distance());
     printf("Turrent Angle %f\n", turret::get_angle());
     printf("Turrent Pose %f\n", std::get<2>(get_turret_pose()));
     printf("Time:       %f\n", counter);
 
-    if (previous_height != height || previous_lr != lr ||
-        previous_speed != speed || previous_color != color) {
+    if (previous_height != height || previous_lr != lr || previous_color != color) {
       counter = 0;
     } else {
       counter += 10;
@@ -128,19 +108,30 @@ void task() {
 
     previous_height = height;
     previous_lr = lr;
-    previous_speed = speed;
     previous_color = color;
     printf("----------------\n");
 
-    if(fabs(turret::get_angle()) >= 75 ) {
+    if(turret::get_angle() >= 74 ) {
       turn_degrees = std::min(turn_degrees, 0.0);
-    } else if(fabs(turret::get_angle()) <= -75) {
+    } else if(turret::get_angle() <= -74) {
       turn_degrees = std::max(turn_degrees, 0.0);
     }
 
-    turret::move(turn_degrees * 20);
+    float deadzone = 10.0;
+
+    if (fabs(lr - 265) <= deadzone) {
+      turn_degrees = 0.0;
+    }
+
+
+    // 0 is red
+    // 1 is blue
+    // 3 is nothing detected
+
+
+    turret::move(turn_degrees * 7.5);
     
     pros::delay(10);
   }
 }
-} // namespace vision
+} // namespace vision      

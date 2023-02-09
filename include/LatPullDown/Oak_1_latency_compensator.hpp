@@ -14,7 +14,7 @@ class Oak_1_latency_compensator
             bool debug
             );
         virtual ~Oak_1_latency_compensator();
-        double get_new_goal_distance();
+        double get_new_goal_distance(double gamme);
         
     private:
         void latency_comp_task_fn();
