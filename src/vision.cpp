@@ -56,7 +56,8 @@ Oak_1_latency_compensator latency_compensator(
     10, // get odom position every 10ms
     get_turret_pose, // function to get pose of the turret
     get_goal_distance, // function to calulate the vector to the goal based on the distance
-    get_latency // function to get the latency of the current frame
+    get_latency, // function to get the latency of the current frame
+    true
 );
 
 void task() {

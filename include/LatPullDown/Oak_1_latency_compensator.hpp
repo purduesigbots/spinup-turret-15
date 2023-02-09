@@ -11,7 +11,8 @@ class Oak_1_latency_compensator
             int loop_time, 
             std::tuple<double, double, double> (*get_robot_turret_pose)(), 
             double (*get_old_goal_distance)(), 
-            double (*get_latency)()
+            double (*get_latency)(),
+            bool debug
             );
         virtual ~Oak_1_latency_compensator();
         double get_new_goal_distance();
@@ -19,6 +20,7 @@ class Oak_1_latency_compensator
     private:
         void latency_comp_task_fn();
         void begin_task();
+        bool use_debug;
         std::vector<std::tuple<double, double, double>> odom_queue;
         std::tuple<double, double> to_goal_vector;
         std::tuple<double, double, double> (*get_robot_turret_pose)();
