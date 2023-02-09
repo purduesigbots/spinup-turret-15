@@ -69,6 +69,27 @@ double get_goal_distance()
          (communication->get_data(HEIGHT) * SENSOR_HEIGHT);
 }
 
+std::tuple<double, double, double> get_turret_pose() {
+  // get odom x,y, and heading
+  // get turret heading
+  arms::Point p = arms::odom::getPosition();
+  //-7.5
+  //7.2
+  return std::make_tuple(p.x, p.y, arms::odom::getHeading() - turret::get_position());
+}
+
+double get_latency() {
+  return 40; // 40ms latency
+}
+
+Oak_1_latency_compensator latency_compensator(
+    7, // max buffer of 7
+    10, // get odom position every 10ms
+    get_turret_pose, // function to get pose of the turret
+    get_goal_distance, // function to calulate the vector to the goal based on the distance
+    get_latency // function to get the latency of the current frame
+);
+
 void task() {
   communication->start();
   float previous_speed = 0;
@@ -108,6 +129,8 @@ void task() {
     // 1 is blue
     // 3 is nothing detected
 
+    double turn_degrees = latency_compensator.get_new_goal_distance();
+
     if (color == 0) {
       speed = 0;
     }
@@ -131,7 +154,8 @@ void task() {
     previous_color = color;
     printf("----------------\n");
 
-    turret::move(speed);
+    turret::move(turn_degrees);
+    
     pros::delay(10);
   }
 }
