@@ -14,6 +14,15 @@
 #define LEFT_RIGHT 0b00000010
 #define HEIGHT 0b00000011
 
+const double IMAGE_HEIGHT = 416;
+const double GOAL_HEIGHT = 13.87;
+const double FOCAL_LENGTH = 0.1893701; 
+
+// Important, this is the size of the physical sensor, not its height off the
+// ground! 
+// https://stackoverflow.com/questions/50125574/calculate-image-size-of-an-object-from-real-size
+const double SENSOR_HEIGHT = 0.3074803;
+
 // std::tuple<double,double,double> get_turret_pose() {
 // 	// get odom x,y, and heading
 // 	// get turret heading
@@ -52,6 +61,12 @@ std::shared_ptr<comms::ReceiveComms> communication;
 void init() {
   communication =
       std::make_shared<comms::ReceiveComms>(8, 115200, START_CHAR, END_CHAR);
+}
+
+double get_goal_distance()
+{
+  return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) / 
+         (communication->get_data(HEIGHT) * SENSOR_HEIGHT);
 }
 
 void task() {
