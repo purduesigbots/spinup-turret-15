@@ -85,6 +85,24 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
+	using namespace arms::chassis;
+	
+	arms::odom::reset({0, 0}, 0.0); // start position
+	move(30, 70);
+	move(-8, 50, arms::REVERSE);
+	turn(90);
+	pros::delay(500);
+	move(-4, 50, arms::REVERSE);
+	pros::delay(500);
+	move(13, 50);
+
+	turn(78);
+
+	move(-13, 50, arms::REVERSE);
+	turn(135);
+
+	move(40, 70);
+
 }
 
 /**
@@ -202,6 +220,11 @@ void opcontrol() {
 			printf("x %f ", arms::odom::getPosition().x);
 			printf("y %f\n", arms::odom::getPosition().y);
 		}
+
+		if(!pros::competition::is_connected() && master.get_digital_new_press(DIGITAL_X)){
+			autonomous();
+		}
+
 		pros::delay(20);
 	}
 }

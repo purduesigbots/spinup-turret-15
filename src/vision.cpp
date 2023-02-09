@@ -12,10 +12,12 @@
 
 #define GOAL_COLOR 0b00000001
 #define LEFT_RIGHT 0b00000010
-#define HEIGHT 0b00000011
+#define HEIGHT     0b00000011
+#define WIDTH      0b00000100
 
 const double IMAGE_HEIGHT = 416;
 const double GOAL_HEIGHT = 13.87;
+const double GOAL_WIDTH = 16;
 const double FOCAL_LENGTH = 0.5; 
 
 // Important, this is the size of the physical sensor, not its height off the
@@ -32,6 +34,10 @@ void init() {
       std::make_shared<comms::ReceiveComms>(8, 115200, START_CHAR, END_CHAR);
 }
 
+double get_goal_gamma() {
+  return atan((GOAL_WIDTH/communication->get_data(WIDTH) * (208-communication->get_data(LEFT_RIGHT)))/get_goal_distance()) * 180 * M_1_PI;
+}
+
 double get_goal_distance()
 {
   return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) / 
@@ -44,7 +50,7 @@ std::tuple<double, double, double> get_turret_pose() {
   arms::Point p = arms::odom::getPosition();
   //-7.5
   //7.2
-  return std::make_tuple(p.x, p.y, arms::odom::getHeading() + turret::get_angle());
+  return std::make_tuple(p.x, p.y, arms::odom::getHeading() + turret::get_angle() + get_goal_gamma());
 }
 
 double get_latency() {
@@ -57,7 +63,7 @@ Oak_1_latency_compensator latency_compensator(
     get_turret_pose, // function to get pose of the turret
     get_goal_distance, // function to calulate the vector to the goal based on the distance
     get_latency, // function to get the latency of the current frame
-    true
+    false
 );
 
 void task() {
