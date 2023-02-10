@@ -1,5 +1,6 @@
 #include "main.h"
 #include "math.h"
+#include "pros/adi.hpp"
 #include "pros/misc.hpp"
 #include "pros/motors.h"
 #include "subsystems.h"
@@ -8,9 +9,13 @@
 // intake -------------------------------------------------------------------------
 namespace intake {
 
+int smart_port = 20;
+char adi_port = 'a';
+ADIDigitalOut intake_piston = ADIDigitalOut({{smart_port,adi_port}});
 Motor left_motor(11, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 Motor right_motor(19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 
+bool state = false;
 double speed = 0;
 
 void move(double speed) {
@@ -19,6 +24,10 @@ void move(double speed) {
     intake::speed = speed;
 }
 
+void toggle(){
+    state = !state;
+    intake_piston.set_value(state);
+}
 } // intake
 
 // roller -------------------------------------------------------------------------
@@ -275,4 +284,27 @@ void stopIndexer(){
     indexer.move_voltage(0);
 }
 
+}
+//deflector__________________________________________________________
+namespace deflector {
+int smart_port = 20;
+char adi_port = 'h';
+ADIDigitalOut deflector_piston = ADIDigitalOut({{smart_port,adi_port}});
+bool state = true;
+void toggle(){
+    state = !state;
+    deflector_piston.set_value(state);
+}
+}
+
+//endgame__________________________________________________________
+namespace endgame {
+int smart_port = 20;
+char adi_port = 'b';
+ADIDigitalOut endgame_piston = ADIDigitalOut({{smart_port,adi_port}});
+bool state = false;
+void launch(){
+    state = !state;
+    endgame_piston.set_value(state);
+}
 }

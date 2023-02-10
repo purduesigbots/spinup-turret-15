@@ -32,14 +32,14 @@ void on_center_button() {
  */
 void initialize() {
 	sylib::initialize();
-	turret::home();
+	//turret::home();
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
-	Task flywheel(flywheel::task);
-	vision::init();
-	Task vision(vision::task);
+	//Task flywheel(flywheel::task);
+	//vision::init();
+	//Task vision(vision::task);
 
 
 	pros::lcd::initialize();
@@ -88,20 +88,23 @@ void autonomous() {
 	using namespace arms::chassis;
 	
 	arms::odom::reset({0, 0}, 0.0); // start position
-	move(30, 70);
-	move(-8, 50, arms::REVERSE);
-	turn(90);
-	pros::delay(500);
-	move(-4, 50, arms::REVERSE);
-	pros::delay(500);
-	move(13, 50);
+	move(48,50);
 
-	turn(78);
 
-	move(-13, 50, arms::REVERSE);
-	turn(135);
+	// move(30, 70);
+	// move(-8, 50, arms::REVERSE);
+	// turn(90);
+	// pros::delay(500);
+	// move(-4, 50, arms::REVERSE);
+	// pros::delay(500);
+	// move(13, 50);
 
-	move(40, 70);
+	// turn(78);
+
+	// move(-13, 50, arms::REVERSE);
+	// turn(135);
+
+	// move(40, 70);
 
 }
 
@@ -163,6 +166,17 @@ void opcontrol() {
 		} else if (!master.get_digital(DIGITAL_L1)){
 			disklift::discLiftDown();
 		}
+	
+		if (master.get_digital_new_press(DIGITAL_LEFT)){
+			deflector::toggle();
+		}
+		if (master.get_digital_new_press(DIGITAL_RIGHT)){
+			endgame::launch();
+		}
+		if (master.get_digital_new_press(DIGITAL_B)){
+			intake::toggle();
+		}
+		
 		
 
 		if(master.get_digital_new_press(DIGITAL_L1)){
@@ -215,7 +229,7 @@ void opcontrol() {
 			flywheel::move(flywheel::speed - 5);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
-		if (counter++ % 100000 == 0) {
+		if (counter++ % 10 == 0) {
 			printf("heading %f ", arms::odom::getHeading());
 			printf("x %f ", arms::odom::getPosition().x);
 			printf("y %f\n", arms::odom::getPosition().y);

@@ -25,6 +25,7 @@ extern Motor left_motor;
 extern Motor right_motor;
 extern double speed;
 void move(double speed);
+void toggle();
 } // namespace intake
 
 namespace roller {
@@ -59,6 +60,15 @@ void wait_until_at_speed();
 void fire();
 void stopIndexer();
 void task();
+}
+
+//deflector__________________________________________________________
+namespace deflector {
+void toggle();
+}
+//endgame__________________________________________________________
+namespace endgame {
+void launch();
 }
 
 #endif
