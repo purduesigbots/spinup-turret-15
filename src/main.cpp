@@ -32,7 +32,7 @@ void on_center_button() {
  */
 void initialize() {
 	sylib::initialize();
-	//turret::home();
+	turret::home();
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
@@ -50,7 +50,7 @@ void initialize() {
 	pros::lcd::register_btn1_cb(on_center_button);
 
 	roller::init();
-
+	disklift::home();
 }
 
 /**
@@ -148,9 +148,7 @@ void opcontrol() {
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
 
-		pros::lcd::set_text(0, "Heading: " + std::to_string(arms::odom::getHeading()));
-		pros::lcd::set_text(1, "X: " + std::to_string(arms::odom::getPosition().x));
-		pros::lcd::set_text(2, "Y: " + std::to_string(arms::odom::getPosition().y));
+		pros::lcd::set_text(3, "Current Draw: " + std::to_string(disklift::lift_motor.get_current_draw()));
 		
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 

@@ -142,8 +142,7 @@ namespace disklift {
     int deltaDown = 2;
     int newPos = 0;
     int i = 0; // (DEPRECATED) -JBH 2/1/23
-    double liftDownPos = -1;
-    void move(double speed);
+    double liftDownPos = 1;
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
@@ -182,6 +181,13 @@ namespace disklift {
         } else{
             lift_motor.move_absolute(liftDownPos,100);
         }
+    }
+    void home() {
+        lift_motor.move(-80);
+        while (lift_motor.get_current_draw() < 1500) {
+            pros::delay(10);
+        }
+        lift_motor.tare_position();
     }
 }
 
