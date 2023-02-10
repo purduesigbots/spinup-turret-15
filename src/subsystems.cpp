@@ -9,9 +9,9 @@
 // intake -------------------------------------------------------------------------
 namespace intake {
 
-int smart_port = 20;
+int smart_port = 8;
 char adi_port = 'a';
-ADIDigitalOut intake_piston = ADIDigitalOut({{smart_port,adi_port}});
+ADIDigitalOut intake_piston({{smart_port,adi_port}});
 Motor left_motor(11, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 Motor right_motor(19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 
@@ -142,7 +142,7 @@ namespace disklift {
     int deltaDown = 2;
     int newPos = 0;
     int i = 0; // (DEPRECATED) -JBH 2/1/23
-    double liftDownPos = 1;
+    double liftDownPos = 6;
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
@@ -171,7 +171,7 @@ namespace disklift {
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         //When called, hold disc lift in place (enough force to give indexer effective traction)
         // lift_motor.move_absolute(newPos,100);
-        lift_motor.move_voltage(6000);
+        lift_motor.move_voltage(9000);
     }
     void discLiftDown(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -184,7 +184,7 @@ namespace disklift {
     }
     void home() {
         lift_motor.move(-80);
-        while (lift_motor.get_current_draw() < 1500) {
+        while (lift_motor.get_current_draw() < 1000) {
             pros::delay(10);
         }
         lift_motor.tare_position();
@@ -293,9 +293,9 @@ void stopIndexer(){
 }
 //deflector__________________________________________________________
 namespace deflector {
-int smart_port = 20;
-char adi_port = 'h';
-ADIDigitalOut deflector_piston = ADIDigitalOut({{smart_port,adi_port}});
+int smart_port = 8;
+char adi_port = 'c';
+ADIDigitalOut deflector_piston({{smart_port,adi_port}});
 bool state = true;
 void toggle(){
     state = !state;
@@ -305,9 +305,9 @@ void toggle(){
 
 //endgame__________________________________________________________
 namespace endgame {
-int smart_port = 20;
+int smart_port = 8;
 char adi_port = 'b';
-ADIDigitalOut endgame_piston = ADIDigitalOut({{smart_port,adi_port}});
+ADIDigitalOut endgame_piston({{smart_port,adi_port}});
 bool state = false;
 void launch(){
     state = !state;

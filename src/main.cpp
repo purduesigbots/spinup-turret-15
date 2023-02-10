@@ -37,7 +37,7 @@ void initialize() {
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
-	//Task flywheel(flywheel::task);
+	Task flywheel(flywheel::task);
 	//vision::init();
 	//Task vision(vision::task);
 
@@ -147,8 +147,6 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
-
-		pros::lcd::set_text(3, "Current Draw: " + std::to_string(disklift::lift_motor.get_current_draw()));
 		
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
@@ -226,11 +224,6 @@ void opcontrol() {
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
 			flywheel::move(flywheel::speed - 5);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
-		}
-		if (counter++ % 10 == 0) {
-			printf("heading %f ", arms::odom::getHeading());
-			printf("x %f ", arms::odom::getPosition().x);
-			printf("y %f\n", arms::odom::getPosition().y);
 		}
 
 		if(!pros::competition::is_connected() && master.get_digital_new_press(DIGITAL_X)){
