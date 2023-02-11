@@ -43,6 +43,7 @@ void initialize() {
 
 
 	pros::lcd::initialize();
+	pros::lcd::clear();
 	pros::lcd::set_text(1, "Hello PROS User!");
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
@@ -87,24 +88,56 @@ void competition_initialize() {
 void autonomous() {
 	using namespace arms::chassis;
 	
+	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	move(48,50);
+	flywheel::move(150);
+	intake::toggle();
+	deflector::toggle();
+	deflector::toggle();
+	intake::move(100);
 
+	// intake first disk
+	move({30,0}, 70);
+	pros::delay(500);
 
-	// move(30, 70);
-	// move(-8, 50, arms::REVERSE);
-	// turn(90);
-	// pros::delay(500);
-	// move(-4, 50, arms::REVERSE);
-	// pros::delay(500);
-	// move(13, 50);
+	// spin roller
+	move({18,0}, 50, arms::REVERSE);
+	pros::delay(500);
+	turn(90, 50);
+	pros::delay(500);
+	tank(-50,-50);
+	pros::delay(750);
+	tank(0,0);
+	roller::move(100);
+	pros::delay(125);
+	roller::move(0);
+	
+	// shoot disks
+	arms::odom::reset({22,-3},90);
+	move(13, 50);
+	turret::move_angle(-15, 400);
+	disklift::discLiftUp();
+	pros::delay(250);
+	disklift::discLiftHold();
+	flywheel::fire();
+	flywheel::wait_until_fired();
+	flywheel::stopIndexer();
+	flywheel::wait_until_at_speed();
+	flywheel::fire();
+	flywheel::wait_until_fired();
+	flywheel::stopIndexer();
+	flywheel::wait_until_at_speed();
+	flywheel::fire();
+	pros::delay(1000);
+	flywheel::stopIndexer();
 
-	// turn(78);
-
-	// move(-13, 50, arms::REVERSE);
-	// turn(135);
-
-	// move(40, 70);
+	turn(142, 50);
+	pros::delay(500);
+	move(27, 50);
+	pros::delay(500);
+	turn(40, 50);
+	pros::delay(500);
+	move(12, 50);
 
 }
 
@@ -147,6 +180,9 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
+		pros::lcd::print(1, "X: %f", arms::odom::getPosition().x);
+		pros::lcd::print(2, "Y: %f", arms::odom::getPosition().y);
+		pros::lcd::print(3, "Heading: %f", arms::odom::getHeading());
 		
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 

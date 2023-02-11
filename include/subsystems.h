@@ -27,6 +27,7 @@ extern Motor right_motor;
 extern double speed;
 void move(double speed);
 void toggle();
+bool clear();
 } // namespace intake
 
 namespace roller {
@@ -44,6 +45,7 @@ extern double speed;
 extern double target_angle;
 extern double current_angle;
 void move(double speed);
+void move_angle(double angle, double velocity);
 void home();
 double get_position();
 double get_angle();

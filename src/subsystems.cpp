@@ -14,6 +14,7 @@ char adi_port = 'a';
 ADIDigitalOut intake_piston({{smart_port,adi_port}});
 Motor left_motor(11, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 Motor right_motor(19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+ADIAnalogIn line(6);
 
 bool state = false;
 double speed = 0;
@@ -27,6 +28,10 @@ void move(double speed) {
 void toggle(){
     state = !state;
     intake_piston.set_value(state);
+}
+
+bool clear() {
+    return line.get_value() > 1500;
 }
 } // intake
 
@@ -96,13 +101,6 @@ void move(double speed) {
     turret::speed = speed;
 }
 
-void task() {
-    while (true) {
-        current_angle = motor.get_position() * 0.01;
-        motor.move_voltage(120 * (speed + (target_angle-current_angle) * 1));
-    }
-}
-
 const double LIMIT = 5.79;
 const double RANGE = 138.35;
 
@@ -113,6 +111,11 @@ double get_position() {
 
 double get_angle() {
     return (motor.get_position() / (2 * LIMIT / RANGE));
+}
+
+void move_angle(double angle, double velocity) {
+    double target_position = angle * (2 * LIMIT / RANGE);
+    motor.move_absolute(target_position, velocity);
 }
 
 void home() {
@@ -171,7 +174,7 @@ namespace disklift {
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         //When called, hold disc lift in place (enough force to give indexer effective traction)
         // lift_motor.move_absolute(newPos,100);
-        lift_motor.move_voltage(9000);
+        lift_motor.move_voltage(6000);
     }
     void discLiftDown(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
