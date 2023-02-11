@@ -15,7 +15,7 @@ namespace arms {
 
 // Ticks per inch
 #define TPI 310.00       // Encoder ticks per inch of forward robot movement
-#define MIDDLE_TPI 330.0 // Ticks per inch for the middle wheel
+#define MIDDLE_TPI 310.0 // Ticks per inch for the middle wheel
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
