@@ -196,27 +196,24 @@ namespace disklift {
 
 namespace flywheel {
 // flywheel tuning
-int threshold = 50;
-double kV = 65.4;
+int threshold = 14;
+double kV = 60;
 double kP = 0.5;
-
-// auton flywheel tunings
-int sy_threshold = 10;
-double sy_kV = 68;
-double sy_kP = 30;
+double kI = 0.000;
+double kD = 0.1;
 
 sylib::SpeedControllerInfo motor_speed_controller (
     [](double rpm){return kV;}, // kV function - 120
-    sy_kP, // kP - 1
-    0, // kI
-    0.25, // kD - 0.5
+    kP, // kP - 1
+    kI, // kI
+    kD, // kD - 0.5
     0, // kH
     true, // anti-windup enabled
     3, // anti-windup range
-    true, // p controller bounds threshold enabled
+    false, // p controller bounds threshold enabled
     3, // p controller bounds cutoff enabled - 5
-    sy_kP/4, // kP2 for when over threshold - 0.25
-    sy_threshold // range to target to apply max voltage - 10
+    kP/4, // kP2 for when over threshold - 0.25
+    threshold // range to target to apply max voltage - 10
 );
 
 // flywheel motors
