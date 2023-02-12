@@ -145,7 +145,7 @@ namespace disklift {
     int deltaDown = 2;
     int newPos = 0;
     int i = 0; // (DEPRECATED) -JBH 2/1/23
-    double liftDownPos = 6;
+    double liftDownPos = 3;
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
@@ -187,7 +187,8 @@ namespace disklift {
     }
     void home() {
         lift_motor.move(-80);
-        while (lift_motor.get_current_draw() < 1000) {
+        int timestamp = pros::millis();
+        while (lift_motor.get_current_draw() < 1000 && pros::millis() - timestamp < 2000) {
             pros::delay(10);
         }
         lift_motor.tare_position();
@@ -244,7 +245,7 @@ static double average;
 } */
 
 bool at_speed() {
-    return speed - average < 4;
+    return speed - average < 1;
 }
 
 void wait_until_fired() {

@@ -19,7 +19,7 @@
 
 void shoot2() {
 	disklift::discLiftUp();
-	pros::delay(250);
+	pros::delay(500);
 	disklift::discLiftHold();
 	flywheel::fire();
 	flywheel::wait_until_fired();
@@ -29,7 +29,7 @@ void shoot2() {
 	flywheel::fire();
 	flywheel::wait_until_fired();
 	flywheel::stopIndexer();
-	pros::delay(1000);
+	disklift::discLiftDown();
 }
 
 extern "C" {
@@ -38,7 +38,7 @@ void autonomous() {
 	
 	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(145);
+	flywheel::move(140);
 	intake::toggle();
 	deflector::toggle();
 	deflector::toggle();
@@ -67,36 +67,46 @@ void autonomous() {
     std::cout << "Shooting preloads + corner disc into goal" << std::endl;
 	arms::odom::reset({22,-3},90);
 	move(13, 50);
-	turret::move_angle(-8, 400);
-	//shoot2();
-	pros::delay(500);
+	turret::move_angle(-6, 400);
+	shoot2();
+	//pros::delay(500);
 
     std::cout << "Fetching disc 4" << std::endl;
-	flywheel::move(125);
+	flywheel::move(120);
     turn(145, 60, arms::ASYNC);
 	pros::delay(1500);
     move(21, 50);
 	pros::delay(500);
+	while (!intake::clear()) {
+		pros::delay(10);
+	}
+	pros::delay(500);
     
     std::cout << "Fetching disc 5" << std::endl;
     turn(70, 60, arms::ASYNC);
-	pros::delay(1500);
+	pros::delay(3000);
     move(7, 50);
 	pros::delay(500);
-	turret::move_angle(9, 400);
-	//shoot2();
-	pros::delay(500);
+	while (!intake::clear()) {
+		pros::delay(10);
+	}
+	pros::delay(1000);
+	turret::move_angle(4, 400);
+	shoot2();
+	//pros::delay(500);
 
     std::cout << "Shooting discs 4, 5" << std::endl;
     /* TODO: Implement this when the intake gets fixed */
 	turn(155, 60, arms::ASYNC);
 	pros::delay(1500);
 	move(18,50);
-	pros::delay(500);
+	pros::delay(1000);
 	turn(70, 60, arms::ASYNC);
 	pros::delay(1500);
-	move(9, 50);
-	pros::delay(500);
+	move(7, 50);
+	pros::delay(1000);
+	turret::move_angle(-5, 400);
+	shoot2();
 
     std::cout << "Fetching discs 6" << std::endl;
     // turn(155, 60, arms::ASYNC);
