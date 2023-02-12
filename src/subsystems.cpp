@@ -151,34 +151,28 @@ namespace disklift {
     }
     void discLiftUp(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        // if(lift_motor.get_position() < 70){
-        //     lift_motor.move_voltage(12000);
-        // } else{
-        //     newPos = 78;
-        //     lift_motor.move_absolute(78,100);
-        // }
-        lift_motor.move_voltage(12000);
+        if(lift_motor.get_position() < 70){
+            lift_motor.move_voltage(12000);
+        } else{
+            lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+            lift_motor.brake();
+        }
     }
     void calculatePos(){
-        // if(lift_motor.get_position() > 72){
-        //     //3 discs in mag
-        //     newPos = lift_motor.get_position() - 5;
-        // } else if(lift_motor.get_position() > 60){
-        //     newPos = lift_motor.get_position() - 9;
-        // } else{
-        //     newPos = lift_motor.get_position() - 5;
-        // }
-        newPos = lift_motor.get_position();
+        // newPos = lift_motor.get_position();
     }
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        //When called, hold disc lift in place (enough force to give indexer effective traction)
-        // lift_motor.move_absolute(newPos,100);
-        lift_motor.move_voltage(6000);
+        if(lift_motor.get_position() < 70){
+            lift_motor.move_voltage(6000);
+        } else{
+            lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+            lift_motor.brake();
+        }
     }
     void discLiftDown(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(!(lift_motor.get_position() > liftDownPos)){
+        if(lift_motor.get_position() < liftDownPos){
             // Acceptable tolerance, avoid burnout
             lift_motor.move_voltage(0);
         } else{
@@ -186,6 +180,7 @@ namespace disklift {
         }
     }
     void home() {
+        lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         lift_motor.move(-80);
         int timestamp = pros::millis();
         while (lift_motor.get_current_draw() < 1000 && pros::millis() - timestamp < 2000) {

@@ -32,6 +32,9 @@ void on_center_button() {
  */
 void initialize() {
 	sylib::initialize();
+	Task disklift_home_task([](void){
+		disklift::home();
+	});
 	turret::home();
 
 	arms::init();
@@ -51,7 +54,6 @@ void initialize() {
 	// pros::lcd::register_btn1_cb(on_center_button);
 
 	roller::init();
-	disklift::home();
 }
 
 /**
@@ -117,6 +119,7 @@ void opcontrol() {
 		pros::lcd::print(1, "X: %f", arms::odom::getPosition().x);
 		pros::lcd::print(2, "Y: %f", arms::odom::getPosition().y);
 		pros::lcd::print(3, "Heading: %f", arms::odom::getHeading());
+		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
