@@ -28,12 +28,12 @@ void shoot2() {
 	pros::delay(250);
 	flywheel::fire();
 	flywheel::wait_until_fired();
+	pros::delay(250);
 	flywheel::stopIndexer();
 	disklift::discLiftDown();
 }
 
-extern "C" {
-void autonomous() {
+void matchAuto() {
 	using namespace arms::chassis;
 	
 	// setup
@@ -133,10 +133,72 @@ void autonomous() {
 
     std::cout << "Shooting discs 6, 7" << std::endl;
     /* TODO: Implement this when the intake gets fixed */
-
-
-
-    
     flywheel::move(0);
+}
+
+void skillsAuto() {
+	using namespace arms::chassis;
+	
+	// setup
+	arms::odom::reset({0, 0}, 0.0); // start position
+	flywheel::move(140);
+	intake::toggle();
+	deflector::toggle();
+	deflector::toggle();
+	intake::move(100);
+
+	// spin roller
+    std::cout << "Spinning roller" << std::endl;
+	move({17.3,0}, 50);
+	pros::delay(500);
+	turn(90, 50);
+	pros::delay(500);
+	tank(-50,-50);
+	pros::delay(1000);
+	tank(0,0);
+	roller::move(100);
+	pros::delay(150);
+
+	roller::move(0);
+	
+	// shoot disks
+    std::cout << "Shooting preloads + corner disc into goal" << std::endl;
+	arms::odom::reset({22,-3},90);
+	move(13, 50);
+	turret::move_angle(-6, 400);
+	shoot2();
+
+	turn(15, 60, arms::ASYNC);
+	pros::delay(3000);
+	move(18, 50);
+	pros::delay(500);
+	turn(185, 60, arms::ASYNC);
+	pros::delay(3000);
+
+	tank(-50,-50);
+	pros::delay(1000);
+	tank(0,0);
+	roller::move(100);
+	pros::delay(150);
+	roller::move(0);
+	arms::odom::reset({0,0},0);
+
+	move(18, 50);
+	turn(-45, 60, arms::ASYNC);
+	pros::delay(3000);
+	endgame::launch();
+	pros::delay(500);
+}
+
+extern "C" {
+void autonomous() {
+	switch (arms::selector::auton) {
+		case 0:
+			skillsAuto();
+			break;
+		default:
+			matchAuto();
+			break;
+	}
 }
 }

@@ -48,7 +48,7 @@ void initialize() {
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
 
-	pros::lcd::register_btn1_cb(on_center_button);
+	// pros::lcd::register_btn1_cb(on_center_button);
 
 	roller::init();
 	disklift::home();
