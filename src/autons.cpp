@@ -64,7 +64,7 @@ void matchAuto() {
 	roller::move(0);
 	
 	// shoot disks
-    std::cout << "Shooting preloads + corner disc into goal" << std::endl;
+    std::cout << "Shooting preloads" << std::endl;
 	arms::odom::reset({22,-3},90);
 	move(13, 50);
 	turret::move_angle(-6, 400);
@@ -76,22 +76,16 @@ void matchAuto() {
     turn(145, 60, arms::ASYNC);
 	pros::delay(1500);
     move(21, 50);
-	pros::delay(500);
-	while (!intake::clear()) {
-		pros::delay(10);
-	}
+	pros::delay(1000);
 	pros::delay(500);
     
     std::cout << "Fetching disc 5" << std::endl;
     turn(70, 60, arms::ASYNC);
 	pros::delay(3000);
     move(7, 50);
-	pros::delay(500);
-	while (!intake::clear()) {
-		pros::delay(10);
-	}
 	pros::delay(1000);
-	turret::move_angle(4, 400);
+	pros::delay(1000);
+	turret::move_angle(0, 400);
 	shoot2();
 	//pros::delay(500);
 
@@ -104,8 +98,8 @@ void matchAuto() {
 	turn(70, 60, arms::ASYNC);
 	pros::delay(1500);
 	move(7, 50);
-	pros::delay(1000);
-	turret::move_angle(-5, 400);
+	pros::delay(1500);
+	turret::move_angle(0, 400);
 	shoot2();
 
     std::cout << "Fetching discs 6" << std::endl;

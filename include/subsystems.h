@@ -49,6 +49,7 @@ void move_angle(double angle, double velocity);
 void home();
 double get_position();
 double get_angle();
+void set_position(double angle, double vel);
 } // namespace turret
 
 namespace flywheel {

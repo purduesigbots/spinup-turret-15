@@ -94,6 +94,8 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
+	turret::set_position(0.0, 80);
+
 	int counter = 0;
 
 	// move(30, 70);
@@ -140,6 +142,7 @@ void opcontrol() {
 			deflector::toggle();
 		}
 		if (master.get_digital_new_press(DIGITAL_RIGHT)){
+			std::cout << "Launching Endgame" << std::endl;
 			endgame::launch();
 		}
 		if (master.get_digital_new_press(DIGITAL_B)){

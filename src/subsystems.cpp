@@ -104,6 +104,11 @@ void move(double speed) {
 const double LIMIT = 5.79;
 const double RANGE = 138.35;
 
+
+void set_position(double angle, double vel) {
+    motor.move_absolute(angle, vel);
+}
+
 // create function to return motor position
 double get_position() {
     return motor.get_position();
@@ -127,7 +132,7 @@ void home() {
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
-    motor.move_relative(-6.0, 400);
+    motor.move_relative(-5.90, 400);
 
     pros::delay(1000);
     motor.move(0);
@@ -301,12 +306,13 @@ void toggle(){
 
 //endgame__________________________________________________________
 namespace endgame {
-int smart_port = 8;
-char adi_port = 'b';
-ADIDigitalOut endgame_piston({{smart_port,adi_port}});
+int smart_port = 20;
+char adi_port = 'f';
+ADIDigitalOut endgame_piston('f');
 bool state = false;
 void launch(){
     state = !state;
     endgame_piston.set_value(state);
+    std::cout << "Endgame launched" << std::endl;
 }
 }
