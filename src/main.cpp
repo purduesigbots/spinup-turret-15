@@ -198,6 +198,9 @@ void opcontrol() {
 
 		if(!pros::competition::is_connected() && master.get_digital_new_press(DIGITAL_X)){
 			autonomous();
+			// arms::odom::reset({0,0},0);
+			// arms::chassis::turn(90, 60, arms::ASYNC);
+			// pros::delay(3000);
 		}
 
 		pros::delay(20);
