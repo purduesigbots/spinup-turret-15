@@ -150,13 +150,13 @@ namespace disklift {
     int deltaDown = 2;
     int newPos = 0;
     int i = 0; // (DEPRECATED) -JBH 2/1/23
-    double liftDownPos = 3;
+    double liftDownPos = 7;
     void move_to(double position,double speed){
        lift_motor.move_absolute(position, speed);
     }
     void discLiftUp(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < 70){
+        if(lift_motor.get_position() < 80){
             lift_motor.move_voltage(12000);
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -168,7 +168,7 @@ namespace disklift {
     }
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < 70){
+        if(lift_motor.get_position() < 80){
             lift_motor.move_voltage(6000);
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -177,7 +177,7 @@ namespace disklift {
     }
     void discLiftDown(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < liftDownPos){
+        if(lift_motor.get_position() < liftDownPos + 2){
             // Acceptable tolerance, avoid burnout
             lift_motor.move_voltage(0);
         } else{
