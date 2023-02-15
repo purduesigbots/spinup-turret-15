@@ -124,7 +124,7 @@ void move_angle(double angle, double velocity) {
 }
 
 void home() {
-    motor.move(80);
+    motor.move(30);
 
     while(!limit_switch.get_value()) {
         pros::delay(20);
@@ -132,7 +132,7 @@ void home() {
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
-    motor.move_relative(-5.90, 400);
+    motor.move_relative(-2.1, 250);
 
     pros::delay(1000);
     motor.move(0);
