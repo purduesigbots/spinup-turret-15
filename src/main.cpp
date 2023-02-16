@@ -122,7 +122,10 @@ void opcontrol() {
 		pros::lcd::print(2, "Y: %f", arms::odom::getPosition().y);
 		pros::lcd::print(3, "Heading: %f", arms::odom::getHeading());
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
-		
+		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
+		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
+
+
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
     	} 
