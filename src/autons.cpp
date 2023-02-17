@@ -4,6 +4,7 @@
 #include "vision.h"
 #include "ARMS/api.h"
 
+#include "subsystems/subsystems.hpp"
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -67,7 +68,7 @@ void matchAuto() {
     std::cout << "Shooting preloads" << std::endl;
 	arms::odom::reset({22,-3},90);
 	move(13, 50);
-	turret::move_angle(-6, 400);
+	////turret::move_angle(-6, 400);
 	shoot2();
 	//pros::delay(500);
 
@@ -85,7 +86,7 @@ void matchAuto() {
     move(7, 50);
 	pros::delay(1000);
 	pros::delay(1000);
-	turret::move_angle(0, 400);
+	////turret::move_angle(0, 400);
 	shoot2();
 	//pros::delay(500);
 
@@ -99,7 +100,7 @@ void matchAuto() {
 	pros::delay(1500);
 	move(7, 50);
 	pros::delay(1500);
-	turret::move_angle(-4, 400);
+	////turret::move_angle(-4, 400);
 	shoot2();
 
     std::cout << "Fetching discs 6" << std::endl;
@@ -159,7 +160,7 @@ void skillsAuto() {
     std::cout << "Shooting preloads + corner disc into goal" << std::endl;
 	arms::odom::reset({22,-3},90);
 	move(13, 50);
-	turret::move_angle(-6, 400);
+	//turret::move_angle(-6, 400);
 	shoot2();
 
 	turn(15, 60, arms::ASYNC);

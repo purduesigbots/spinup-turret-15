@@ -10,6 +10,8 @@
  * Subsystem Dependencies: None
  */
 namespace turret {
+    void initialize();
+
     /**
      * Calibrates the turret.
      * 
@@ -19,34 +21,13 @@ namespace turret {
      */
     void calibrate();
 
-    /**
-     * Sends the turret to 0.0
-     * 
-     * @param async Tells the function to wait asyncronously
-     */
-    void home(bool async);
+    void goto_angle(double angle, double velocity = 100, bool async = false);
 
     /**
-     * Tells the turret to move relative to it's current angle.
-     * 
-     * @param angle Degrees to turn, relative to current position
-     * @param 
+     * Returns the angle of the turret in degrees, where 0 is directly forward,
+     * 90 is 90 degrees to the left, and -90 is 90 degrees to the right
      */
-    void goto_angle_rel(double pos, double vel, bool async = false);
+    double get_angle();
 
-    /**
-     * Tells the turret to go to an angle in the global (field) coordinate
-     * system. If the robot cannot turn to face the angle, it will get as close
-     * as it can. 
-     */
-    void goto_angle_glob(double pos);
-
-    void turn_angle_rel();
-
-    void turn_angle_glob();
-
-    /**
-     * Blocks execution until the turret reaches the point it is supposed to. 
-     */
-    void wait_until_setteld();
+    void wait_until_settled();
 }

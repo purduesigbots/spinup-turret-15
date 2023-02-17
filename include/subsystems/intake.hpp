@@ -1,5 +1,6 @@
 #pragma once
 
+#if 0
 /**
  * Subsystem Dependencies: Disc Lift
  */
@@ -44,3 +45,5 @@ namespace intake {
      */
     bool is_on();
 }
+
+#endif

@@ -92,6 +92,7 @@ void set_brake_mode(pros::motor_brake_mode_e mode) {
 } // roller
 
 // turret -------------------------------------------------------------------------
+#if 0
 namespace turret {
 
 Motor motor(7, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
@@ -147,6 +148,8 @@ void home() {
 
 
 } // turret
+
+#endif 
 
 namespace disklift {
     //Declaarations; definitions

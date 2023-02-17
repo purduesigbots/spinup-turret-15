@@ -1,5 +1,5 @@
 #pragma once
 
-#include "include/subsystems/turret.hpp"
-#include "include/subsystems/flywheel.hpp"
-
+#include "subsystems/turret.hpp"
+#include "subsystems/flywheel.hpp"
+#include "subsystems/intake.hpp"

@@ -7,6 +7,8 @@
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "vision.h"
 
+#include "subsystems/subsystems.hpp"
+
 std::map<uint8_t, int32_t> comms_data;
 /**
  * A callback function for LLEMU's center button.
@@ -35,7 +37,8 @@ void initialize() {
 	Task disklift_home_task([](void){
 		disklift::home();
 	});
-	turret::home();
+	
+	turret::initialize();
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
@@ -94,7 +97,7 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	turret::set_position(0.0, 80);
+	//turret::set_position(0.0, 80);
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
@@ -121,9 +124,12 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
-		pros::lcd::print(1, "X: %f", arms::odom::getPosition().x);
-		pros::lcd::print(2, "Y: %f", arms::odom::getPosition().y);
-		pros::lcd::print(3, "Heading: %f", arms::odom::getHeading());
+		pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
+			arms::odom::getPosition().x,
+			arms::odom::getPosition().y,
+			arms::odom::getHeading()
+		);
+		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
@@ -182,6 +188,12 @@ void opcontrol() {
 			roller::move(0);
 		}
 
+		if(master.get_digital(DIGITAL_A)) {
+			turret::goto_angle(45.0, 200, true);
+		}
+		if(master.get_digital(DIGITAL_X)) {
+			turret::goto_angle(0.0, 200, false);
+		}
 
     	// if (master.get_digital(DIGITAL_A)) { // Turret Left
 		// 	turret::move(127);

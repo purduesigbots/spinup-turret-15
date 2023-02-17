@@ -1,6 +1,6 @@
 #pragma once 
 
-
+#if 0
 /**
  * Subsystem Dependencies: Disc Lift
  */
@@ -29,3 +29,4 @@ namespace flywheel {
     int fire(std::vector<double> speeds, int timeout = 5000);
 }
 
+#endif
