@@ -95,6 +95,8 @@ void opcontrol() {
 	using namespace arms::chassis;
 
 	turret::set_position(0.0, 80);
+	
+	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	int counter = 0;
 	bool indexer_wait = false;

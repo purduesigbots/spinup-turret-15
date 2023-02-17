@@ -84,6 +84,11 @@ void init() {
     pros::Task roller_task(task);
 }
 
+void set_brake_mode(pros::motor_brake_mode_e mode) {
+    motor.set_brake_mode(mode);
+}
+
+
 } // roller
 
 // turret -------------------------------------------------------------------------

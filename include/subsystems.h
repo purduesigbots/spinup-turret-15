@@ -37,6 +37,7 @@ extern double speed;
 void move(double speed);
 void toggle_turn_roller();
 void init();
+void set_brake_mode(pros::motor_brake_mode_e mode);
 } // namespace roller
 
 namespace turret {

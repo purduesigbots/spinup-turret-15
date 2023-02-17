@@ -99,7 +99,7 @@ void matchAuto() {
 	pros::delay(1500);
 	move(7, 50);
 	pros::delay(1500);
-	turret::move_angle(0, 400);
+	turret::move_angle(-4, 400);
 	shoot2();
 
     std::cout << "Fetching discs 6" << std::endl;
@@ -186,6 +186,8 @@ void skillsAuto() {
 
 extern "C" {
 void autonomous() {
+	roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	
 	switch (arms::selector::auton) {
 		case 0:
 			skillsAuto();
