@@ -101,8 +101,8 @@ void move(double speed) {
     turret::speed = speed;
 }
 
-const double LIMIT = 5.79;
-const double RANGE = 138.35;
+const double LIMIT = 5.9; //Offset from limit switch to center
+const double RANGE = 138.35; //Total range of turret
 
 
 void set_position(double angle, double vel) {
@@ -124,7 +124,7 @@ void move_angle(double angle, double velocity) {
 }
 
 void home() {
-    motor.move(30);
+    motor.move(50);
 
     while(!limit_switch.get_value()) {
         pros::delay(20);
@@ -132,8 +132,7 @@ void home() {
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
-    motor.move_relative(-2.1, 250);
-
+    motor.move_relative(-2.25, 250);
     pros::delay(1000);
     motor.move(0);
 
@@ -145,18 +144,33 @@ void home() {
 } // turret
 
 namespace disklift {
+    //Declaarations; definitions
     pros::Motor lift_motor(21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
-    double lift_pos[] = {-15, 55, 68, 78}; //(DEPRECATED) -JBH 2/1/23
-    int deltaDown = 2;
-    int newPos = 0;
-    int i = 0; // (DEPRECATED) -JBH 2/1/23
+    bool lifted = false; //if true, keep true until a disc is fired
+    bool reachedSpeed = false;
+    int targState = 0; // 0 = down, 1 = up, 2 = hold
     double liftDownPos = 7;
-    void move_to(double position,double speed){
-       lift_motor.move_absolute(position, speed);
-    }
     void discLiftUp(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < 80){
+        //Prevents lifted from changing back to false momentariily, once it's set it stays until 
+        //lifted AND flyweel detects a shot
+        if(!lifted){
+            lifted = lift_motor.get_actual_velocity() < 2 && lift_motor.get_position() > 12;
+        } else if (lift_motor.get_actual_velocity() > 2){
+            lifted = false;
+        }
+        if(!reachedSpeed){
+            reachedSpeed = flywheel::at_speed();
+        } else if (!flywheel::at_speed() && lifted){
+            //Status changed + DL was up; shot detected
+            lifted = false;
+            reachedSpeed = false;
+        }
+        if(lifted){
+            //DISC LIFT ALL THE WAY UP FOR CURRENT NUM OF DISCS
+            lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+            lift_motor.brake();
+        } else if(lift_motor.get_position() < 89){
             lift_motor.move_voltage(12000);
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -168,14 +182,18 @@ namespace disklift {
     }
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < 80){
+        if(lift_motor.get_position() < 89){
             lift_motor.move_voltage(6000);
+            // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+            // lift_motor.brake();
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             lift_motor.brake();
         }
     }
     void discLiftDown(){
+        lifted = false;
+        reachedSpeed = false;
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         if(lift_motor.get_position() < liftDownPos + 2){
             // Acceptable tolerance, avoid burnout
