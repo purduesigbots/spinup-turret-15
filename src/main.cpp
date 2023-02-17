@@ -188,14 +188,7 @@ void opcontrol() {
 			roller::move(0);
 		}
 
-    	// if (master.get_digital(DIGITAL_A)) { // Turret Left
-		// 	turret::move(127);
-		// } else if (master.get_digital(DIGITAL_X)) { // Turret Right
-		// 	turret::move(-127);
-		// } else { // idle
-		// 	turret::move(0);
-		// }
-
+		turret::goto_angle(0, 250, true);
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {

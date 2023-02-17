@@ -1,5 +1,7 @@
 #pragma once
 
+#include "api.h"
+
 /**
  * Turret Subsystem: Interface to controll the aiming of the turret. 
  * 
@@ -10,6 +12,8 @@
  * Subsystem Dependencies: None
  */
 namespace turret {
+    extern pros::Motor motor;
+
     void initialize();
 
     /**

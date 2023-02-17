@@ -46,17 +46,13 @@ void calibrate() {
     motor.move(0);
 
     // Now tell the motor to move back to face forward.
-    motor.move_relative(-2.25, 250);
+    motor.move_relative(-2.24, 250);
     pros::delay(1000);
     motor.move(0);
 
     // Tare the position so that forward is 0.0
     motor.tare_position();
     pros::delay(100);
-}
-
-void home() {
-    
 }
 
 double get_angle() {

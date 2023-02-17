@@ -40,19 +40,6 @@ void init();
 void set_brake_mode(pros::motor_brake_mode_e mode);
 } // namespace roller
 
-namespace turret {
-extern Motor turret_motor;
-extern double speed;
-extern double target_angle;
-extern double current_angle;
-void move(double speed);
-void move_angle(double angle, double velocity);
-void home();
-double get_position();
-double get_angle();
-void set_position(double angle, double vel);
-} // namespace turret
-
 namespace flywheel {
 extern sylib::Motor left_flywheel;
 extern sylib::Motor right_flywheel;
