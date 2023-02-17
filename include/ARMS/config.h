@@ -19,7 +19,7 @@ namespace arms {
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  5.98 // The distance between left and right wheels (or tracker wheels)
+  6.31 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
   4.75 // Distance from middle wheel to the robot turning center
 
