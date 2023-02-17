@@ -29,5 +29,7 @@ namespace turret {
      */
     double get_angle();
 
+    bool settled();
+
     void wait_until_settled();
 }

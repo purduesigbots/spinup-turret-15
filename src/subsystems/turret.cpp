@@ -33,18 +33,24 @@ void initialize() {
 }
 
 void calibrate() {
+    // Set the motor to move to the left
     motor.move(50);
 
+    // Wait until the limit switch is hit. This ensures the turret stops at a 
+    // consistent location
     while(!limit_switch.get_value()) {
         pros::delay(20);
     }
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
+
+    // Now tell the motor to move back to face forward.
     motor.move_relative(-2.25, 250);
     pros::delay(1000);
     motor.move(0);
 
+    // Tare the position so that forward is 0.0
     motor.tare_position();
     pros::delay(100);
 }
@@ -70,6 +76,11 @@ void goto_angle(double angle, double velocity, bool async) {
     }
 }
 
+
+bool settled() {
+    return std::abs(get_angle() - target_angle) > SETTLE_THRESHHOLD;
+}
+
 /**
  * Blocks execution until the turret reaches the point it is supposed to. 
  */
@@ -77,9 +88,7 @@ void wait_until_settled() {
     // While the target_angle is outside the range we want, we sleep.
     // Once it is within SETTLE_THRESHHOLD degrees of the target angle, we quit
     // the loop.
-    while(get_angle() > target_angle + SETTLE_THRESHHOLD ||
-          get_angle() < target_angle - SETTLE_THRESHHOLD
-    ) {
+    while(!settled()) {
         pros::delay(10);
     }
 }

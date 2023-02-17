@@ -92,6 +92,7 @@ void set_brake_mode(pros::motor_brake_mode_e mode) {
 } // roller
 
 // turret -------------------------------------------------------------------------
+// Rewritten. Check out the turret files in the subsystem folders
 #if 0
 namespace turret {
 
@@ -271,7 +272,7 @@ static double average;
 } */
 
 bool at_speed() {
-    return speed - average < 1;
+    return std::abs(speed - average) / speed < 0.80;
 }
 
 void wait_until_fired() {

@@ -167,7 +167,7 @@ void opcontrol() {
 			disklift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			if (!indexer_wait || flywheel::at_speed()) {
+			if (/* !indexer_wait || */ flywheel::at_speed()) {
 				flywheel::fire();
 			} else {
 				flywheel::stopIndexer();
@@ -186,13 +186,6 @@ void opcontrol() {
 		} else if (!master.get_digital(DIGITAL_L2)) { // idle
 			intake::move(0);
 			roller::move(0);
-		}
-
-		if(master.get_digital(DIGITAL_A)) {
-			turret::goto_angle(45.0, 200, true);
-		}
-		if(master.get_digital(DIGITAL_X)) {
-			turret::goto_angle(0.0, 200, false);
 		}
 
     	// if (master.get_digital(DIGITAL_A)) { // Turret Left
