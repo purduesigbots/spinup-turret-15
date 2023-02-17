@@ -215,11 +215,11 @@ namespace disklift {
 
 namespace flywheel {
 // flywheel tuning
-int threshold = 14;
-double kV = 60;
+int threshold = 150;
+double kV = 57.7;
 double kP = 0.5;
-double kI = 0.000;
-double kD = 0.1;
+double kI = 0.001;
+double kD = 0.37;
 
 sylib::SpeedControllerInfo motor_speed_controller (
     [](double rpm){return kV;}, // kV function - 120
@@ -228,7 +228,7 @@ sylib::SpeedControllerInfo motor_speed_controller (
     kD, // kD - 0.5
     0, // kH
     true, // anti-windup enabled
-    3, // anti-windup range
+    36, // anti-windup range
     false, // p controller bounds threshold enabled
     3, // p controller bounds cutoff enabled - 5
     kP/4, // kP2 for when over threshold - 0.25
@@ -289,7 +289,7 @@ void task() {
     while(1) {
         sylib::delay_until(&clock,10);
         average = left_flywheel.get_velocity();
-        //printf("%.2f,%d\n",average, flywheel1.get_applied_voltage()/120);
+        printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
         if(speed == 0) {
             left_flywheel.stop();
             right_flywheel.stop();

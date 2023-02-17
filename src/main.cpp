@@ -97,6 +97,7 @@ void opcontrol() {
 	turret::set_position(0.0, 80);
 
 	int counter = 0;
+	bool indexer_wait = false;
 
 	// move(30, 70);
 	// move(-4, 50, arms::REVERSE);
@@ -158,7 +159,11 @@ void opcontrol() {
 			disklift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			flywheel::fire();
+			if (!indexer_wait || flywheel::at_speed()) {
+				flywheel::fire();
+			} else {
+				flywheel::stopIndexer();
+			}
 			disklift::discLiftHold();
 		} else {
 			flywheel::stopIndexer();
@@ -167,7 +172,6 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_R1)) { // intake
 			intake::move(100);
 			roller::move(100);
-      		printf("pressed");
 		} else if (master.get_digital(DIGITAL_R2)) { // outake
 			intake::move(-100);
 			roller::move(-100);
@@ -189,7 +193,7 @@ void opcontrol() {
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
 			if (flywheel::speed == 0) {
-				flywheel::move(90); // max = 200
+				flywheel::move(120); // max = 200
 			} else {
 				flywheel::move(0);
 			}
@@ -205,11 +209,8 @@ void opcontrol() {
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
 
-		if(!pros::competition::is_connected() && master.get_digital_new_press(DIGITAL_X)){
-			autonomous();
-			// arms::odom::reset({0,0},0);
-			// arms::chassis::turn(90, 60, arms::ASYNC);
-			// pros::delay(3000);
+		if(master.get_digital_new_press(DIGITAL_X)){
+			indexer_wait = !indexer_wait;
 		}
 
 		pros::delay(20);
