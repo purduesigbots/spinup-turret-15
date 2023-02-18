@@ -199,7 +199,7 @@ static int count=0;
 static double average;
 
 bool at_speed() {
-    return std::abs(speed - average) / speed < 0.80;
+    return std::abs(speed - average) / speed < 0.03;
 }
 
 void wait_until_fired() {
@@ -225,7 +225,7 @@ void task() {
     while(1) {
         sylib::delay_until(&clock,10);
         average = left_flywheel.get_velocity();
-        printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
+        //printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
         if(speed == 0) {
             left_flywheel.stop();
             right_flywheel.stop();

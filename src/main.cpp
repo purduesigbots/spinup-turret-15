@@ -130,6 +130,7 @@ void opcontrol() {
 			arms::odom::getHeading()
 		);
 		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
+		pros::lcd::print(3, "Distance to goal: %2.4f", arms::odom::getDistanceError({0,0}));
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
@@ -200,17 +201,18 @@ void opcontrol() {
 		}
 
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::move(flywheel::speed + 10);
+			flywheel::move(flywheel::speed + 1);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::move(flywheel::speed - 5);
+			flywheel::move(flywheel::speed - 1);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
 
 		if(master.get_digital_new_press(DIGITAL_X)){
-			indexer_wait = !indexer_wait;
+			//indexer_wait = !indexer_wait;
+			autonomous();
 		}
 
 		pros::delay(20);
