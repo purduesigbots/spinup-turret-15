@@ -88,6 +88,8 @@ void init() {
 
 void set_brake_mode(pros::motor_brake_mode_e mode) {
     motor.set_brake_mode(mode);
+}
+
 } // roller
 
 namespace disklift {
