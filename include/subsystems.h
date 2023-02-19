@@ -31,12 +31,12 @@ bool clear();
 } // namespace intake
 
 namespace roller {
+extern void init();
 extern Motor motor;
 extern Optical optical;
 extern double speed;
 void move(double speed);
 void toggle_turn_roller();
-void init();
 void set_brake_mode(pros::motor_brake_mode_e mode);
 } // namespace roller
 
@@ -62,5 +62,7 @@ void toggle();
 namespace endgame {
 void launch();
 }
+
+extern bool isSilva();
 
 #endif
