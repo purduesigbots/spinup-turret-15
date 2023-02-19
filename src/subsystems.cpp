@@ -9,6 +9,7 @@
 // intake -------------------------------------------------------------------------
 namespace intake {
 
+//LOCAL DEFS:
 int smart_port = 8;
 char adi_port = 'a';
 ADIDigitalOut intake_piston({{smart_port,adi_port}});
@@ -38,6 +39,7 @@ bool clear() {
 // roller -------------------------------------------------------------------------
 namespace roller {
 
+//LOCAL DEFS:
 Motor motor(6, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 Optical optical(5);
 
@@ -89,6 +91,7 @@ void init() {
 // turret -------------------------------------------------------------------------
 namespace turret {
 
+//LOCAL DEFS:
 Motor motor(7, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 pros::ADIDigitalIn limit_switch('e');
 
@@ -132,7 +135,7 @@ void home() {
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
-    motor.move_relative(-2.25, 250);
+    motor.move_relative(-1.96, 250);
     pros::delay(1000);
     motor.move(0);
 
@@ -144,12 +147,14 @@ void home() {
 } // turret
 
 namespace disklift {
-    //Declaarations; definitions
+    
+    //LOCAL DEFS:
     pros::Motor lift_motor(21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
     bool lifted = false; //if true, keep true until a disc is fired
     bool reachedSpeed = false;
     int targState = 0; // 0 = down, 1 = up, 2 = hold
     double liftDownPos = 7;
+
     void discLiftUp(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         //Prevents lifted from changing back to false momentariily, once it's set it stays until 
@@ -177,9 +182,11 @@ namespace disklift {
             lift_motor.brake();
         }
     }
+    
     void calculatePos(){
         // newPos = lift_motor.get_position();
     }
+
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         if(lift_motor.get_position() < 89){
@@ -191,6 +198,7 @@ namespace disklift {
             lift_motor.brake();
         }
     }
+
     void discLiftDown(){
         lifted = false;
         reachedSpeed = false;
@@ -202,6 +210,7 @@ namespace disklift {
             lift_motor.move_absolute(liftDownPos,100);
         }
     }
+
     void home() {
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         lift_motor.move(-80);
@@ -214,12 +223,16 @@ namespace disklift {
 }
 
 namespace flywheel {
+
 // flywheel tuning
 int threshold = 150;
 double kV = 57.7;
 double kP = 0.5;
 double kI = 0.001;
 double kD = 0.37;
+// SILVA : GOLDY
+int leftPort = isSilva() ? 9 : 9;
+int rightPort = isSilva() ? 8 : 10;
 
 sylib::SpeedControllerInfo motor_speed_controller (
     [](double rpm){return kV;}, // kV function - 120
@@ -235,14 +248,22 @@ sylib::SpeedControllerInfo motor_speed_controller (
     threshold // range to target to apply max voltage - 10
 );
 
+sylib::Motor left_flywheel(leftPort, 200, false, motor_speed_controller);
+sylib::Motor right_flywheel(rightPort, 200, true, motor_speed_controller);  
+
+
 // flywheel motors
 // pros::Motor flywheel1(9);
 // pros::Motor flywheel2(1, 1);
 // pros::Motor_Group motor({flywheel1, flywheel2});
-sylib::Motor left_flywheel(9, 200, false, motor_speed_controller);
-sylib::Motor right_flywheel(10, 200, true, motor_speed_controller);
+
+
+
+
 pros::Motor indexer (14, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 double speed = 0;
+
+
 
 void move(double speed) {
     flywheel::speed = speed;
@@ -333,4 +354,15 @@ void launch(){
     endgame_piston.set_value(state);
     std::cout << "Endgame launched" << std::endl;
 }
+} // namespace endgame
+
+//misc__________________________________________________________
+// Global shit like isGoldy
+bool isSilva(){
+FILE* usd_file_read = fopen("/usd/TURRET_ID.txt", "r");
+char buf[50]; // This just needs to be larger than the contents of the file
+fread(buf, 1, 50, usd_file_read); // passing 1 because a `char` is 1 byte, and 50 b/c it's the length of buf
+int isGoldy = buf[0] == '1'; // buf[0] is the first character in the file, if it's a 1, the turret is goldy. If not, it's silva.
+fclose(usd_file_read); 
+return !isGoldy;
 }
