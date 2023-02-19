@@ -86,65 +86,9 @@ void init() {
     pros::Task roller_task(task);
 }
 
+void set_brake_mode(pros::motor_brake_mode_e mode) {
+    motor.set_brake_mode(mode);
 } // roller
-
-// turret -------------------------------------------------------------------------
-namespace turret {
-
-//LOCAL DEFS:
-Motor motor(7, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
-pros::ADIDigitalIn limit_switch('e');
-
-double speed = 0;
-double target_angle = 0;
-double current_angle = 0;
-
-void move(double speed) {
-    motor.move(speed);
-    turret::speed = speed;
-}
-
-const double LIMIT = 5.9; //Offset from limit switch to center
-const double RANGE = 138.35; //Total range of turret
-
-
-void set_position(double angle, double vel) {
-    motor.move_absolute(angle, vel);
-}
-
-// create function to return motor position
-double get_position() {
-    return motor.get_position();
-}
-
-double get_angle() {
-    return (motor.get_position() / (2 * LIMIT / RANGE));
-}
-
-void move_angle(double angle, double velocity) {
-    double target_position = angle * (2 * LIMIT / RANGE);
-    motor.move_absolute(target_position, velocity);
-}
-
-void home() {
-    motor.move(50);
-
-    while(!limit_switch.get_value()) {
-        pros::delay(20);
-    }
-
-    // Stop the motor so it doesn't break the ring gear
-    motor.move(0);
-    motor.move_relative(-1.96, 250);
-    pros::delay(1000);
-    motor.move(0);
-
-    motor.tare_position();
-    pros::delay(100);
-}
-
-
-} // turret
 
 namespace disklift {
     
@@ -248,17 +192,9 @@ sylib::SpeedControllerInfo motor_speed_controller (
     threshold // range to target to apply max voltage - 10
 );
 
+
 sylib::Motor left_flywheel(leftPort, 200, false, motor_speed_controller);
 sylib::Motor right_flywheel(rightPort, 200, true, motor_speed_controller);  
-
-
-// flywheel motors
-// pros::Motor flywheel1(9);
-// pros::Motor flywheel2(1, 1);
-// pros::Motor_Group motor({flywheel1, flywheel2});
-
-
-
 
 pros::Motor indexer (14, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 double speed = 0;
@@ -275,26 +211,20 @@ static double sma_data[SMA_LEN];
 static int count=0;
 static double average;
 
-/* void add_data() {
-    double reading = flywheel1.get_actual_velocity();
-    average -= sma_data[count]/SMA_LEN;
-    average += reading/SMA_LEN;
-    sma_data[count++] = reading;
-    count = count < SMA_LEN ? count : 0;
-} */
-
 bool at_speed() {
-    return speed - average < 1;
+    return std::abs(speed - average) / speed < 0.03;
 }
 
 void wait_until_fired() {
-    while (at_speed()) {
+    while (speed - average < 20) {
+        printf("wait_until_fired\n");
         pros::delay(10);
     }
 }
 
 void wait_until_at_speed() {
     while (!at_speed()) {
+        printf("wait_until_at_speed\n");
         pros::delay(10);
     }
 }

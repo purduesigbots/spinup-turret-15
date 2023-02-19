@@ -35,14 +35,14 @@ namespace arms {
 #define ANGULAR_EXIT_ERROR 1    // default exit distance for angular movements
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling
 #define SETTLE_THRESH_ANGULAR 1 // amount of angular movement for settling
-#define SETTLE_TIME 2000         // amount of time to count as settled
+#define SETTLE_TIME 500         // amount of time to count as settled
 #define LINEAR_KP 5
 #define LINEAR_KI 0.01
 #define LINEAR_KD 1.7
-#define TRACKING_KP 60 // point tracking turning strength
-#define ANGULAR_KP 4.5
+#define TRACKING_KP 80 // point tracking turning strength
+#define ANGULAR_KP 5
 #define ANGULAR_KI 0
-#define ANGULAR_KD 16
+#define ANGULAR_KD 35
 #define MIN_ERROR                                                              \
   5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)
