@@ -74,7 +74,7 @@ void goto_angle(double angle, double velocity, bool async) {
 
 
 bool settled() {
-    return std::abs(get_angle() - target_angle) > SETTLE_THRESHHOLD;
+    return std::abs(get_angle() - target_angle) < SETTLE_THRESHHOLD;
 }
 
 /**

@@ -35,7 +35,7 @@ namespace arms {
 #define ANGULAR_EXIT_ERROR 1    // default exit distance for angular movements
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling
 #define SETTLE_THRESH_ANGULAR 1 // amount of angular movement for settling
-#define SETTLE_TIME 2000         // amount of time to count as settled
+#define SETTLE_TIME 500         // amount of time to count as settled
 #define LINEAR_KP 5
 #define LINEAR_KI 0.01
 #define LINEAR_KD 1.7

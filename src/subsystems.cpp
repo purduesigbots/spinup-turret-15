@@ -203,13 +203,15 @@ bool at_speed() {
 }
 
 void wait_until_fired() {
-    while (at_speed()) {
+    while (speed - average < 20) {
+        printf("wait_until_fired\n");
         pros::delay(10);
     }
 }
 
 void wait_until_at_speed() {
     while (!at_speed()) {
+        printf("wait_until_at_speed\n");
         pros::delay(10);
     }
 }
@@ -225,7 +227,7 @@ void task() {
     while(1) {
         sylib::delay_until(&clock,10);
         average = left_flywheel.get_velocity();
-        //printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
+        printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
         if(speed == 0) {
             left_flywheel.stop();
             right_flywheel.stop();

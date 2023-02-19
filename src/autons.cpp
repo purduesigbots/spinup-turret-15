@@ -23,17 +23,16 @@ void shoot(int count, double angle) {
 	pros::delay(500);
 	disklift::discLiftHold();
 	for (int i = 1; i < count; i++) {
-		turret::goto_angle(angle, 400);
+		turret::goto_angle(angle, 400, true);
 		flywheel::wait_until_at_speed();
 		flywheel::fire();
 		flywheel::wait_until_fired();
 		flywheel::stopIndexer();
 	}
-	turret::goto_angle(angle, 400);
+	turret::goto_angle(angle, 400, true);
 	flywheel::wait_until_at_speed();
 	flywheel::fire();
-	flywheel::wait_until_fired();
-	pros::delay(250);
+	pros::delay(750);
 	flywheel::stopIndexer();
 	disklift::discLiftDown();
 }
@@ -43,7 +42,7 @@ void matchAuto() {
 	
 	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(145);
+	flywheel::move(170);
 	intake::toggle();
 	deflector::toggle();
 	deflector::toggle();
@@ -52,13 +51,12 @@ void matchAuto() {
 	// intake first disk
     std::cout << "Fetching first disc" << std::endl;
 	//move({15,0}, 70, arms::THRU);
-	move({30, 0}, 50);
+	move({30, -0.5}, 50);
 	pros::delay(500);
 
 	// spin roller
     std::cout << "Spinning roller" << std::endl;
-	move({17.3,0}, 50, arms::REVERSE);
-	pros::delay(500);
+	move({17,0}, 50, arms::REVERSE);
 	turn(90, 50);
 	pros::delay(500);
 	tank(-50,-50);
@@ -71,15 +69,21 @@ void matchAuto() {
 	// shoot disks
     std::cout << "Shooting preloads" << std::endl;
 	arms::odom::reset({18,-3},90);
-	move({18,10}, 50);
+	turret::goto_angle(-12, 400, true);
+	move({18,3}, 50);
 	pros::delay(500);
-	shoot(3, -9);
+	shoot(3, -12);
 	//pros::delay(500);
+
+	turn(35, 60);
+	pros::delay(500);
+	move({21,8},50);
+	pros::delay(500);
 
 	
     std::cout << "Fetching disc 4" << std::endl;
-	flywheel::move(125);
-    turn(140, 60);
+	flywheel::move(135);
+    turn(150, 60);
 	pros::delay(500);
     move({0,25,140}, 50);
 	pros::delay(500);
@@ -87,40 +91,44 @@ void matchAuto() {
     std::cout << "Fetching disc 5" << std::endl;
     turn(50, 60);
 	pros::delay(500);
-    move({3,33,50}, 50);
-	pros::delay(500);
+	turret::goto_angle(5, 400, true);
+    move({3,33}, 50);
+	pros::delay(1500);
+	shoot(3,5);
 
+	
     std::cout << "Shooting discs 4, 5" << std::endl;
+	flywheel::move(140);
 	turn(150, 60);
 	pros::delay(500);
 	move({-9,39,150},50);
 	pros::delay(500);
-	turn(60, 60, arms::ASYNC);
-	pros::delay(2000);
-	shoot(4,-7);
+	turn(60, 60);
+	pros::delay(500);
+	move({-7,42},50);
+	pros::delay(500);
 
     std::cout << "Fetching discs 6" << std::endl;
-    // turn(155, 60, arms::ASYNC);
-	// pros::delay(1500);
-	// move(15, 50);
-	// pros::delay(500);
+	turret::goto_angle(-71, 400, true);
+    turn(155, 60);
+	pros::delay(500);
+	move({-24,50}, 50);
+	pros::delay(500);
+	turn(110, 60);
+	pros::delay(500);
+	shoot(3, -71);
+	pros::delay(500);
 
     std::cout << "Fetching discs 7" << std::endl;
-    // turn(105, 60, arms::ASYNC);
-	// pros::delay(1500);
-	// tank(-75,-75);
-	// pros::delay(1300);
-	// tank(-25,-25);
-	// pros::delay(1000);
-	// tank(0,0);
-	// pros::delay(500);
-	// arms::odom::reset({0,0},90);
-	// move(13, 50);
-	// pros::delay(500);
-	// turn(160, 60);
-	// pros::delay(2500);
-	// move(20, 50);
-	// pros::delay(500);
+	flywheel::move(200);
+	turret::goto_angle(0, 400, true);
+    turn(240, 60);
+	pros::delay(500);
+	move({-32,27,260}, 50);
+	move({-32,9,270},50);
+	pros::delay(500);
+	turn(55, 60);
+	shoot(3, 0);
 
     std::cout << "Shooting discs 6, 7" << std::endl;
     /* TODO: Implement this when the intake gets fixed */

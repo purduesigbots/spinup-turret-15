@@ -201,12 +201,12 @@ void opcontrol() {
 		}
 
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::move(flywheel::speed + 1);
+			flywheel::move(flywheel::speed + 10);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::move(flywheel::speed - 1);
+			flywheel::move(flywheel::speed - 5);
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
 		}
 
