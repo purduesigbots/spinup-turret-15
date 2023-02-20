@@ -148,53 +148,43 @@ void skillsAuto() {
 	
 	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(140);
+	flywheel::move(125);
 	intake::toggle();
 	deflector::toggle();
 	deflector::toggle();
 	intake::move(100);
 
 	// spin roller
-    std::cout << "Spinning roller" << std::endl;
-	move({17.3,0}, 50);
+    std::cout << "First 3 Stack" << std::endl;
+	move({15,0}, 50);
+	pros::delay(100);
+	move({32,0},30);
+	turret::goto_angle(-65, 400, true);
+	turn(-50, 60);
 	pros::delay(500);
-	turn(90, 50);
+	shoot(3, -65);
+
+	flywheel::move(165);
+	move({72,-48},50);
 	pros::delay(500);
-	tank(-50,-50);
-	pros::delay(1000);
-	tank(0,0);
-	roller::move(100);
-	pros::delay(150);
-
-	roller::move(0);
-	
-	// shoot disks
-    std::cout << "Shooting preloads + corner disc into goal" << std::endl;
-	arms::odom::reset({22,-3},90);
-	move(13, 50);
-	//turret::move_angle(-6, 400);
-	shoot(2,-7);
-
-	turn(15, 60, arms::ASYNC);
-	pros::delay(3000);
-	move(18, 50);
+	turn(-110, 60);
 	pros::delay(500);
-	turn(185, 60, arms::ASYNC);
-	pros::delay(3000);
+	shoot(3, -65);
 
-	tank(-50,-50);
-	pros::delay(1000);
-	tank(0,0);
-	roller::move(100);
-	pros::delay(150);
-	roller::move(0);
-	arms::odom::reset({0,0},0);
-
-	move(18, 50);
-	turn(-45, 60, arms::ASYNC);
-	pros::delay(3000);
-	endgame::launch();
+	turret::goto_angle(-45,400,true);
+	turn(-45, 60);
 	pros::delay(500);
+	move({98,-79},50);
+	pros::delay(500);
+	turn(0, 60);
+	pros::delay(500);
+	move({115,-79},50);
+	pros::delay(500);
+	turn(135,60);
+	pros::delay(500);
+	move({112,-74},50);
+	pros::delay(500);
+	shoot(2,-45);
 }
 
 extern "C" {
