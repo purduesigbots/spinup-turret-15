@@ -42,7 +42,7 @@ void matchAuto() {
 	
 	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(170);
+	flywheel::move(167);
 	intake::toggle();
 	deflector::toggle();
 	deflector::toggle();
@@ -57,8 +57,9 @@ void matchAuto() {
 	// spin roller
     std::cout << "Spinning roller" << std::endl;
 	move({17,0}, 50, arms::REVERSE);
+	pros::delay(100);
 	turn(90, 50);
-	pros::delay(500);
+	pros::delay(100);
 	tank(-50,-50);
 	pros::delay(1000);
 	tank(0,0);
@@ -76,62 +77,69 @@ void matchAuto() {
 	//pros::delay(500);
 
 	turn(35, 60);
-	pros::delay(500);
+	pros::delay(100);
 	move({21,8},50);
-	pros::delay(500);
+	pros::delay(100);
 
 	
     std::cout << "Fetching disc 4" << std::endl;
 	flywheel::move(135);
     turn(150, 60);
-	pros::delay(500);
-    move({0,25,140}, 50);
-	pros::delay(500);
+	pros::delay(100);
+    move({0,25}, 50);
+	pros::delay(100);
     
     std::cout << "Fetching disc 5" << std::endl;
     turn(50, 60);
-	pros::delay(500);
 	turret::goto_angle(5, 400, true);
+	pros::delay(100);
     move({3,33}, 50);
+	pros::delay(500);
+	move(-5, 50, arms::REVERSE & arms::THRU);
+	turn(50, 70, arms::ASYNC);
 	pros::delay(1500);
 	shoot(3,5);
-
 	
     std::cout << "Shooting discs 4, 5" << std::endl;
 	flywheel::move(140);
 	turn(150, 60);
 	pros::delay(500);
-	move({-9,39,150},50);
+	move({-9,39},50);
 	pros::delay(500);
 	turn(60, 60);
 	pros::delay(500);
-	move({-7,42},50);
-	pros::delay(500);
+	move({-7,44},60);
 
     std::cout << "Fetching discs 6" << std::endl;
-	turret::goto_angle(-71, 400, true);
-    turn(155, 60);
+	turret::goto_angle(-75, 400, true);
 	pros::delay(500);
-	move({-24,50}, 50);
+    turn(140, 60);
+	pros::delay(500);
+	move({-20,50}, 50);
 	pros::delay(500);
 	turn(110, 60);
 	pros::delay(500);
-	shoot(3, -71);
-	pros::delay(500);
+	shoot(3, -75);
 
     std::cout << "Fetching discs 7" << std::endl;
-	flywheel::move(200);
 	turret::goto_angle(0, 400, true);
-    turn(240, 60);
+	flywheel::move(165);
+	move({-20,37},50, arms::REVERSE);
 	pros::delay(500);
-	move({-32,27,260}, 50);
-	move({-32,9,270},50);
+	turn(175, 60);
 	pros::delay(500);
-	turn(55, 60);
-	shoot(3, 0);
+	move({-24,37},50);
+	turn(220, 60);
+	move({-26,34}, 50);
+	turn(240, 60);
+	move({-28,30});
+	pros::delay(500);
 
     std::cout << "Shooting discs 6, 7" << std::endl;
     /* TODO: Implement this when the intake gets fixed */
+	turn(45, 60);
+	pros::delay(1000);
+	shoot(3,0);
     flywheel::move(0);
 }
 
