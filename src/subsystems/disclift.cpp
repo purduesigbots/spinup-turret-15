@@ -34,7 +34,7 @@ void discLiftUp() {
         //DISC LIFT ALL THE WAY UP FOR CURRENT NUM OF DISCS
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
         lift_motor.brake();
-    } else if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() > 95)){
+    } else if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() < 95)){
         lift_motor.move_voltage(12000);
     } else{
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -48,7 +48,7 @@ void calculatePos(){
 
 void discLiftHold(){
     lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() > 95)){
+    if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() < 95)){
         lift_motor.move_voltage(6000);
         // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
         // lift_motor.brake();
