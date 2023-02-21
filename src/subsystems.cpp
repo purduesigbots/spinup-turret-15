@@ -88,6 +88,8 @@ void init() {
 
 void set_brake_mode(pros::motor_brake_mode_e mode) {
     motor.set_brake_mode(mode);
+}
+
 } // roller
 
 namespace disklift {
@@ -119,7 +121,7 @@ namespace disklift {
             //DISC LIFT ALL THE WAY UP FOR CURRENT NUM OF DISCS
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             lift_motor.brake();
-        } else if(lift_motor.get_position() < 89){
+        } else if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() > 95)){
             lift_motor.move_voltage(12000);
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -133,7 +135,7 @@ namespace disklift {
 
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < 89){
+        if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() > 95)){
             lift_motor.move_voltage(6000);
             // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             // lift_motor.brake();
