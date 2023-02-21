@@ -40,27 +40,10 @@ void toggle_turn_roller();
 void set_brake_mode(pros::motor_brake_mode_e mode);
 } // namespace roller
 
-namespace flywheel {
-extern sylib::Motor left_flywheel;
-extern sylib::Motor right_flywheel;
-extern pros::Motor indexer;
-extern double speed;
-void move(double speed);
-bool at_speed();
-void wait_until_fired();
-void wait_until_at_speed();
-void fire();
-void stopIndexer();
-void task();
-}
 
 //deflector__________________________________________________________
 namespace deflector {
 void toggle();
-}
-//endgame__________________________________________________________
-namespace endgame {
-void launch();
 }
 
 extern bool isSilva();

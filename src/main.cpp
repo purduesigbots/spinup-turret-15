@@ -43,7 +43,7 @@ void initialize() {
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
-	Task flywheel(flywheel::task);
+	flywheel::initialize();
 	//vision::init();
 	//Task vision(vision::task);
 
@@ -156,7 +156,7 @@ void opcontrol() {
 		}
 		if (master.get_digital_new_press(DIGITAL_RIGHT)){
 			std::cout << "Launching Endgame" << std::endl;
-			endgame::launch();
+			endgame::deploy();
 		}
 		if (master.get_digital_new_press(DIGITAL_B)){
 			intake::toggle();
@@ -168,14 +168,15 @@ void opcontrol() {
 			disklift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			if (/* !indexer_wait || */ flywheel::at_speed()) {
-				flywheel::fire();
-			} else {
-				flywheel::stopIndexer();
-			}
-			disklift::discLiftHold();
+			/* TODO: Rewrite this logic to work with the new subsystems */
+			// if (/* !indexer_wait || */ flywheel::at_speed()) {
+			// 	flywheel::fire();
+			// } else {
+			// 	flywheel::stopIndexer();
+			// }
+			// disklift::discLiftHold();
 		} else {
-			flywheel::stopIndexer();
+			// flywheel::stopIndexer();
 		}
 		
 		if (master.get_digital(DIGITAL_R1)) { // intake
@@ -193,21 +194,17 @@ void opcontrol() {
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
-			if (flywheel::speed == 0) {
-				flywheel::move(120); // max = 200
-			} else {
-				flywheel::move(0);
-			}
+			flywheel::toggle(120);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::move(flywheel::speed + 10);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+			flywheel::change_target_speed(10);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());
 		}
 
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::move(flywheel::speed - 5);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+			flywheel::change_target_speed(-5);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());
 		}
 
 		if(master.get_digital_new_press(DIGITAL_X)){

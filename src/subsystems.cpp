@@ -6,6 +6,8 @@
 #include "subsystems.h"
 #include <cmath>
 
+#include "subsystems/flywheel.hpp"
+
 // intake -------------------------------------------------------------------------
 namespace intake {
 
@@ -168,101 +170,7 @@ namespace disklift {
     }
 }
 
-namespace flywheel {
 
-// flywheel tuning
-int threshold = 150;
-double kV = 57.7;
-double kP = 0.5;
-double kI = 0.001;
-double kD = 0.37;
-// SILVA : GOLDY
-int leftPort = isSilva() ? 9 : 9;
-int rightPort = isSilva() ? 8 : 10;
-
-sylib::SpeedControllerInfo motor_speed_controller (
-    [](double rpm){return kV;}, // kV function - 120
-    kP, // kP - 1
-    kI, // kI
-    kD, // kD - 0.5
-    0, // kH
-    true, // anti-windup enabled
-    36, // anti-windup range
-    false, // p controller bounds threshold enabled
-    3, // p controller bounds cutoff enabled - 5
-    kP/4, // kP2 for when over threshold - 0.25
-    threshold // range to target to apply max voltage - 10
-);
-
-
-sylib::Motor left_flywheel(leftPort, 200, false, motor_speed_controller);
-sylib::Motor right_flywheel(rightPort, 200, true, motor_speed_controller);  
-
-pros::Motor indexer (14, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
-double speed = 0;
-
-
-
-void move(double speed) {
-    flywheel::speed = speed;
-}
-
-#define SMA_LEN 5
-
-static double sma_data[SMA_LEN];
-static int count=0;
-static double average;
-
-bool at_speed() {
-    return std::abs(speed - average) / speed < 0.03;
-}
-
-void wait_until_fired() {
-    while (speed - average < 20) {
-        printf("wait_until_fired\n");
-        pros::delay(10);
-    }
-}
-
-void wait_until_at_speed() {
-    while (!at_speed()) {
-        printf("wait_until_at_speed\n");
-        pros::delay(10);
-    }
-}
-
-void task() {    
-    uint32_t clock = sylib::millis();
-
-    left_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
-    right_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
-
-    bool stopped = false;
-
-    while(1) {
-        sylib::delay_until(&clock,10);
-        average = left_flywheel.get_velocity();
-        printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
-        if(speed == 0) {
-            left_flywheel.stop();
-            right_flywheel.stop();
-            continue;
-        }
-        // if autonomous, use sylib controller
-        left_flywheel.set_velocity_custom_controller(speed);
-        right_flywheel.set_velocity_custom_controller(speed);
-    }
-}
-
-void fire(){
-    indexer.move_voltage(12000);
-}
-
-void stopIndexer(){
-    indexer.move_voltage(0);
-}
-
-}
 //deflector__________________________________________________________
 namespace deflector {
 int smart_port = 8;
@@ -275,18 +183,6 @@ void toggle(){
 }
 }
 
-//endgame__________________________________________________________
-namespace endgame {
-int smart_port = 20;
-char adi_port = 'f';
-ADIDigitalOut endgame_piston('f');
-bool state = false;
-void launch(){
-    state = !state;
-    endgame_piston.set_value(state);
-    std::cout << "Endgame launched" << std::endl;
-}
-} // namespace endgame
 
 //misc__________________________________________________________
 // Global shit like isGoldy

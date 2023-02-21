@@ -14,6 +14,9 @@
 namespace turret {
     extern pros::Motor motor;
 
+    /**
+     * Initilalize the turret subsystem. This also calibrates the turret
+     */
     void initialize();
 
     /**
@@ -25,6 +28,16 @@ namespace turret {
      */
     void calibrate();
 
+    /**
+     * Tells the turret to go to an angle relative to the robot's heading
+     * 
+     * -90 is 90 degrees to the left, 90 is 90 degrees to the right. 0 is 
+     * straight forwards with the robot's heading
+     * 
+     * @param angle The angle to face
+     * @param velocity The velocity to move with
+     * @param async If true, this function will not block the calling thread
+     */
     void goto_angle(double angle, double velocity = 100, bool async = false);
 
     /**
@@ -33,7 +46,15 @@ namespace turret {
      */
     double get_angle();
 
+    /**
+     * Returns whether the turret has reached its target angle
+     * 
+     * @return True if the turret has reached its target angle
+     */
     bool settled();
 
+    /**
+     * Blocks the calling thread until the turret reaches its target angle 
+     */
     void wait_until_settled();
 }

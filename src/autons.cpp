@@ -17,7 +17,7 @@
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-
+#if 0
 void shoot(int count, double angle) {
 	disklift::discLiftUp();
 	pros::delay(500);
@@ -186,9 +186,11 @@ void skillsAuto() {
 	pros::delay(500);
 	shoot(2,-45);
 }
-
+#endif 
 extern "C" {
 void autonomous() {
+#if 0
+
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	
 	switch (arms::selector::auton) {
@@ -199,5 +201,6 @@ void autonomous() {
 			matchAuto();
 			break;
 	}
+#endif
 }
 }
