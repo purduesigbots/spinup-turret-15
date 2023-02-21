@@ -143,9 +143,9 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			disclift::discLiftUp();
 			if(discLiftCounter < 10){
-				intake::move(100);
+				intake::start(100);
 			} else{
-				intake::move(0);
+				intake::stop();
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
@@ -160,7 +160,7 @@ void opcontrol() {
 			endgame::deploy();
 		}
 		if (master.get_digital_new_press(DIGITAL_B)){
-			intake::toggle();
+			intake::toggle(100);
 		}
 		
 		
@@ -181,13 +181,13 @@ void opcontrol() {
 		}
 		
 		if (master.get_digital(DIGITAL_R1)) { // intake
-			intake::move(100);
+			intake::start(100);
 			roller::move(100);
 		} else if (master.get_digital(DIGITAL_R2)) { // outake
-			intake::move(-100);
+			intake::start(-100);
 			roller::move(-100);
 		} else if (!master.get_digital(DIGITAL_L2)) { // idle
-			intake::move(0);
+			intake::stop();
 			roller::move(0);
 		}
 
