@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <vector>
 
 /**
  * Subsystem Dependencies: Disc Lift
@@ -97,5 +98,5 @@ namespace flywheel {
     // Fires a number of discs, each with a specified speed. This function takes
     // a vector of doubles where each double is a speed for the disk. The size
     // of the passed vector specifies how many discs are shot. 
-    int fire(std::vector<double> speeds, int timeout = 5000);
+    //int fire(std::vector<double> speeds, int timeout = 5000);
 }

@@ -1,6 +1,8 @@
 #include "flywheel.hpp"
 
+#include "api.h"
 #include "main.h"
+#include "subsystems/subsystems.hpp"
 
 using namespace pros;
 
@@ -140,12 +142,12 @@ void wait_until_at_speed() {
     }
 }
 
-int fire(int numDiscs, int timeout = 5000) {
+int fire(int numDiscs, int timeout) {
     // TODO: Implement
 }
 
-int fire(std::vector<double> speeds, int timeout = 5000) {
-    // TODO: Implement
-}
+//int fire(std::vector<double> speeds, int timeout) {
+//    // TODO: Implement
+//}
 
 } // namespace flywheel

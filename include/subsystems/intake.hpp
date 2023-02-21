@@ -1,5 +1,7 @@
 #pragma once
 
+#include "api.h"
+
 #if 0
 /**
  * Subsystem Dependencies: Disc Lift
@@ -47,3 +49,13 @@ namespace intake {
 }
 
 #endif
+
+
+namespace intake {
+extern pros::Motor left_motor;
+extern pros::Motor right_motor;
+extern double speed;
+void move(double speed);
+void toggle();
+bool clear();
+} // namespace intake

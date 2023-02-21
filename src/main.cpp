@@ -2,12 +2,13 @@
 #include "ARMS/config.h"
 #include "ARMS/odom.h"
 #include "pros/misc.h"
-#include "subsystems.h"
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "vision.h"
 
 #include "subsystems/subsystems.hpp"
+
+using namespace pros;
 
 std::map<uint8_t, int32_t> comms_data;
 /**
@@ -35,7 +36,7 @@ void on_center_button() {
 void initialize() {
 	sylib::initialize();
 	Task disklift_home_task([](void){
-		disklift::home();
+		disclift::home();
 	});
 	
 	turret::initialize();
@@ -131,16 +132,16 @@ void opcontrol() {
 		);
 		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
 		pros::lcd::print(3, "Distance to goal: %2.4f", arms::odom::getDistanceError({0,0}));
-		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
-		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
-		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
+		pros::lcd::print(4, "DiscLift Position %f", disclift::lift_motor.get_position());
+		pros::lcd::print(5, "DL Temp: %f", disclift::lift_motor.get_temperature());
+		pros::lcd::print(6, "DL Draw: %d", disclift::lift_motor.get_current_draw());
 		pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
-			disklift::discLiftUp();
+			disclift::discLiftUp();
 			if(discLiftCounter < 10){
 				intake::move(100);
 			} else{
@@ -148,7 +149,7 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-			disklift::discLiftDown();
+			disclift::discLiftDown();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
@@ -165,7 +166,7 @@ void opcontrol() {
 		
 
 		if(master.get_digital_new_press(DIGITAL_L1)){
-			disklift::calculatePos();
+			disclift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
 			/* TODO: Rewrite this logic to work with the new subsystems */
@@ -174,7 +175,7 @@ void opcontrol() {
 			// } else {
 			// 	flywheel::stopIndexer();
 			// }
-			// disklift::discLiftHold();
+			// disclift::discLiftHold();
 		} else {
 			// flywheel::stopIndexer();
 		}
