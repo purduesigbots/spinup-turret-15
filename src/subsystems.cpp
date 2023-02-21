@@ -102,7 +102,12 @@ namespace disklift {
     double liftDownPos = 7;
 
     void discLiftUp(){
+        // Conditions for various states of the disc lift
+        // 
+
+
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
         //Prevents lifted from changing back to false momentariily, once it's set it stays until 
         //lifted AND flyweel detects a shot
         if(!lifted){
@@ -110,6 +115,7 @@ namespace disklift {
         } else if (lift_motor.get_actual_velocity() > 2){
             lifted = false;
         }
+
         if(!reachedSpeed){
             reachedSpeed = flywheel::at_speed();
         } else if (!flywheel::at_speed() && lifted){
@@ -117,11 +123,12 @@ namespace disklift {
             lifted = false;
             reachedSpeed = false;
         }
+
         if(lifted){
             //DISC LIFT ALL THE WAY UP FOR CURRENT NUM OF DISCS
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             lift_motor.brake();
-        } else if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() > 95)){
+        } else if(lift_motor.get_position() < 89 || (!isSilva() && lift_motor.get_position() < 95)){
             lift_motor.move_voltage(12000);
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -135,7 +142,7 @@ namespace disklift {
 
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() > 95)){
+        if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() < 95)){
             lift_motor.move_voltage(6000);
             // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             // lift_motor.brake();
@@ -242,7 +249,7 @@ void task() {
     while(1) {
         sylib::delay_until(&clock,10);
         average = left_flywheel.get_velocity();
-        printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
+        //printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
         if(speed == 0) {
             left_flywheel.stop();
             right_flywheel.stop();
