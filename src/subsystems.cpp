@@ -221,7 +221,7 @@ static int count=0;
 static double average;
 
 bool at_speed() {
-    return std::abs(speed - average) / speed < 0.03;
+    return std::abs(speed - average) / speed < 0.3;
 }
 
 void wait_until_fired() {
