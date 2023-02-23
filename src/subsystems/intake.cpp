@@ -14,7 +14,6 @@ namespace intake {
 
 Motor left_motor(11, E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 Motor right_motor(19, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-ADIAnalogIn lineSensor('f');
 
 bool running = false;
 double speed = 0;
@@ -23,6 +22,14 @@ double speed = 0;
 ADIDigitalOut armPiston({{8, 'a'}});
 bool armRaised = true;
 bool armState = false;
+
+void disc_counting_task_function(void* data) {
+    while(true) {
+
+    }
+}
+
+Task discCountingTask(disc_counting_task_function);
 
 void start(double speed) {
     left_motor.move_voltage(120 * speed);
@@ -47,25 +54,18 @@ void toggle(double speed) {
 
 int expect(int numDiscs, int timeout) {
     int startTime = pros::millis();
+    int startNumDiscs = disccounter::disc_count();
 
-    int discsFound = 0;
-    bool sawDisc = lineSensor.get_value() > 2000;
-
-    while(pros::millis() - startTime < timeout && discsFound < numDiscs) {
-        bool seeingDisc = lineSensor.get_value() > 2000;
-
-        if(sawDisc == true && seeingDisc == false) {
-            printf("Disc intook.\n");
-            discsFound++;
-        }
-
-        sawDisc = seeingDisc;
+    while(
+        disccounter::disc_count() - startNumDiscs < numDiscs &&
+        pros::millis() - startTime < timeout
+    ) {
         pros::delay(10);
     }
 
     pros::delay(500);
-
-    return discsFound;
+    
+    return disccounter::disc_count() - startNumDiscs;
 }
 
 bool is_on() {
@@ -92,11 +92,6 @@ void toggle_arm() {
 
 bool arm_raised() {
     return armRaised;
-}
-
-// This probably needs rewritten:
-bool clear() {
-    return lineSensor.get_value() > 1500;
 }
 
 } // namespace intake

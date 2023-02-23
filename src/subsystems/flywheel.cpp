@@ -164,6 +164,7 @@ int fire(int numDiscs, int timeout) {
 
         indexer.move_voltage(12000);
         numberFired++;
+        disccounter::decrement();
 
         pros::delay(10);
     }

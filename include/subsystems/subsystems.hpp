@@ -9,5 +9,6 @@
 #include "subsystems/deflector.hpp"
 #include "subsystems/roller.hpp"
 #include "subsystems/disclift.hpp"
+#include "subsystems/disccounter.hpp"
 
 #include "subsystems/misc.hpp"
