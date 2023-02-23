@@ -1,5 +1,6 @@
 // clang-format off
 #include "vision.h"
+#include "subsystems.h"
 #include "subsystems/subsystems.hpp"
 #include "comms/comms.hpp"
 #include "ARMS/odom.h"
@@ -33,12 +34,12 @@ std::shared_ptr<comms::ReceiveComms> communication;
 
 void init() {
   communication =
-      std::make_shared<comms::ReceiveComms>(8, 115200, START_CHAR, END_CHAR);
+      std::make_shared<comms::ReceiveComms>(3, 115200, START_CHAR, END_CHAR);
 }
 
 double get_goal_gamma() {
   return atan2((GOAL_WIDTH / (double)communication->get_data(WIDTH) *
-                (265 - (double)communication->get_data(LEFT_RIGHT))),
+                (220 - (double)communication->get_data(LEFT_RIGHT))),
                get_goal_distance()) *
          (180 * M_1_PI);
 }
@@ -96,16 +97,16 @@ void task() {
       turn_degrees = 0;
     }
 
-    printf("Color:      %llu\n", color);
-    printf("Left/Right: %llu\n", lr);
-    printf("Height:     %llu\n", height);
-    printf("Width:      %llu\n", width);
-    printf("Gamma:      %f\n", get_goal_gamma());
-    printf("Turn Degrees: %f\n", turn_degrees);
-    printf("Goal Distance: %f\n", get_goal_distance());
-    printf("Turrent Angle %f\n", turret::get_angle());
-    printf("Turrent Pose %f\n", std::get<2>(get_turret_pose()));
-    printf("Time:       %f\n", counter);
+    // printf("Color:      %llu\n", color);
+    // printf("Left/Right: %llu\n", lr);
+    // printf("Height:     %llu\n", height);
+    // printf("Width:      %llu\n", width);
+    // printf("Gamma:      %f\n", get_goal_gamma());
+    // printf("Turn Degrees: %f\n", turn_degrees);
+    // printf("Goal Distance: %f\n", get_goal_distance());
+    // printf("Turrent Angle %f\n", turret::get_angle());
+    // printf("Turrent Pose %f\n", std::get<2>(get_turret_pose()));
+    // printf("Time:       %f\n", counter);
 
     if (previous_height != height || previous_lr != lr ||
         previous_color != color) {
@@ -117,7 +118,7 @@ void task() {
     previous_height = height;
     previous_lr = lr;
     previous_color = color;
-    printf("----------------\n");
+    //printf("----------------\n");
 
     // 0 is red
     // 1 is blue
