@@ -60,11 +60,11 @@ void task_function(void* data) {
         sylib::delay_until(&clock,10);
         average_speed = left_flywheel.get_velocity();
 
-        printf("%.2f,%.2f,%.2f\n", 
-            average_speed, 
-            targetSpeed, 
-            left_flywheel.get_applied_voltage()/80.0
-        );
+        // printf("%.2f,%.2f,%.2f\n", 
+        //     average_speed, 
+        //     targetSpeed, 
+        //     left_flywheel.get_applied_voltage()/80.0
+        // );
 
         // If the speed is less than or equal to zero, we want to stop the
         // motors and let them coast. Otherwise, we want them to adjust to the
@@ -135,19 +135,40 @@ double target_speed() {
 }
 
 // Blocks until the robot reaches a specific speed.
-void wait_until_at_speed() {
+void wait_until_at_speed(uint32_t timeout) {
     while (!at_speed()) {
         printf("wait_until_at_speed\n");
         pros::delay(10);
     }
 }
 
-int fire(int numDiscs, int timeout) {
-    // TODO: Implement
+void wait_until_fired() {
+    while (targetSpeed - average_speed < 20) {
+        printf("wait_until_fired\n");
+        pros::delay(10);
+    }
 }
 
-//int fire(std::vector<double> speeds, int timeout) {
-//    // TODO: Implement
-//}
+int fire(int numDiscs, int timeout) {
+    uint32_t startTime = pros::millis();
+
+    int numberFired = 0;
+
+    while(pros::millis() - startTime < timeout) {
+        while(!at_speed()) {
+            if(pros::millis() - startTime < timeout) {
+                return numberFired;
+            }
+            pros::delay(10);
+        }
+
+        indexer.move_voltage(12000);
+        numberFired++;
+
+        pros::delay(10);
+    }
+
+    return numberFired;
+}
 
 } // namespace flywheel

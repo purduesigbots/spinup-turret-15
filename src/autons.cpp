@@ -187,7 +187,22 @@ void skillsAuto() {
 }
 #endif 
 extern "C" {
+
+void subsystem_test() {
+	printf("Intaking 3 discs:\n");
+	
+	intake::start(300);
+
+	intake::expect(3, 10000);
+
+	printf("Done\n");
+
+	intake::stop();
+}
+
 void autonomous() {
+	subsystem_test();
+
 #if 0
 
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);

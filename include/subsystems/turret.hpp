@@ -41,6 +41,16 @@ namespace turret {
     void goto_angle(double angle, double velocity = 100, bool async = false);
 
     /**
+     * Tells the turret to go to an angle relative to the robot's heading and
+     * the current turret angle
+     * 
+     * @param angle The angle to move by in degrees
+     * @param velocity The velocity to move with.
+     * @param async If strue, this function will not block the calling thread
+     */
+    void goto_rel_move(double angle, double velocity = 100, bool async = false);
+
+    /**
      * Returns the angle of the turret in degrees, where 0 is directly forward,
      * 90 is 90 degrees to the left, and -90 is 90 degrees to the right
      */

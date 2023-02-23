@@ -3,6 +3,7 @@
 #include "subsystems/subsystems.hpp"
 #include "api.h"
 
+#include <cmath>
 #include <algorithm>
 
 using namespace pros;
@@ -22,13 +23,14 @@ const double ROT_TO_DEG = 37.5;
 const double LEFT_LIMIT = 80.0;         // Maximum angle to the left
 const double RIGHT_LIMIT = -80.0;       // Maximum angle to the right 
 
-const double SETTLE_THRESHHOLD = 1.0;   // How many degrees to the left or right
+const double SETTLE_THRESHHOLD = 0.5;   // How many degrees to the left or right
                                         // do we consider within the settled
                                         // range
 
-void initialize() {
-    motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+inline double rot_to_deg(double rot) { return rot * ROT_TO_DEG; }
+inline double deg_to_rot(double deg) { return deg / ROT_TO_DEG; }
 
+void initialize() {
     calibrate();
 }
 
@@ -56,13 +58,13 @@ void calibrate() {
 }
 
 double get_angle() {
-    return motor.get_position() * ROT_TO_DEG;
+    return rot_to_deg(motor.get_position());
 }
 
 void goto_angle(double angle, double velocity, bool async) {
     // Clamp the angle so that we don't try to move to a position that will 
     // harm the ring gear or burn out the motor
-    target_angle = std::clamp(angle / ROT_TO_DEG, RIGHT_LIMIT, LEFT_LIMIT);
+    target_angle = std::clamp(deg_to_rot(angle), RIGHT_LIMIT, LEFT_LIMIT);
 
     // Let PROS handle the positioning of the motor 
     motor.move_absolute(target_angle, velocity);
@@ -72,9 +74,16 @@ void goto_angle(double angle, double velocity, bool async) {
     }
 }
 
+void goto_rel_move(double angle, double velocity, bool async) {
+    goto_angle(get_angle() + angle, velocity, async);
+}
+
+double get_angle_error() {
+    return get_angle() - target_angle;
+}
 
 bool settled() {
-    return std::abs(get_angle() - target_angle) < SETTLE_THRESHHOLD;
+    return fabs(get_angle_error()) < SETTLE_THRESHHOLD;
 }
 
 /**
@@ -85,6 +94,8 @@ void wait_until_settled() {
     // Once it is within SETTLE_THRESHHOLD degrees of the target angle, we quit
     // the loop.
     while(!settled()) {
+        printf("Turret not settled:\n");
+        printf("    Delta: %f\n", get_angle_error);
         pros::delay(10);
     }
 }

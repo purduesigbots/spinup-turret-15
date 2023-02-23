@@ -11,6 +11,7 @@
 using namespace pros;
 
 std::map<uint8_t, int32_t> comms_data;
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -78,6 +79,7 @@ void disabled() {
  * starts.
  */
 void competition_initialize() {
+	
 }
 
 
@@ -141,7 +143,7 @@ void opcontrol() {
 			discLiftCounter = 0; 
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
-			disclift::discLiftUp();
+			//disclift::discLiftUp();
 			if(discLiftCounter < 10){
 				intake::start(100);
 			} else{
@@ -149,11 +151,12 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-			disclift::discLiftDown();
+			// disclift::discLiftDown();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
 			deflector::toggle();
+			intake::toggle_arm();
 		}
 		if (master.get_digital_new_press(DIGITAL_RIGHT)){
 			std::cout << "Launching Endgame" << std::endl;
@@ -163,8 +166,6 @@ void opcontrol() {
 			intake::toggle(100);
 		}
 		
-		
-
 		if(master.get_digital_new_press(DIGITAL_L1)){
 			disclift::calculatePos();
 		}
@@ -191,7 +192,7 @@ void opcontrol() {
 			roller::move(0);
 		}
 
-		turret::goto_angle(0, 250, true);
+		//turret::goto_angle(0, 250, true);
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
@@ -205,7 +206,8 @@ void opcontrol() {
 
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
 			flywheel::change_target_speed(-5);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());
+			
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());		
 		}
 
 		if(master.get_digital_new_press(DIGITAL_X)){

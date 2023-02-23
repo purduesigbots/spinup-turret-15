@@ -14,7 +14,7 @@ namespace intake {
 
 Motor left_motor(11, E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 Motor right_motor(19, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-ADIAnalogIn line(6);
+ADIAnalogIn lineSensor(6);
 
 bool running = false;
 double speed = 0;
@@ -46,7 +46,24 @@ void toggle(double speed) {
 } 
 
 int expect(int numDiscs, int timeout) {
-    // TODO: implement
+    int startTime = pros::millis();
+
+    int discsFound = 0;
+    bool sawDisc = lineSensor.get_value() < 1500;
+
+    while(pros::millis() - startTime < timeout && discsFound < numDiscs) {
+        bool seeingDisc = lineSensor.get_value() > 1500;
+
+        if(sawDisc == true && seeingDisc == false) {
+            printf("Disc intook.\n");
+            discsFound++;
+        }
+
+        sawDisc = seeingDisc;
+        pros::delay(10);
+    }
+
+    return discsFound;
 }
 
 bool is_on() {
@@ -55,26 +72,20 @@ bool is_on() {
 
 void raise_arm() {
     if(!armRaised) {
-        armRaised = true;
-        armState = !armState;
-        armPiston.set_value(armState);
+        toggle_arm();
     }
 }
 
 void lower_arm() {
     if(armRaised) {
-        armState = !armState;
-        armRaised = false;
+        toggle_arm();
     }
 }
 
 void toggle_arm() {
-    if(armRaised) {
-        lower_arm();
-    }
-    else {
-        raise_arm();
-    }
+    armState = !armState;
+    armRaised = !armRaised;
+    armPiston.set_value(armState);
 }
 
 bool arm_raised() {
@@ -83,7 +94,7 @@ bool arm_raised() {
 
 // This probably needs rewritten:
 bool clear() {
-    return line.get_value() > 1500;
+    return lineSensor.get_value() > 1500;
 }
 
 } // namespace intake
