@@ -9,7 +9,7 @@ namespace disccounter {
 /**
  * Initializes the disc counter subsystem: Creates tasks, sets defaults, etc. 
  */
-void initialze();
+void initialize();
 
 /**
  * Returns the number of discs currently in the robot 

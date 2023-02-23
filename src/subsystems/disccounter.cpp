@@ -13,12 +13,6 @@ namespace disccounter {
 // The line sensor being used for detecting the discs.
 ADIAnalogIn lineSensor('f');
 
-// The PROS task for running this subsystem. Since PROS doesn't have a way to 
-// create a global task, but not start it until a function is called, we use a 
-// smart pointer here, and when this subsystem's intialize function is called, 
-// we then create the pointer to the task object. 
-std::unique_ptr<Task> task;
-
 // The number of discs that the robot currently has. This is made atomic so that
 // we don't get race conditions trying to increment or decrement it.
 std::atomic<int> discCount = 0;
@@ -35,7 +29,7 @@ State state = State::NO_DISC;
 // probably be drastically improved with a gausian filter tuned to each 
 // competition location, but that's more work. 
 bool seesDisc() {
-    return lineSensor.get_value() < 2000;
+    return lineSensor.get_value() < 2400;
 }
 
 /**
@@ -44,18 +38,29 @@ bool seesDisc() {
  */
 void task_function(void* data) {
     while(true) {
+        printf("Number of discs: %d\n", int(discCount));
+        printf("    State %d\n", state);
+        printf("    Line Sensor Value: %d\n", lineSensor.get_value());
+        printf("    Pros err: %d\n", errno);
+
+
         bool seeingDisc = seesDisc();
+        printf("    seeingDisc = %i\n", seeingDisc);
         
         // If we have not yet seen a disc and we just started seeing one,
         // set the appropriate state depending on the intake's direction
         if(state == State::NO_DISC && seeingDisc) {
+            printf("    Started Seeing Disc\n");
             if(intake::intaking()) {
+                printf("    state = State::DISC_INTAKE\n");
                 state = State::DISC_INTAKE;
             }
             else if(intake::outtaking()) {
+                printf("    state = State::DISC_OUTTAKE\n");
                 state = State::DISC_OUTTAKE;
             }
         }
+
         // If we have been seeing a disc and stopped seeing it, we only
         // increment the disc count if the intake was intaking when we first saw
         // the disc and when we stopped seeing it. Otherwise, the intake's
@@ -88,7 +93,9 @@ void task_function(void* data) {
 
 // Initializes the subsystem by starting the task.
 void initialize() {
-    task = std::make_unique<pros::Task>(task_function, nullptr, "Disc Counter Task");
+    printf("Initializing Disc Counter Subsystem: ");
+    pros::Task task(task_function, nullptr, "Disc Counter Task");
+    printf("Done\n");
 }
 
 // Returns the number of discs in the robot currently.
