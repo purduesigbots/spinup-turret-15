@@ -68,4 +68,19 @@ bool arm_raised();
 
 bool clear();
 
+/**
+ * Returns whether the intake is intaking or not.
+ * 
+ * @return True if the intake is intaking. 
+ */
+bool intaking();
+
+/**
+ * Returns whether the intake is outtaking or not, i.e., running in reverse
+ * 
+ * @return True if the intake is outtaking.
+ */
+bool outtaking();
+
+
 } // namespace intake

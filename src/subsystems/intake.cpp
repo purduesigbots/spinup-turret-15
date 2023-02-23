@@ -23,14 +23,6 @@ ADIDigitalOut armPiston({{8, 'a'}});
 bool armRaised = true;
 bool armState = false;
 
-void disc_counting_task_function(void* data) {
-    while(true) {
-
-    }
-}
-
-Task discCountingTask(disc_counting_task_function);
-
 void start(double speed) {
     left_motor.move_voltage(120 * speed);
     right_motor.move_voltage(120 * speed);
@@ -64,7 +56,7 @@ int expect(int numDiscs, int timeout) {
     }
 
     pros::delay(500);
-    
+
     return disccounter::disc_count() - startNumDiscs;
 }
 
@@ -92,6 +84,14 @@ void toggle_arm() {
 
 bool arm_raised() {
     return armRaised;
+}
+
+bool intaking() {
+    return speed > 0.0;
+}
+
+bool outtaking() {
+    return speed < 0.0;
 }
 
 } // namespace intake
