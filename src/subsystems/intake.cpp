@@ -14,7 +14,7 @@ namespace intake {
 
 Motor left_motor(11, E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
 Motor right_motor(19, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-ADIAnalogIn lineSensor(6);
+ADIAnalogIn lineSensor('f');
 
 bool running = false;
 double speed = 0;
@@ -49,10 +49,10 @@ int expect(int numDiscs, int timeout) {
     int startTime = pros::millis();
 
     int discsFound = 0;
-    bool sawDisc = lineSensor.get_value() < 1500;
+    bool sawDisc = lineSensor.get_value() > 2000;
 
     while(pros::millis() - startTime < timeout && discsFound < numDiscs) {
-        bool seeingDisc = lineSensor.get_value() > 1500;
+        bool seeingDisc = lineSensor.get_value() > 2000;
 
         if(sawDisc == true && seeingDisc == false) {
             printf("Disc intook.\n");
@@ -62,6 +62,8 @@ int expect(int numDiscs, int timeout) {
         sawDisc = seeingDisc;
         pros::delay(10);
     }
+
+    pros::delay(500);
 
     return discsFound;
 }
