@@ -37,22 +37,18 @@ void initialize() {
 	Task disklift_home_task([](void){
 		disklift::home();
 	});
-	
-	turret::initialize();
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
-	pros::delay(2000);
-	Task flywheel(flywheel::task);
-	//vision::init();
-	//Task vision(vision::task);
-
-
 	pros::lcd::initialize();
 	pros::lcd::clear();
-	pros::lcd::set_text(1, "Hello PROS User!");
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
+	//pros::delay(2000);
+	Task flywheel(flywheel::task);
+	vision::init();
+	Task vision(vision::task);
+	turret::initialize();
 
 	// pros::lcd::register_btn1_cb(on_center_button);
 
@@ -97,7 +93,7 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	//turret::set_position(0.0, 80);
+	turret::goto_angle(0, 400, true);
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
@@ -130,11 +126,11 @@ void opcontrol() {
 			arms::odom::getHeading()
 		);
 		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-		pros::lcd::print(3, "Distance to goal: %2.4f", arms::odom::getDistanceError({0,0}));
+		pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
-		pros::lcd::print(7, "Is goldy: %d", !isSilva());
+		//pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
@@ -189,8 +185,6 @@ void opcontrol() {
 			roller::move(0);
 		}
 
-		turret::goto_angle(0, 250, true);
-
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
 			if (flywheel::speed == 0) {
@@ -213,8 +207,9 @@ void opcontrol() {
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
 			autonomous();
+			//turret::toggle_vision_aim();
 		}
-
+		turret::update();
 		pros::delay(20);
 	}
 }

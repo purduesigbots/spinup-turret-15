@@ -25,7 +25,11 @@ namespace turret {
      */
     void calibrate();
 
+    void update();
+
     void goto_angle(double angle, double velocity = 100, bool async = false);
+
+    void toggle_vision_aim();
 
     /**
      * Returns the angle of the turret in degrees, where 0 is directly forward,

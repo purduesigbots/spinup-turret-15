@@ -4,6 +4,7 @@
 #include "pros/misc.hpp"
 #include "pros/motors.h"
 #include "subsystems.h"
+#include "subsystems/subsystems.hpp"
 #include <cmath>
 
 // intake -------------------------------------------------------------------------
@@ -82,7 +83,7 @@ void task() {
 }
 
 void init() {
-    optical.set_led_pwm(100);
+    //optical.set_led_pwm(100);
     pros::Task roller_task(task);
 }
 
@@ -182,7 +183,7 @@ int threshold = 150;
 double kV = 57.7;
 double kP = 0.5;
 double kI = 0.001;
-double kD = 0.37;
+double kD = 0;
 // SILVA : GOLDY
 int leftPort = isSilva() ? 9 : 9;
 int rightPort = isSilva() ? 8 : 10;
@@ -225,15 +226,17 @@ bool at_speed() {
 }
 
 void wait_until_fired() {
-    while (speed - average < 20) {
-        printf("wait_until_fired\n");
+    while (speed - average < 30) {
+        //printf("wait_until_fired\n");
+        turret::update();
         pros::delay(10);
     }
 }
 
 void wait_until_at_speed() {
-    while (!at_speed()) {
-        printf("wait_until_at_speed\n");
+    while (speed - average > 20) {
+        //printf("wait_until_at_speed\n");
+        turret::update();
         pros::delay(10);
     }
 }

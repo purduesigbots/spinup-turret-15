@@ -6,6 +6,7 @@ namespace vision {
     void task();
 
     double get_goal_distance();
+    double get_goal_gamma();
     
 }
 

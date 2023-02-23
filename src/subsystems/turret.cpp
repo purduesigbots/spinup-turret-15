@@ -1,6 +1,7 @@
 #include "subsystems/turret.hpp"
 
 #include "subsystems/subsystems.hpp"
+#include "vision.h"
 #include "api.h"
 
 #include <algorithm>
@@ -9,11 +10,17 @@ using namespace pros;
 
 namespace turret {
 
+#define DISABLED 0
+#define MOVE_TO_ANGLE 1
+#define MOVE_WITH_VISION 2
+
 // Devices needed for implementing the subsystem:
 Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
 ADIDigitalIn limit_switch('e');
 
 double target_angle = 0.0;
+double max_velocity = 0.0;
+int state = DISABLED;
 
 // This constant is used to convert the motor's possition, which is in
 // rotations, to the turret's angle in degrees.
@@ -55,6 +62,25 @@ void calibrate() {
     pros::delay(100);
 }
 
+void update() {
+    switch(state) {
+        case DISABLED:
+            motor.move(0);
+            break;
+        case MOVE_TO_ANGLE:
+            motor.move_absolute(target_angle, max_velocity);
+            break;
+        case MOVE_WITH_VISION:
+            double angle_error = vision::get_goal_gamma();
+            if (angle_error != 45.00) {
+                motor.move_voltage(400 * angle_error);
+            } else {
+                motor.move_voltage(0);
+            }
+            break;
+    }
+}
+
 double get_angle() {
     return motor.get_position() * ROT_TO_DEG;
 }
@@ -63,12 +89,19 @@ void goto_angle(double angle, double velocity, bool async) {
     // Clamp the angle so that we don't try to move to a position that will 
     // harm the ring gear or burn out the motor
     target_angle = std::clamp(angle / ROT_TO_DEG, RIGHT_LIMIT, LEFT_LIMIT);
-
-    // Let PROS handle the positioning of the motor 
-    motor.move_absolute(target_angle, velocity);
+    max_velocity = velocity;
+    state = MOVE_TO_ANGLE;
 
     if(!async) {
         wait_until_settled();
+    }
+}
+
+void toggle_vision_aim() {
+    if (state == MOVE_WITH_VISION) {
+        state = MOVE_TO_ANGLE;
+    } else {
+        state = MOVE_WITH_VISION;
     }
 }
 
