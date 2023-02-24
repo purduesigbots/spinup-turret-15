@@ -1,6 +1,8 @@
 #include "subsystems/turret.hpp"
 
-#include "subsystems/subsystems.hpp"
+#include "pros/adi.hpp"
+#include "../../include/subsystems.h"
+#include "main.h"
 #include "vision.h"
 #include "api.h"
 
@@ -16,7 +18,7 @@ namespace turret {
 
 // Devices needed for implementing the subsystem:
 Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
-ADIDigitalIn limit_switch('e');
+ADIDigitalIn limit_switch( ext_adi_port_pair_t{4, 'h'});
 
 double target_angle = 0.0;
 double max_velocity = 0.0;

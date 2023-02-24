@@ -11,12 +11,12 @@
 namespace intake {
 
 //LOCAL DEFS:
-int smart_port = 8;
-char adi_port = 'a';
+int smart_port = isSilva()? 4 : 8;
+char adi_port = isSilva()? 'h' : 'a';
 ADIDigitalOut intake_piston({{smart_port,adi_port}});
-Motor left_motor(11, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
-Motor right_motor(19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-ADIAnalogIn line(6);
+Motor left_motor(isSilva()? 11 : 10, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor right_motor(isSilva()? 18 : 19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+ADIAnalogIn line(isSilva()? 'h' : 6);
 
 bool state = false;
 double speed = 0;
@@ -96,7 +96,7 @@ void set_brake_mode(pros::motor_brake_mode_e mode) {
 namespace disklift {
     
     //LOCAL DEFS:
-    pros::Motor lift_motor(21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+    pros::Motor lift_motor(isSilva()? 15 : 21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
     bool lifted = false; //if true, keep true until a disc is fired
     bool reachedSpeed = false;
     int targState = 0; // 0 = down, 1 = up, 2 = hold
@@ -275,8 +275,8 @@ void stopIndexer(){
 }
 //deflector__________________________________________________________
 namespace deflector {
-int smart_port = 8;
-char adi_port = 'c';
+int smart_port = isSilva()? 4 : 8;
+char adi_port = isSilva() ? 'A' : 'c';
 ADIDigitalOut deflector_piston({{smart_port,adi_port}});
 bool state = true;
 void toggle(){
@@ -287,9 +287,7 @@ void toggle(){
 
 //endgame__________________________________________________________
 namespace endgame {
-int smart_port = 20;
-char adi_port = 'f';
-ADIDigitalOut endgame_piston('f');
+ADIDigitalOut endgame_piston(isSilva()? ext_adi_port_pair_t{4, 'D'} : ext_adi_port_pair_t{20, 'f'});
 bool state = false;
 void launch(){
     state = !state;

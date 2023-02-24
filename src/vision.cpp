@@ -34,7 +34,7 @@ std::shared_ptr<comms::ReceiveComms> communication;
 
 void init() {
   communication =
-      std::make_shared<comms::ReceiveComms>(3, 115200, START_CHAR, END_CHAR);
+      std::make_shared<comms::ReceiveComms>(isSilva()? 1 : 3, 115200, START_CHAR, END_CHAR);
 }
 
 double get_goal_gamma() {

@@ -126,11 +126,11 @@ void opcontrol() {
 			arms::odom::getHeading()
 		);
 		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-		pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
+		// pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
-		//pros::lcd::print(7, "Is goldy: %d", !isSilva());
+		pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
