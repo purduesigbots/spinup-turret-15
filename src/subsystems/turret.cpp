@@ -68,6 +68,7 @@ double last_error = 0.0;
 void update() {
     double angle_error = vision::get_goal_gamma();
     vision_working = angle_error != 45.00 && angle_error != last_error;
+    last_error = angle_error;
     switch(state) {
         case DISABLED:
             motor.move(0);
@@ -88,7 +89,6 @@ void update() {
             }
             break;
     }
-    last_error = angle_error;
 }
 
 double get_angle() {

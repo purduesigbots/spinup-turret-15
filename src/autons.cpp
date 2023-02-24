@@ -123,7 +123,7 @@ void matchAuto() {
     turn(155, 60);
 	pros::delay(500);
 	move({-20,47}, 50);
-	pros::delay(500);
+	pros::delay(1000);
 	turn(110, 60);
 	pros::delay(500);
 	shoot(3, -75);

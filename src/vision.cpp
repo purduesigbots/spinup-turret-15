@@ -35,7 +35,7 @@ double vision_offset = 240;
 
 void init() {
   communication =
-      std::make_shared<comms::ReceiveComms>(3, 115200, START_CHAR, END_CHAR);
+      std::make_shared<comms::ReceiveComms>(2, 115200, START_CHAR, END_CHAR);
 }
 
 double get_goal_gamma() {

@@ -223,8 +223,8 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
-			autonomous();
-			//use_vision = !use_vision;
+			//autonomous();
+			use_vision = !use_vision;
 		}
 		turret::update();
 		counter++;
