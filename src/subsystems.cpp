@@ -252,7 +252,7 @@ void task() {
     while(1) {
         sylib::delay_until(&clock,10);
         average = left_flywheel.get_velocity();
-        printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
+        //printf("%.2f,%.2f,%.2f\n",average, speed, left_flywheel.get_applied_voltage()/80.0);
         if(speed == 0) {
             left_flywheel.stop();
             right_flywheel.stop();
@@ -287,9 +287,9 @@ void toggle(){
 
 //endgame__________________________________________________________
 namespace endgame {
-int smart_port = 20;
+int smart_port = 8;
 char adi_port = 'f';
-ADIDigitalOut endgame_piston('f');
+ADIDigitalOut endgame_piston({{smart_port,adi_port}});
 bool state = false;
 void launch(){
     state = !state;
