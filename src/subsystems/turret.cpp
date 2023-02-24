@@ -21,6 +21,7 @@ ADIDigitalIn limit_switch('e');
 double target_angle = 0.0;
 double max_velocity = 0.0;
 int state = DISABLED;
+bool vision_working = true;
 
 // This constant is used to convert the motor's possition, which is in
 // rotations, to the turret's angle in degrees.
@@ -41,7 +42,7 @@ void initialize() {
 
 void calibrate() {
     // Set the motor to move to the left
-    motor.move(50);
+    motor.move(80);
 
     // Wait until the limit switch is hit. This ensures the turret stops at a 
     // consistent location
@@ -51,7 +52,7 @@ void calibrate() {
 
     // Stop the motor so it doesn't break the ring gear
     motor.move(0);
-
+    pros::delay(100);
     // Now tell the motor to move back to face forward.
     motor.move_relative(-2.24, 250);
     pros::delay(1000);
@@ -62,7 +63,11 @@ void calibrate() {
     pros::delay(100);
 }
 
+double last_error = 0.0;
+
 void update() {
+    double angle_error = vision::get_goal_gamma();
+    vision_working = angle_error != 45.00 && angle_error != last_error;
     switch(state) {
         case DISABLED:
             motor.move(0);
@@ -71,12 +76,17 @@ void update() {
             motor.move_absolute(target_angle, max_velocity);
             break;
         case MOVE_WITH_VISION:
-            double angle_error = vision::get_goal_gamma();
-            if (angle_error != 45.00) {
-                motor.move_voltage(400 * angle_error);
+            /*
+            Angle error is set to 45.00 when the goal is not detected
+            If angle error has not changed, assume vision has disconnected
+            */
+            if (vision_working) {
+                angle_error = std::cbrt(angle_error);
+                motor.move_voltage(1100 * angle_error);
             } else {
                 motor.move_voltage(0);
             }
+            last_error = angle_error;
             break;
     }
 }
@@ -103,6 +113,14 @@ void toggle_vision_aim() {
     } else {
         state = MOVE_WITH_VISION;
     }
+}
+
+void enable_vision_aim() {
+    state = MOVE_WITH_VISION;
+}
+
+void disable_vision_aim() {
+    state = MOVE_TO_ANGLE;
 }
 
 

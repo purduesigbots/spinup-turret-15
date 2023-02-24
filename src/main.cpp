@@ -93,12 +93,15 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	turret::goto_angle(0, 400, true);
+	turret::goto_angle(0, 250, true);
+	vision::set_vision_offset(false);
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	int counter = 0;
 	bool indexer_wait = false;
+	bool use_vision = true;
+	bool vision_good = false;
 
 	// move(30, 70);
 	// move(-4, 50, arms::REVERSE);
@@ -128,12 +131,15 @@ void opcontrol() {
 		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
 		pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
-		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
+		pros::lcd::print(5, "DL Temp: %f", turret::motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
 		//pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
+			if (use_vision) {
+				turret::enable_vision_aim();
+			}
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			disklift::discLiftUp();
@@ -145,6 +151,7 @@ void opcontrol() {
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
 			disklift::discLiftDown();
+			turret::disable_vision_aim();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
@@ -195,19 +202,27 @@ void opcontrol() {
 		}
 
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::move(flywheel::speed + 1);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+			flywheel::move(flywheel::speed + 10);
+			master.print(1, 0, "Flywheel speed: %.1f", flywheel::speed);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::move(flywheel::speed - 1);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::speed);
+			flywheel::move(flywheel::speed - 5);
+			master.print(1, 0, "Flywheel speed: %.1f", flywheel::speed);
+		}
+
+		if (vision::vision_not_working()) {
+			vision_good = false;
+			master.print(0,0,"Vision Bad");
+		} else if (!vision_good) {
+			master.clear_line(0);
+			vision_good = true;
 		}
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
 			autonomous();
-			//turret::toggle_vision_aim();
+			//use_vision = !use_vision;
 		}
 		turret::update();
 		pros::delay(20);

@@ -31,6 +31,7 @@ const double SENSOR_HEIGHT = 0.3074803;
 namespace vision {
 
 std::shared_ptr<comms::ReceiveComms> communication;
+double vision_offset = 240;
 
 void init() {
   communication =
@@ -39,7 +40,7 @@ void init() {
 
 double get_goal_gamma() {
   return atan2((GOAL_WIDTH / (double)communication->get_data(WIDTH) *
-                (220 - (double)communication->get_data(LEFT_RIGHT))),
+                (vision_offset - (double)communication->get_data(LEFT_RIGHT))),
                get_goal_distance()) *
          (180 * M_1_PI);
 }
@@ -47,6 +48,18 @@ double get_goal_gamma() {
 double get_goal_distance() {
   return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) /
          (communication->get_data(HEIGHT) * SENSOR_HEIGHT);
+}
+
+bool vision_not_working() {
+  return communication->get_data(GOAL_COLOR) == 0 && communication->get_data(HEIGHT) == 0;
+}
+
+void set_vision_offset(bool is_auto) {
+  if (is_auto) {
+    vision_offset = 220;
+  } else {
+    vision_offset = 240;
+  }
 }
 
 std::tuple<double, double, double> get_turret_pose() {

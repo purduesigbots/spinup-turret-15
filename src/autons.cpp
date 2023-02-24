@@ -19,9 +19,12 @@
  */
 
 void shoot(int count, double angle) {
-	turret::toggle_vision_aim();
+	turret::enable_vision_aim();
 	disklift::lift_motor.move_voltage(12000);
-	pros::delay(1000);
+	for (int i = 0; i < 100; i++) {
+		turret::update();
+		pros::delay(10);
+	}
 	disklift::lift_motor.move_voltage(6000);
 	for (int i = 1; i < count; i++) {
 		flywheel::wait_until_at_speed();
@@ -34,6 +37,7 @@ void shoot(int count, double angle) {
 	pros::delay(750);
 	flywheel::stopIndexer();
 	disklift::discLiftDown();
+	turret::disable_vision_aim();
 }
 
 void matchAuto() {
@@ -41,7 +45,7 @@ void matchAuto() {
 	
 	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(120);
+	flywheel::move(167);
 	intake::toggle();
 	deflector::toggle();
 	deflector::toggle();
@@ -69,8 +73,7 @@ void matchAuto() {
 	// shoot disks
     std::cout << "Shooting preloads" << std::endl;
 	arms::odom::reset({18,-3},90);
-	turret::goto_angle(-13, 400, true);
-	flywheel::move(167);
+	turret::goto_angle(-13, 250, true);
 	turret::update();
 	move({18,3}, 50);
 	pros::delay(500);
@@ -79,7 +82,7 @@ void matchAuto() {
 	turret::update();
 	//pros::delay(500);
 
-	flywheel::move(90);
+	flywheel::move(135);
 	turn(30, 60);
 	pros::delay(100);
 	move({23,7},50);
@@ -94,19 +97,17 @@ void matchAuto() {
     
     std::cout << "Fetching disc 5" << std::endl;
     turn(50, 60);
-	turret::goto_angle(4, 400, true);
-	flywheel::move(135);
+	turret::goto_angle(7, 250, true);
 	turret::update();
 	pros::delay(100);
     move({4,30}, 50);
 	pros::delay(500);
 	move(-5, 50, arms::REVERSE & arms::THRU);
-	turn(60, 70, arms::ASYNC);
-	pros::delay(1500);
-	shoot(3,4);
+	pros::delay(500);
+	shoot(3,7);
 	
     std::cout << "Shooting discs 4, 5" << std::endl;
-	flywheel::move(90);
+	flywheel::move(135);
 	turn(145, 60);
 	pros::delay(500);
 	move({-8,33},50);
@@ -116,36 +117,33 @@ void matchAuto() {
 	move({-6,41},60);
 
     std::cout << "Fetching discs 6" << std::endl;
-	turret::goto_angle(-75, 400, true);
-	flywheel::move(135);
+	turret::goto_angle(-75, 250, true);
 	turret::update();
 	pros::delay(500);
     turn(155, 60);
 	pros::delay(500);
 	move({-20,47}, 50);
 	pros::delay(500);
-	turn(118, 60);
+	turn(110, 60);
 	pros::delay(500);
 	shoot(3, -75);
-	return;
 
     std::cout << "Fetching discs 7" << std::endl;
-	flywheel::move(120);
-	move({-24,34},50, arms::REVERSE);
-	turret::goto_angle(0, 400, true);
+	flywheel::move(165);
+	move({-21,35},50, arms::REVERSE);
+	turret::goto_angle(0, 250, true);
 	turret::update();
 	pros::delay(500);
-	turn(175, 60);
+	turn(178, 60);
 	pros::delay(500);
-	move({-28,34},50);
-	turn(225, 60);
-	move({-30,30}, 50);
-	turn(255, 60);
-	move({-30,27});
+	move({-26,35},50);
+	turn(217, 60);
+	move({-28,33}, 50);
+	turn(245, 60);
+	move({-30,28});
 	pros::delay(500);
     std::cout << "Shooting discs 6, 7" << std::endl;
     /* TODO: Implement this when the intake gets fixed */
-	flywheel::move(165);
 	turn(55, 60);
 	pros::delay(1000);
 	shoot(3,0);
@@ -162,26 +160,28 @@ void skillsAuto() {
 	deflector::toggle();
 	deflector::toggle();
 	intake::move(100);
+	vision::set_vision_offset(false);
 
 	// spin roller
     std::cout << "First 3 Stack" << std::endl;
 	move({15,0}, 50);
 	pros::delay(100);
 	move({32,0},30);
-	turret::goto_angle(-65, 400, true);
+	turret::goto_angle(-65, 250, true);
 	turret::update();
-	turn(-50, 60);
+	pros::delay(500);
+	turn(-45, 60);
 	pros::delay(500);
 	shoot(3, -65);
 
-	flywheel::move(165);
-	move({72,-48},50);
+	move({73,-43},50);
 	pros::delay(500);
-	turn(-110, 60);
+	turn(-90, 60);
 	pros::delay(500);
 	shoot(3, -65);
+	return;
 
-	turret::goto_angle(-45,400,true);
+	turret::goto_angle(-45,250,true);
 	turret::update();
 	turn(-45, 60);
 	pros::delay(500);
@@ -200,6 +200,7 @@ void skillsAuto() {
 
 extern "C" {
 void autonomous() {
+	vision::set_vision_offset(true);
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	
 	switch (arms::selector::auton) {
@@ -210,6 +211,6 @@ void autonomous() {
 			matchAuto();
 			break;
 	}
-	turret::goto_angle(0,400,true);
+	turret::goto_angle(0,250,true);
 }
 }
