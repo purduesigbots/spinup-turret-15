@@ -1,3 +1,6 @@
+/**
+This file includes all of the ARMS constants as well as all robot-specific constants for the SILVER robot.
+*/
 #pragma once
 
 
@@ -21,6 +24,9 @@
 #define FLYWHEEL_LEFT 9
 #define FLYWHEEL_RIGHT 8
 #define INDEXER_PORT 14
+
+#define TURRET_MOTOR 7
+#define TURRET_LIMIT_SWITCH {{4, 'h'}}
 
 #define DEFLECTOR_PISTON {{4, 'a'}}
 #define ENDGAME_PISTON {{4, 'd'}}

@@ -8,6 +8,12 @@
 
 #include <algorithm>
 
+#if BOT == GOLD
+  #include "ARMS/config_gold.h"
+#elif BOT == SILVER
+  #include "ARMS/config_silver.h"
+#endif
+
 using namespace pros;
 
 namespace turret {
@@ -18,13 +24,9 @@ namespace turret {
 
 // Devices needed for implementing the subsystem:
 
-#if BOT == GOLD
-    Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
-    ADIDigitalIn limit_switch( ext_adi_port_pair_t{4, 'h'});
-#elif BOT == SILVER
-    Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
-    ADIDigitalIn limit_switch( ext_adi_port_pair_t{4, 'h'});
-#endif
+Motor motor(TURRET_MOTOR, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
+ADIDigitalIn limit_switch(TURRET_LIMIT_SWITCH);
+
 
 double target_angle = 0.0;
 double max_velocity = 0.0;

@@ -1,3 +1,6 @@
+/**
+This file includes all of the ARMS constants as well as all robot-specific constants for the GOLD robot.
+*/
 #pragma once
 
 
@@ -21,6 +24,9 @@
 #define FLYWHEEL_LEFT 9
 #define FLYWHEEL_RIGHT 10
 #define INDEXER_PORT 14
+
+#define TURRET_MOTOR 7
+#define TURRET_LIMIT_SWITCH 'e'
 
 #define DEFLECTOR_PISTON {{8, 'c'}}
 #define ENDGAME_PISTON {{20, 'f'}}
