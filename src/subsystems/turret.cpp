@@ -86,9 +86,9 @@ void update() {
             } else {
                 motor.move_voltage(0);
             }
-            last_error = angle_error;
             break;
     }
+    last_error = angle_error;
 }
 
 double get_angle() {

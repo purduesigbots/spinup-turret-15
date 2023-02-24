@@ -213,8 +213,10 @@ void opcontrol() {
 
 		if (vision::vision_not_working()) {
 			vision_good = false;
-			master.print(0,0,"Vision Bad");
-		} else if (!vision_good) {
+			if (counter % 5 == 0) {
+				master.print(0,0,"Vision Bad");
+			}
+		} else if (!vision_good && counter % 5 == 0) {
 			master.clear_line(0);
 			vision_good = true;
 		}
@@ -225,6 +227,7 @@ void opcontrol() {
 			//use_vision = !use_vision;
 		}
 		turret::update();
+		counter++;
 		pros::delay(20);
 	}
 }

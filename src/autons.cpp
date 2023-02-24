@@ -21,7 +21,7 @@
 void shoot(int count, double angle) {
 	turret::enable_vision_aim();
 	disklift::lift_motor.move_voltage(12000);
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 125; i++) {
 		turret::update();
 		pros::delay(10);
 	}
@@ -155,7 +155,7 @@ void skillsAuto() {
 	
 	// setup
 	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(125);
+	flywheel::move(120);
 	intake::toggle();
 	deflector::toggle();
 	deflector::toggle();
@@ -176,26 +176,52 @@ void skillsAuto() {
 
 	move({73,-43},50);
 	pros::delay(500);
-	turn(-90, 60);
+	turn(-95, 60);
 	pros::delay(500);
 	shoot(3, -65);
-	return;
 
+	flywheel::move(165);
+	turn(-50, 60);
+	pros::delay(500);
+	move({88,-69},50);
+	pros::delay(500);
+	turn(90,60);
+	pros::delay(500);
+	tank(-50,-50);
+	pros::delay(750);
+	tank(0,0);
+	pros::delay(100);
+	arms::odom::reset({88,-81},90);
 	turret::goto_angle(-45,250,true);
 	turret::update();
-	turn(-45, 60);
-	pros::delay(500);
-	move({98,-79},50);
+	move({88,-76},50);
 	pros::delay(500);
 	turn(0, 60);
 	pros::delay(500);
-	move({115,-79},50);
+	move({125,-78},50);
 	pros::delay(500);
 	turn(135,60);
 	pros::delay(500);
-	move({112,-74},50);
+	move({116,-69},50);
 	pros::delay(500);
 	shoot(2,-45);
+
+	flywheel::move(145);
+	move({101,-50},30);
+	turret::goto_angle(-50,250,true);
+	turret::update();
+	pros::delay(1000);
+	intake::move(-100);
+	move(105, 50);
+	pros::delay(500);
+	turn(-45, 60);
+
+	// flywheel::move(120);
+	// move({71,-32},50);
+	// turret::goto_angle(-78,250,true);
+	// turret::update();
+	// pros::delay(500);
+	// shoot(2,-78);
 }
 
 extern "C" {

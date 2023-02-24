@@ -50,7 +50,7 @@ namespace arms {
 // Auton selector configuration constants
 #define AUTONS "Front", "Back", "Do Nothing" // Names of autonomi, up to 10
 #define HUE 0     // Color of theme from 0-359(H part of HSV)
-#define DEFAULT 0 // Default auton selected
+#define DEFAULT 1 // Default auton selected
 
 // Initializer
 inline void init() {
