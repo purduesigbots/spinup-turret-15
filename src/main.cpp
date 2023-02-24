@@ -6,8 +6,16 @@
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "vision.h"
-
 #include "subsystems/subsystems.hpp"
+
+// DO NOT REMOVE THIS. THIS IS A SANITY CHECK
+#if BOT == SILVER
+	#warning "Building Sliver Bot"
+#elif BOT == GOLD
+	#warning "Building Gold Bot"
+#else 
+	#error "INVALID BOT TYPE!!!! Use 'pros make gold' or 'pros make silver'"
+#endif
 
 std::map<uint8_t, int32_t> comms_data;
 /**

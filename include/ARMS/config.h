@@ -8,15 +8,15 @@
 
 namespace arms {
 
+#if BOT == GOLD
+  #include "ARMS/config_gold.h"
+#elif BOT == SILVER
+  #include "ARMS/config_silver.h"
+#endif
+
 // Debug
 #define ODOM_DEBUG 0
 
-// Negative numbers mean reversed motor
-
-#define LEFT_MOTORS_SILVA 2, -13, 12
-#define RIGHT_MOTORS_SILVA -16, 17, -19
-#define LEFT_MOTORS_GOLDY 4, -13, 12
-#define RIGHT_MOTORS_GOLDY -15, 17, -18
 
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
@@ -61,15 +61,10 @@ namespace arms {
 
 // Initializer
 inline void init() {
-  if(isSilva()) {
-    chassis::init({LEFT_MOTORS_SILVA}, {RIGHT_MOTORS_SILVA}, GEARSET, SLEW_STEP,
+  chassis::init({LEFT_MOTORS}, {RIGHT_MOTORS}, GEARSET, SLEW_STEP,
                 LINEAR_EXIT_ERROR, ANGULAR_EXIT_ERROR, SETTLE_THRESH_LINEAR,
                 SETTLE_THRESH_ANGULAR, SETTLE_TIME);
-  }else{
-    chassis::init({LEFT_MOTORS_GOLDY}, {RIGHT_MOTORS_GOLDY}, GEARSET, SLEW_STEP,
-                LINEAR_EXIT_ERROR, ANGULAR_EXIT_ERROR, SETTLE_THRESH_LINEAR,
-                SETTLE_THRESH_ANGULAR, SETTLE_TIME);
-  }
+
   odom::init(ODOM_DEBUG, ENCODER_TYPE, {ENCODER_PORTS}, EXPANDER_PORT, IMU_PORT,
              TRACK_WIDTH, MIDDLE_DISTANCE, TPI, MIDDLE_TPI);
 

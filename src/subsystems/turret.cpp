@@ -17,8 +17,14 @@ namespace turret {
 #define MOVE_WITH_VISION 2
 
 // Devices needed for implementing the subsystem:
-Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
-ADIDigitalIn limit_switch( ext_adi_port_pair_t{4, 'h'});
+
+#if BOT == GOLD
+    Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
+    ADIDigitalIn limit_switch( ext_adi_port_pair_t{4, 'h'});
+#elif BOT == SILVER
+    Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
+    ADIDigitalIn limit_switch( ext_adi_port_pair_t{4, 'h'});
+#endif
 
 double target_angle = 0.0;
 double max_velocity = 0.0;
