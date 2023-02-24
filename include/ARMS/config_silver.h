@@ -1,6 +1,32 @@
 #pragma once
 
 
+#define INTAKE_PISTON {{4, 'h'}}
+#define INTAKE_LEFT 11
+#define INTAKE_RIGHT 18
+#define INTAKE_LINE 'h'
+
+#define ROLLER_MOTOR 6
+#define ROLLER_OPTICAL 5
+
+#define LIFT_MOTOR 15
+#define LIFT_UP_POS 90
+#define LIFT_DOWN_POS 7
+
+#define FLYWHEEL_THRESHOLD 150
+#define FLYWHEEL_KV 57.7
+#define FLYWHEEL_KP 0.5
+#define FLYWHEEL_KI 0.001
+#define FLYWHEEL_KD 0
+#define FLYWHEEL_LEFT 9
+#define FLYWHEEL_RIGHT 8
+#define INDEXER_PORT 14
+
+#define DEFLECTOR_PISTON {{4, 'a'}}
+#define ENDGAME_PISTON {{4, 'd'}}
+
+#define IRIS_PORT 1
+
 // Debug
 #define ODOM_DEBUG 0
 

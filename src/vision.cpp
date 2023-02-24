@@ -7,7 +7,11 @@
 #include "pros/misc.h"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 // clang-format on
-
+#if BOT == SILVER
+    #include "../include/ARMS/config_silver.h"
+#elif BOT == GOLD
+    #include "../include/ARMS/config_gold.h"
+#endif
 #define START_CHAR 0b11001100
 #define END_CHAR 0b00110011
 
@@ -34,7 +38,7 @@ std::shared_ptr<comms::ReceiveComms> communication;
 
 void init() {
   communication =
-      std::make_shared<comms::ReceiveComms>(isSilva()? 1 : 3, 115200, START_CHAR, END_CHAR);
+      std::make_shared<comms::ReceiveComms>(IRIS_PORT, 115200, START_CHAR, END_CHAR);
 }
 
 double get_goal_gamma() {

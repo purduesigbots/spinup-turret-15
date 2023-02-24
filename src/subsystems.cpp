@@ -7,16 +7,20 @@
 #include "subsystems/subsystems.hpp"
 #include <cmath>
 
+#if BOT == SILVER
+    #include "../include/ARMS/config_silver.h"
+#elif BOT == GOLD
+    #include "../include/ARMS/config_gold.h"
+#endif
 // intake -------------------------------------------------------------------------
 namespace intake {
 
 //LOCAL DEFS:
-int smart_port = isSilva()? 4 : 8;
-char adi_port = isSilva()? 'h' : 'a';
-ADIDigitalOut intake_piston({{smart_port,adi_port}});
-Motor left_motor(isSilva()? 11 : 10, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
-Motor right_motor(isSilva()? 18 : 19, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-ADIAnalogIn line(isSilva()? 'h' : 6);
+
+ADIDigitalOut intake_piston(INTAKE_PISTON);
+Motor left_motor(INTAKE_LEFT, MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor right_motor(INTAKE_RIGHT, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+ADIAnalogIn line(INTAKE_LINE);
 
 bool state = false;
 double speed = 0;
@@ -41,8 +45,8 @@ bool clear() {
 namespace roller {
 
 //LOCAL DEFS:
-Motor motor(6, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
-Optical optical(5);
+Motor motor(ROLLER_MOTOR, MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Optical optical(ROLLER_OPTICAL);
 
 double speed = 0;
 bool turning_roller = false;
@@ -96,11 +100,10 @@ void set_brake_mode(pros::motor_brake_mode_e mode) {
 namespace disklift {
     
     //LOCAL DEFS:
-    pros::Motor lift_motor(isSilva()? 15 : 21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+    pros::Motor lift_motor(LIFT_MOTOR, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
     bool lifted = false; //if true, keep true until a disc is fired
     bool reachedSpeed = false;
     int targState = 0; // 0 = down, 1 = up, 2 = hold
-    double liftDownPos = 7;
 
     void discLiftUp(){
         // Conditions for various states of the disc lift
@@ -129,7 +132,7 @@ namespace disklift {
             //DISC LIFT ALL THE WAY UP FOR CURRENT NUM OF DISCS
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             lift_motor.brake();
-        } else if(lift_motor.get_position() < 89 || (!isSilva() && lift_motor.get_position() < 95)){
+        } else if(lift_motor.get_position() < LIFT_UP_POS){
             lift_motor.move_voltage(12000);
         } else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -143,7 +146,7 @@ namespace disklift {
 
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if((isSilva() && lift_motor.get_position() < 89) || (!isSilva() && lift_motor.get_position() < 95)){
+        if(lift_motor.get_position() < LIFT_UP_POS){
             lift_motor.move_voltage(6000);
             // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             // lift_motor.brake();
@@ -157,11 +160,11 @@ namespace disklift {
         lifted = false;
         reachedSpeed = false;
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < liftDownPos + 2){
+        if(lift_motor.get_position() < LIFT_DOWN_POS + 2){
             // Acceptable tolerance, avoid burnout
             lift_motor.move_voltage(0);
         } else{
-            lift_motor.move_absolute(liftDownPos,100);
+            lift_motor.move_absolute(LIFT_DOWN_POS,100);
         }
     }
 
@@ -169,7 +172,7 @@ namespace disklift {
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         lift_motor.move(-80);
         int timestamp = pros::millis();
-        while (lift_motor.get_current_draw() < 1000 && pros::millis() - timestamp < 2000) {
+        while (lift_motor.get_actual_velocity() == 0 && pros::millis() - timestamp > 2000) {
             pros::delay(10);
         }
         lift_motor.tare_position();
@@ -178,35 +181,25 @@ namespace disklift {
 
 namespace flywheel {
 
-// flywheel tuning
-int threshold = 150;
-double kV = 57.7;
-double kP = 0.5;
-double kI = 0.001;
-double kD = 0;
-// SILVA : GOLDY
-int leftPort = isSilva() ? 9 : 9;
-int rightPort = isSilva() ? 8 : 10;
-
 sylib::SpeedControllerInfo motor_speed_controller (
-    [](double rpm){return kV;}, // kV function - 120
-    kP, // kP - 1
-    kI, // kI
-    kD, // kD - 0.5
+    [](double rpm){return FLYWHEEL_KV;}, // kV function - 120
+    FLYWHEEL_KP, // kP - 1
+    FLYWHEEL_KI, // kI
+    FLYWHEEL_KD, // kD - 0.5
     0, // kH
     true, // anti-windup enabled
     36, // anti-windup range
     false, // p controller bounds threshold enabled
     3, // p controller bounds cutoff enabled - 5
-    kP/4, // kP2 for when over threshold - 0.25
-    threshold // range to target to apply max voltage - 10
+    FLYWHEEL_KP/4, // kP2 for when over threshold - 0.25
+    FLYWHEEL_THRESHOLD // range to target to apply max voltage - 10
 );
 
 
-sylib::Motor left_flywheel(leftPort, 200, false, motor_speed_controller);
-sylib::Motor right_flywheel(rightPort, 200, true, motor_speed_controller);  
+sylib::Motor left_flywheel(FLYWHEEL_LEFT, 200, false, motor_speed_controller);
+sylib::Motor right_flywheel(FLYWHEEL_RIGHT, 200, true, motor_speed_controller);  
 
-pros::Motor indexer (14, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor indexer (INDEXER_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 double speed = 0;
 
 
@@ -275,9 +268,7 @@ void stopIndexer(){
 }
 //deflector__________________________________________________________
 namespace deflector {
-int smart_port = isSilva()? 4 : 8;
-char adi_port = isSilva() ? 'A' : 'c';
-ADIDigitalOut deflector_piston({{smart_port,adi_port}});
+ADIDigitalOut deflector_piston(DEFLECTOR_PISTON);
 bool state = true;
 void toggle(){
     state = !state;
@@ -287,7 +278,7 @@ void toggle(){
 
 //endgame__________________________________________________________
 namespace endgame {
-ADIDigitalOut endgame_piston(isSilva()? ext_adi_port_pair_t{4, 'D'} : ext_adi_port_pair_t{20, 'f'});
+ADIDigitalOut endgame_piston(ENDGAME_PISTON);
 bool state = false;
 void launch(){
     state = !state;
@@ -296,13 +287,4 @@ void launch(){
 }
 } // namespace endgame
 
-//misc__________________________________________________________
-// Global shit like isGoldy
-bool isSilva(){
-FILE* usd_file_read = fopen("/usd/TURRET_ID.txt", "r");
-char buf[50]; // This just needs to be larger than the contents of the file
-fread(buf, 1, 50, usd_file_read); // passing 1 because a `char` is 1 byte, and 50 b/c it's the length of buf
-int isGoldy = buf[0] == '1'; // buf[0] is the first character in the file, if it's a 1, the turret is goldy. If not, it's silva.
-fclose(usd_file_read); 
-return !isGoldy;
-}
+

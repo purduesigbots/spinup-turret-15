@@ -14,7 +14,7 @@
 #elif BOT == GOLD
 	#warning "Building Gold Bot"
 #else 
-	#error "INVALID BOT TYPE!!!! Use 'pros make gold' or 'pros make silver'"
+	#error "INVALID BOT TYPE!!!! Set BOT to either SILVER or GOLD in robot.h"
 #endif
 
 std::map<uint8_t, int32_t> comms_data;
@@ -138,7 +138,6 @@ void opcontrol() {
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		pros::lcd::print(5, "DL Temp: %f", disklift::lift_motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
-		pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 

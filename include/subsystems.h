@@ -63,6 +63,5 @@ namespace endgame {
 void launch();
 }
 
-extern bool isSilva();
 
 #endif
