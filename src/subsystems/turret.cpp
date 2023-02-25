@@ -82,8 +82,7 @@ void update() {
             If angle error has not changed, assume vision has disconnected
             */
             if (vision_working) {
-                angle_error = std::cbrt(angle_error);
-                motor.move_voltage(1100 * angle_error);
+                motor.move_voltage(angle_error*400);
             } else {
                 motor.move_voltage(0);
             }
