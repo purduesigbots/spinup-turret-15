@@ -6,8 +6,16 @@
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "vision.h"
-
 #include "subsystems/subsystems.hpp"
+
+// DO NOT REMOVE THIS. THIS IS A SANITY CHECK
+#if BOT == SILVER
+	#warning "Building Sliver Bot"
+#elif BOT == GOLD
+	#warning "Building Gold Bot"
+#else 
+	#error "INVALID BOT TYPE!!!! Set BOT to either SILVER or GOLD in robot.h"
+#endif
 
 std::map<uint8_t, int32_t> comms_data;
 /**
@@ -129,11 +137,10 @@ void opcontrol() {
 			arms::odom::getHeading()
 		);
 		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-		pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
+		// pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
 		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
 		pros::lcd::print(5, "DL Temp: %f", turret::motor.get_temperature());
 		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
-		//pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 

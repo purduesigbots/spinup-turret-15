@@ -1,10 +1,18 @@
 #include "subsystems/turret.hpp"
 
-#include "subsystems/subsystems.hpp"
+#include "pros/adi.hpp"
+#include "../../include/subsystems.h"
+#include "main.h"
 #include "vision.h"
 #include "api.h"
 
 #include <algorithm>
+
+#if BOT == GOLD
+  #include "ARMS/config_gold.h"
+#elif BOT == SILVER
+  #include "ARMS/config_silver.h"
+#endif
 
 using namespace pros;
 
@@ -15,8 +23,10 @@ namespace turret {
 #define MOVE_WITH_VISION 2
 
 // Devices needed for implementing the subsystem:
-Motor motor(7, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
-ADIDigitalIn limit_switch('e');
+
+Motor motor(TURRET_MOTOR, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
+ADIDigitalIn limit_switch(TURRET_LIMIT_SWITCH);
+
 
 double target_angle = 0.0;
 double max_velocity = 0.0;
