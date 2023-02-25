@@ -37,6 +37,8 @@
 #include "api.h"
 #include "sylib/sylib.hpp"
 
+#include "robot.h"
+
 /**
  * You should add more #includes here
  */
