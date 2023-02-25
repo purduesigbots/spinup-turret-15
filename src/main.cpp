@@ -41,6 +41,8 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	vision::init();
+	turret::initialize();
 	sylib::initialize();
 	Task disklift_home_task([](void){
 		disklift::home();
@@ -54,9 +56,7 @@ void initialize() {
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
 	//pros::delay(2000);
 	Task flywheel(flywheel::task);
-	vision::init();
 	Task vision(vision::task);
-	turret::initialize();
 
 	// pros::lcd::register_btn1_cb(on_center_button);
 
@@ -101,7 +101,7 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	turret::goto_angle(0, 250, true);
+	turret::goto_angle(0, 400, true);
 	vision::set_vision_offset(false);
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -178,7 +178,7 @@ void opcontrol() {
 			disklift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			if (/* !indexer_wait || */ flywheel::at_speed()) {
+			if (flywheel::at_speed()) {
 				flywheel::fire();
 			} else {
 				flywheel::stopIndexer();

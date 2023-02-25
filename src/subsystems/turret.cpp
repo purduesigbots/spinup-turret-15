@@ -24,7 +24,7 @@ namespace turret {
 
 // Devices needed for implementing the subsystem:
 
-Motor motor(TURRET_MOTOR, E_MOTOR_GEARSET_06, true, E_MOTOR_ENCODER_ROTATIONS);
+Motor motor(TURRET_MOTOR, E_MOTOR_GEARSET_06, false, E_MOTOR_ENCODER_ROTATIONS);
 ADIDigitalIn limit_switch(TURRET_LIMIT_SWITCH);
 
 
@@ -52,25 +52,31 @@ void initialize() {
 
 void calibrate() {
     // Set the motor to move to the left
+    printf("Moving turret to the left\n");
     motor.move(80);
 
     // Wait until the limit switch is hit. This ensures the turret stops at a 
     // consistent location
+    printf("Waiting for limit switch\n");
     while(!limit_switch.get_value()) {
         pros::delay(20);
     }
 
     // Stop the motor so it doesn't break the ring gear
+    printf("Stopping motor\n");
     motor.move(0);
     pros::delay(100);
     // Now tell the motor to move back to face forward.
+    printf("Moving to face forward\n");
     motor.move_relative(-2.24, 250);
     pros::delay(1000);
     motor.move(0);
 
     // Tare the position so that forward is 0.0
+    printf("Taring position\n");
     motor.tare_position();
     pros::delay(100);
+    printf("done\n");
 }
 
 double last_error = 0.0;
@@ -92,8 +98,7 @@ void update() {
             If angle error has not changed, assume vision has disconnected
             */
             if (vision_working) {
-                angle_error = std::cbrt(angle_error);
-                motor.move_voltage(1100 * angle_error);
+                motor.move_voltage(angle_error * 400);
             } else {
                 motor.move_voltage(0);
             }
