@@ -54,6 +54,10 @@ bool vision_not_working() {
   return communication->get_data(GOAL_COLOR) == 0 && communication->get_data(HEIGHT) == 0;
 }
 
+void start_vision() {
+  communication->start();
+}
+
 void set_vision_offset(bool is_auto) {
   if (is_auto) {
     vision_offset = 220;

@@ -95,8 +95,10 @@ void opcontrol() {
 
 	turret::goto_angle(0, 250, true);
 	vision::set_vision_offset(false);
+	vision::start_vision();
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	flywheel::move(115);
 
 	int counter = 0;
 	bool indexer_wait = false;
@@ -195,7 +197,7 @@ void opcontrol() {
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
 			if (flywheel::speed == 0) {
-				flywheel::move(120); // max = 200
+				flywheel::move(115); // max = 200
 			} else {
 				flywheel::move(0);
 			}

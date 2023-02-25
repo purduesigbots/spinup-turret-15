@@ -32,12 +32,14 @@ void shoot(int count, double angle) {
 		flywheel::wait_until_fired();
 		flywheel::stopIndexer();
 	}
+	intake::move(-100);
 	flywheel::wait_until_at_speed();
 	flywheel::fire();
 	pros::delay(750);
 	flywheel::stopIndexer();
 	disklift::discLiftDown();
 	turret::disable_vision_aim();
+	intake::move(100);
 }
 
 void matchAuto() {
@@ -67,12 +69,12 @@ void matchAuto() {
 	pros::delay(1000);
 	tank(0,0);
 	roller::move(100);
-	pros::delay(100);
+	pros::delay(125);
 	roller::move(0);
 	
 	// shoot disks
     std::cout << "Shooting preloads" << std::endl;
-	arms::odom::reset({18,-3},90);
+	arms::odom::reset({18,-3},87);
 	turret::goto_angle(-13, 250, true);
 	turret::update();
 	move({18,3}, 50);
@@ -82,7 +84,7 @@ void matchAuto() {
 	turret::update();
 	//pros::delay(500);
 
-	flywheel::move(135);
+	flywheel::move(140);
 	turn(30, 60);
 	pros::delay(100);
 	move({23,7},50);
@@ -90,31 +92,31 @@ void matchAuto() {
 
 	
     std::cout << "Fetching disc 4" << std::endl;
-    turn(142, 60);
+    turn(150, 60);
 	pros::delay(100);
-    move({0,23}, 50);
+    move({0,20}, 50);
 	pros::delay(100);
     
     std::cout << "Fetching disc 5" << std::endl;
-    turn(50, 60);
-	turret::goto_angle(7, 250, true);
+    turn(65, 60);
+	turret::goto_angle(0, 250, true);
 	turret::update();
 	pros::delay(100);
-    move({4,30}, 50);
+    move({3,28}, 50);
 	pros::delay(500);
 	move(-5, 50, arms::REVERSE & arms::THRU);
 	pros::delay(500);
-	shoot(3,7);
+	shoot(3,0);
 	
     std::cout << "Shooting discs 4, 5" << std::endl;
 	flywheel::move(135);
-	turn(145, 60);
+	turn(150, 60);
 	pros::delay(500);
-	move({-8,33},50);
+	move({-10,30},50);
 	pros::delay(500);
 	turn(70, 60);
 	pros::delay(500);
-	move({-6,41},60);
+	move({-9,38},60);
 
     std::cout << "Fetching discs 6" << std::endl;
 	turret::goto_angle(-75, 250, true);
@@ -122,7 +124,7 @@ void matchAuto() {
 	pros::delay(500);
     turn(155, 60);
 	pros::delay(500);
-	move({-20,47}, 50);
+	move({-22,45}, 50);
 	pros::delay(1000);
 	turn(110, 60);
 	pros::delay(500);
@@ -147,7 +149,8 @@ void matchAuto() {
 	turn(55, 60);
 	pros::delay(1000);
 	shoot(3,0);
-    flywheel::move(0);
+	deflector::toggle();
+	flywheel::move(0);
 }
 
 void skillsAuto() {

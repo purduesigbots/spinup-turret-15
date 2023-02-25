@@ -10,7 +10,7 @@ namespace arms {
 
 // Negative numbers mean reversed motor
 #define LEFT_MOTORS 4, -13, 12
-#define RIGHT_MOTORS -15, 17, -18
+#define RIGHT_MOTORS -16, 17, -18
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
@@ -40,7 +40,7 @@ namespace arms {
 #define LINEAR_KI 0.01
 #define LINEAR_KD 1.7
 #define TRACKING_KP 80 // point tracking turning strength
-#define ANGULAR_KP 5
+#define ANGULAR_KP 5.2
 #define ANGULAR_KI 0
 #define ANGULAR_KD 35
 #define MIN_ERROR                                                              \

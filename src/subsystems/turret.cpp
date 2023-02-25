@@ -64,10 +64,16 @@ void calibrate() {
 }
 
 double last_error = 0.0;
+int settler = 0;
 
 void update() {
     double angle_error = vision::get_goal_gamma();
-    vision_working = angle_error != 45.00 && angle_error != last_error;
+    if (angle_error == last_error) {
+        settler += 1;
+    } else {
+        settler = 0;
+    }
+    vision_working = angle_error != 45.00 && settler < 25;
     last_error = angle_error;
     switch(state) {
         case DISABLED:
