@@ -47,13 +47,13 @@ const double SETTLE_THRESHHOLD = 1.0;   // How many degrees to the left or right
 void initialize() {
     motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
 
-    calibrate();
+    // calibrate();
 }
 
 void calibrate() {
     // Set the motor to move to the left
     printf("Moving turret to the left\n");
-    motor.move(80);
+    motor.move(100);
 
     // Wait until the limit switch is hit. This ensures the turret stops at a 
     // consistent location

@@ -60,7 +60,7 @@ bool vision_not_working() {
 
 void set_vision_offset(bool is_auto) {
   if (is_auto) {
-    vision_offset = 220;
+    vision_offset = 272.5;
   } else {
     vision_offset = 240;
   }
@@ -147,7 +147,7 @@ void task() {
       turn_degrees = std::max(turn_degrees, 0.0);
     }
 
-    float deadzone = 10.0;
+    float deadzone = 2.0;
 
     if (fabs(lr - 265) <= deadzone) {
       turn_degrees = 0.0;

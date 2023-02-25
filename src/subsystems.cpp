@@ -26,9 +26,15 @@ bool state = false;
 double speed = 0;
 
 void move(double speed) {
-    left_motor.move_voltage(120 * speed);
-    right_motor.move_voltage(120 * speed);
-    intake::speed = speed;
+    if(disklift::lift_motor.get_position() < 50){
+        left_motor.move_voltage(120 * speed);
+        right_motor.move_voltage(120 * speed);
+        intake::speed = speed;
+    } else{
+        left_motor.move_voltage(0);
+        right_motor.move_voltage(0);
+        intake::speed = 0;
+    }
 }
 
 void toggle(){
@@ -107,9 +113,6 @@ namespace disklift {
 
     void discLiftUp(){
         // Conditions for various states of the disc lift
-        // 
-
-
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
         //Prevents lifted from changing back to false momentariily, once it's set it stays until 
@@ -128,13 +131,15 @@ namespace disklift {
             reachedSpeed = false;
         }
 
-        if(lifted){
+
+
+        if(!lifted && lift_motor.get_position() < LIFT_UP_POS){
+            lift_motor.move_voltage(12000);
+        } else if(lifted){
             //DISC LIFT ALL THE WAY UP FOR CURRENT NUM OF DISCS
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             lift_motor.brake();
-        } else if(lift_motor.get_position() < LIFT_UP_POS){
-            lift_motor.move_voltage(12000);
-        } else{
+        }else{
             lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             lift_motor.brake();
         }
@@ -227,7 +232,7 @@ void wait_until_fired() {
 }
 
 void wait_until_at_speed() {
-    while ((speed - average) / speed > 0.05) {
+    while (std::abs((speed - average) / speed) > 0.04) {
         //printf("wait_until_at_speed\n");
         turret::update();
         pros::delay(10);

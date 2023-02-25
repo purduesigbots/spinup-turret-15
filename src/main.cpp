@@ -5,6 +5,7 @@
 #include "subsystems.h"
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
+#include "subsystems/turret.hpp"
 #include "vision.h"
 #include "subsystems/subsystems.hpp"
 
@@ -42,25 +43,26 @@ void on_center_button() {
  */
 void initialize() {
 	vision::init();
-	turret::initialize();
 	sylib::initialize();
 	Task disklift_home_task([](void){
 		disklift::home();
 	});
-
+	turret::initialize();
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::lcd::initialize();
 	pros::lcd::clear();
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
-	//pros::delay(2000);
+	// pros::delay(2000);
 	Task flywheel(flywheel::task);
 	Task vision(vision::task);
 
 	// pros::lcd::register_btn1_cb(on_center_button);
 
 	roller::init();
+	turret::calibrate();
+
 }
 
 /**
@@ -125,7 +127,8 @@ void opcontrol() {
 
 	int discLiftCounter = 0;
 	bool prevDLButton = false;
-
+	flywheel::move(120);
+	deflector::toggle();
 	while (true) {
 
 		int left = master.get_analog(ANALOG_LEFT_Y);
@@ -230,7 +233,7 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
-			//autonomous();
+			// autonomous();
 			use_vision = !use_vision;
 		}
 		turret::update();

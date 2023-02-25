@@ -765,7 +765,7 @@
       }
     },
     "upload_options": {
-      "after": "none"
+      "after": "run"
     }
   }
 }

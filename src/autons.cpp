@@ -1,3 +1,4 @@
+#include "ARMS/chassis.h"
 #include "main.h"
 
 #include "subsystems.h"
@@ -82,7 +83,7 @@ void matchAuto() {
 	turret::update();
 	//pros::delay(500);
 
-	flywheel::move(135);
+	flywheel::move(150);
 	turn(30, 60);
 	pros::delay(100);
 	move({23,7},50);

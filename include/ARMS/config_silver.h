@@ -4,16 +4,16 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #pragma once
 
 
-#define INTAKE_PISTON {{3, 'd'}}
+#define INTAKE_PISTON {{3, 'f'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 18
-#define INTAKE_LINE 'h'
+#define INTAKE_LINE 'f'
 
 #define ROLLER_MOTOR 6
 #define ROLLER_OPTICAL 5
 
 #define LIFT_MOTOR 15
-#define LIFT_UP_POS 90
+#define LIFT_UP_POS 79
 #define LIFT_DOWN_POS 7
 
 #define FLYWHEEL_THRESHOLD 150
@@ -29,7 +29,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_LIMIT_SWITCH {{3, 'h'}}
 
 #define DEFLECTOR_PISTON {{3, 'a'}}
-#define ENDGAME_PISTON {{3, 'f'}}
+#define ENDGAME_PISTON {{3, 'd'}}
 
 #define IRIS_PORT 21
 
@@ -48,13 +48,13 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  6.31 // The distance between left and right wheels (or tracker wheels)
+  6.6// The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
   4.75 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
-#define ENCODER_PORTS 3, 7, -1                // Port 0 for disabled,
+#define ENCODER_PORTS -'a', 'g', 'c'                // Port 0 for disabled,
 #define EXPANDER_PORT 0                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
