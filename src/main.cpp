@@ -58,7 +58,6 @@ void draw_screen()
 		pros::lcd::clear();
 
 		if(screenIndex == 0) {
-			printf("Main Info:");
 			pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
 				arms::odom::getPosition().x,
 				arms::odom::getPosition().y,
@@ -161,7 +160,7 @@ void opcontrol() {
 	vision::start_vision();
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-	flywheel::move(115);
+	//flywheel::start(115);
 
 	int counter = 0;
 	bool indexer_wait = false;
@@ -188,22 +187,12 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
-		pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
-			arms::odom::getPosition().x,
-			arms::odom::getPosition().y,
-			arms::odom::getHeading()
-		);
-		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-		// pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
-		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
-		pros::lcd::print(5, "DL Temp: %f", turret::motor.get_temperature());
-		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
-			if (use_vision) {
-				turret::enable_vision_aim();
-			}
+			//if (use_vision) {
+			//	turret::enable_vision_aim();
+			//}
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			//disclift::discLiftUp();
@@ -214,8 +203,8 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-			disklift::discLiftDown();
-			turret::disable_vision_aim();
+		//	disklift::discLiftDown();
+			//turret::disable_vision_aim();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
@@ -234,12 +223,12 @@ void opcontrol() {
 			disclift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			if (flywheel::at_speed()) {
-				flywheel::fire();
-			} else {
-				flywheel::stopIndexer();
-			}
-			disklift::discLiftHold();
+		//	if (flywheel::at_speed()) {
+		//		flywheel::fire();
+		//	} else {
+		//		flywheel::stopIndexer();
+		//	}
+		//	disklift::discLiftHold();
 		} else {
 			// flywheel::stopIndexer();
 		}
@@ -286,7 +275,7 @@ void opcontrol() {
 			//autonomous();
 			use_vision = !use_vision;
 		}
-		turret::update();
+		//turret::update();
 		counter++;
 		pros::delay(20);
 	}

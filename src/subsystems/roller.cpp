@@ -3,13 +3,15 @@
 #include "api.h"
 #include "subsystems/subsystems.hpp"
 
+#include "ARMS/config.h"
+
 using namespace pros;
 
 namespace roller {
 
 //LOCAL DEFS:
 // ^^^ These aren't very local since they externed in the header
-Motor motor(6, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor motor(ROLLER_MOTOR, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 Optical optical(5);
 
 double speed = 0;

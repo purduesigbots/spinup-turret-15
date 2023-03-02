@@ -8,12 +8,14 @@
 
 #include "subsystems/flywheel.hpp"
 
+#include "ARMS/config.h"
+
 using namespace pros;
 
 namespace intake {
 
-Motor left_motor(11, E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
-Motor right_motor(19, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor left_motor(INTAKE_LEFT, E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_ROTATIONS);
+Motor right_motor(INTAKE_RIGHT, E_MOTOR_GEARSET_06, false, pros::E_MOTOR_ENCODER_ROTATIONS);
 
 bool running = false;
 double speed = 0;

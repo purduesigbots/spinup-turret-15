@@ -3,6 +3,8 @@
 #include "main.h"
 #include "subsystems/subsystems.hpp"
 
+#include "ARMS/config.h"
+
 #include <atomic>
 #include <memory>
 
@@ -11,7 +13,7 @@ using namespace pros;
 namespace disccounter {
 
 // The line sensor being used for detecting the discs.
-ADIAnalogIn lineSensor('f');
+ADIAnalogIn lineSensor(INTAKE_LINE);
 
 // The number of discs that the robot currently has. This is made atomic so that
 // we don't get race conditions trying to increment or decrement it.
@@ -82,6 +84,7 @@ void task_function(void* data) {
             state == State::DISC_INTAKE && intake::intaking() // Same direction
             && !seeingDisc                                    // Stopped seeing
         ) {
+            state = State::NO_DISC;
             discCount++;
         }
         // Similarly, if we saw a disc when the intake started outtaking, and we
@@ -91,6 +94,7 @@ void task_function(void* data) {
             state == State::DISC_OUTTAKE && intake::outtaking() // Same direction
             && !seeingDisc                                      // Stopped Seeing
         ) {
+            state = State::NO_DISC;
             discCount--;
         }
 

@@ -1,19 +1,14 @@
 #include "subsystems/turret.hpp"
 
 #include "pros/adi.hpp"
-#include "../../include/subsystems.h"
 #include "main.h"
 #include "vision.h"
 #include "api.h"
 
+#include "ARMS/config.h"
+
 #include <cmath>
 #include <algorithm>
-
-#if BOT == GOLD
-  #include "ARMS/config_gold.h"
-#elif BOT == SILVER
-  #include "ARMS/config_silver.h"
-#endif
 
 using namespace pros;
 

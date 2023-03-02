@@ -4,20 +4,18 @@
 #include "main.h"
 #include "subsystems/subsystems.hpp"
 
+#include "ARMS/config.h"
+
 using namespace pros;
 
 namespace flywheel {
     
 // flywheel tuning
-int threshold = 150;
-double kV = 57.7;
-double kP = 0.5;
-double kI = 0.001;
-double kD = 0.37;
-
-// SILVA : GOLDY
-int leftPort = isSilva() ? 9 : 9;
-int rightPort = isSilva() ? 8 : 10;
+int threshold = FLYWHEEL_THRESHOLD;
+double kV = FLYWHEEL_KV;
+double kP = FLYWHEEL_KP;
+double kI = FLYWHEEL_KI;
+double kD = FLYWHEEL_KD;
 
 sylib::SpeedControllerInfo motor_speed_controller (
     [](double rpm){return kV;}, // kV function - 120
@@ -33,10 +31,10 @@ sylib::SpeedControllerInfo motor_speed_controller (
     threshold // range to target to apply max voltage - 10
 );
 
-sylib::Motor left_flywheel(leftPort, 200, false, motor_speed_controller);
-sylib::Motor right_flywheel(rightPort, 200, true, motor_speed_controller);  
+sylib::Motor left_flywheel(FLYWHEEL_LEFT, 200, false, motor_speed_controller);
+sylib::Motor right_flywheel(FLYWHEEL_RIGHT, 200, true, motor_speed_controller);  
 
-pros::Motor indexer (14, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor indexer (INDEXER_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 double targetSpeed = 0;
 
 #define SMA_LEN 5

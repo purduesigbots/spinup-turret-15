@@ -2,11 +2,13 @@
 
 #include "main.h"
 
+#include "ARMS/config.h"
+
 using namespace pros;
 
 namespace endgame {
 
-ADIDigitalOut piston('f');
+ADIDigitalOut piston(ENDGAME_PISTON);
 bool is_deployed = false;
 
 void deploy() {

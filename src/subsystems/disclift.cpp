@@ -1,5 +1,7 @@
 #include "disclift.hpp"
 
+#include "ARMS/config.h"
+
 #include "api.h"
 #include "subsystems.hpp"
 
@@ -8,7 +10,7 @@ using namespace pros;
 namespace disclift {
     
 //LOCAL DEFS:
-pros::Motor lift_motor(21, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor lift_motor(LIFT_MOTOR, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
 bool lifted = false; //if true, keep true until a disc is fired
 bool reachedSpeed = false;
 int targState = 0; // 0 = down, 1 = up, 2 = hold

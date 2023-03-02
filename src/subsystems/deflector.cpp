@@ -1,13 +1,16 @@
 #include "subsystems/deflector.hpp"
 
+#include "ARMS/config.h"
+
 #include "api.h"
 #include "subsystems/subsystems.hpp"
+
 
 using namespace pros;
 
 namespace deflector {
 
-ADIDigitalOut deflector_piston(ext_adi_port_pair_t{8, 'c'});
+ADIDigitalOut deflector_piston(DEFLECTOR_PISTON);
 bool isUp = false;
 bool state = true;
 
