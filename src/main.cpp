@@ -26,8 +26,6 @@ const int MIN_SCREEN_INDEX = 0;
 const int MAX_SCREEN_INDEX = 1;
 static std::atomic<int> screenIndex = 0;
 
-
-
 /**
  * A callback function for LLEMU's center button.
  *
@@ -68,7 +66,6 @@ void draw_screen()
 			pros::lcd::print(4, "DiscLift Position %f", disclift::lift_motor.get_position());
 			pros::lcd::print(5, "DL Temp: %f", disclift::lift_motor.get_temperature());
 			pros::lcd::print(6, "DL Draw: %d", disclift::lift_motor.get_current_draw());
-			pros::lcd::print(7, "Is goldy: %d", !isSilva());
 		}
 		else if(screenIndex == 1) {
 			disccounter::debug_screen();
@@ -102,7 +99,6 @@ void initialize() {
 
 
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
 	pros::lcd::register_btn0_cb(on_left_button);
@@ -111,7 +107,7 @@ void initialize() {
 	roller::init();
 	disccounter::initialize();
 
-	Task screenTask(draw_screen);
+	Task screenTask(draw_screen, "Debug Daemon");
 
 	printf("Done initializing!!!\n");
 }
@@ -197,7 +193,7 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			//disclift::discLiftUp();
 			if(discLiftCounter < 10){
-				intake::start(100);
+				intake::start(1000);
 			} else{
 				intake::stop();
 			}
