@@ -40,6 +40,10 @@ namespace turret {
      */
     void goto_angle(double angle, double velocity = 100, bool async = false);
 
+    void toggle_vision_aim();
+    void enable_vision_aim();
+    void disable_vision_aim();
+
     /**
      * Tells the turret to go to an angle relative to the robot's heading and
      * the current turret angle

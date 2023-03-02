@@ -5,12 +5,20 @@
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "vision.h"
-
 #include "subsystems/subsystems.hpp"
 
 #include <atomic>
 
 using namespace pros;
+
+// DO NOT REMOVE THIS. THIS IS A SANITY CHECK
+#if BOT == SILVER
+	#warning "Building Sliver Bot"
+#elif BOT == GOLD
+	#warning "Building Gold Bot"
+#else 
+	#error "INVALID BOT TYPE!!!! Set BOT to either SILVER or GOLD in robot.h"
+#endif
 
 std::map<uint8_t, int32_t> comms_data;
 
@@ -79,12 +87,12 @@ void draw_screen()
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	vision::init();
+	turret::initialize();
 	sylib::initialize();
 	Task disklift_home_task([](void){
 		disclift::home();
 	});
-	
-	turret::initialize();
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
@@ -148,12 +156,17 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	//turret::set_position(0.0, 80);
+	turret::goto_angle(0, 400, true);
+	vision::set_vision_offset(false);
+	vision::start_vision();
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	flywheel::move(115);
 
 	int counter = 0;
 	bool indexer_wait = false;
+	bool use_vision = true;
+	bool vision_good = false;
 
 	// move(30, 70);
 	// move(-4, 50, arms::REVERSE);
@@ -175,9 +188,22 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
+		pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
+			arms::odom::getPosition().x,
+			arms::odom::getPosition().y,
+			arms::odom::getHeading()
+		);
+		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
+		// pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
+		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
+		pros::lcd::print(5, "DL Temp: %f", turret::motor.get_temperature());
+		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
+			if (use_vision) {
+				turret::enable_vision_aim();
+			}
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			//disclift::discLiftUp();
@@ -188,7 +214,8 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-			// disclift::discLiftDown();
+			disklift::discLiftDown();
+			turret::disable_vision_aim();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
@@ -207,13 +234,12 @@ void opcontrol() {
 			disclift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			/* TODO: Rewrite this logic to work with the new subsystems */
-			// if (/* !indexer_wait || */ flywheel::at_speed()) {
-			// 	flywheel::fire();
-			// } else {
-			// 	flywheel::stopIndexer();
-			// }
-			// disclift::discLiftHold();
+			if (flywheel::at_speed()) {
+				flywheel::fire();
+			} else {
+				flywheel::stopIndexer();
+			}
+			disklift::discLiftHold();
 		} else {
 			// flywheel::stopIndexer();
 		}
@@ -228,8 +254,6 @@ void opcontrol() {
 			intake::stop();
 			roller::move(0);
 		}
-
-		//turret::goto_angle(0, 250, true);
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
@@ -247,11 +271,23 @@ void opcontrol() {
 			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());		
 		}
 
-		if(master.get_digital_new_press(DIGITAL_X)){
-			//indexer_wait = !indexer_wait;
-			autonomous();
+		if (vision::vision_not_working()) {
+			vision_good = false;
+			if (counter % 5 == 0) {
+				master.print(0,0,"Vision Bad");
+			}
+		} else if (!vision_good && counter % 5 == 0) {
+			master.clear_line(0);
+			vision_good = true;
 		}
 
+		if(master.get_digital_new_press(DIGITAL_X)){
+			//indexer_wait = !indexer_wait;
+			//autonomous();
+			use_vision = !use_vision;
+		}
+		turret::update();
+		counter++;
 		pros::delay(20);
 	}
 }

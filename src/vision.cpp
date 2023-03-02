@@ -6,7 +6,11 @@
 #include "pros/misc.h"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 // clang-format on
-
+#if BOT == SILVER
+    #include "../include/ARMS/config_silver.h"
+#elif BOT == GOLD
+    #include "../include/ARMS/config_gold.h"
+#endif
 #define START_CHAR 0b11001100
 #define END_CHAR 0b00110011
 
@@ -30,15 +34,16 @@ const double SENSOR_HEIGHT = 0.3074803;
 namespace vision {
 
 std::shared_ptr<comms::ReceiveComms> communication;
+double vision_offset = 240;
 
 void init() {
   communication =
-      std::make_shared<comms::ReceiveComms>(3, 115200, START_CHAR, END_CHAR);
+      std::make_shared<comms::ReceiveComms>(IRIS_PORT, 115200, START_CHAR, END_CHAR);
 }
 
 double get_goal_gamma() {
   return atan2((GOAL_WIDTH / (double)communication->get_data(WIDTH) *
-                (220 - (double)communication->get_data(LEFT_RIGHT))),
+                (vision_offset - (double)communication->get_data(LEFT_RIGHT))),
                get_goal_distance()) *
          (180 * M_1_PI);
 }
@@ -46,6 +51,22 @@ double get_goal_gamma() {
 double get_goal_distance() {
   return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) /
          (communication->get_data(HEIGHT) * SENSOR_HEIGHT);
+}
+
+bool vision_not_working() {
+  return communication->get_data(GOAL_COLOR) == 0 && communication->get_data(HEIGHT) == 0;
+}
+
+void start_vision() {
+  communication->start();
+}
+
+void set_vision_offset(bool is_auto) {
+  if (is_auto) {
+    vision_offset = 220;
+  } else {
+    vision_offset = 240;
+  }
 }
 
 std::tuple<double, double, double> get_turret_pose() {
