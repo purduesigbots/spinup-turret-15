@@ -11,6 +11,10 @@ namespace disccounter {
  */
 void initialize();
 
+bool seeing_disc();
+
+void debug_screen();
+
 /**
  * Returns the number of discs currently in the robot 
  */

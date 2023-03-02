@@ -28,8 +28,30 @@ State state = State::NO_DISC;
 // Returns whether the line sensor is currently seeing a disc. This could
 // probably be drastically improved with a gausian filter tuned to each 
 // competition location, but that's more work. 
-bool seesDisc() {
+bool seeing_disc() {
     return lineSensor.get_value() < 2400;
+}
+
+void debug_screen() {
+    pros::lcd::print(0, "Disc Counter Info:");
+    pros::lcd::print(1, "Disc Count: %d", disc_count());
+    pros::lcd::print(2, "Seeing Disc: %d", seeing_disc());
+    pros::lcd::print(3, "Sensor Value: %d", lineSensor.get_value());
+    
+    const char* state_str = "";
+    switch(state)
+    {
+    case State::NO_DISC:
+        state_str = "NO_DISC";
+        break;
+    case State::DISC_INTAKE:
+        state_str = "DISC_INTAKE";
+        break;
+    case State::DISC_OUTTAKE:
+        state_str = "DISC_OUTTAKE";
+        break;
+    }
+    pros::lcd::print(4, "State: %s", state_str);
 }
 
 /**
@@ -38,25 +60,15 @@ bool seesDisc() {
  */
 void task_function(void* data) {
     while(true) {
-        printf("Number of discs: %d\n", int(discCount));
-        printf("    State %d\n", state);
-        printf("    Line Sensor Value: %d\n", lineSensor.get_value());
-        printf("    Pros err: %d\n", errno);
-
-
-        bool seeingDisc = seesDisc();
-        printf("    seeingDisc = %i\n", seeingDisc);
+        bool seeingDisc = seeing_disc();
         
         // If we have not yet seen a disc and we just started seeing one,
         // set the appropriate state depending on the intake's direction
         if(state == State::NO_DISC && seeingDisc) {
-            printf("    Started Seeing Disc\n");
             if(intake::intaking()) {
-                printf("    state = State::DISC_INTAKE\n");
                 state = State::DISC_INTAKE;
             }
             else if(intake::outtaking()) {
-                printf("    state = State::DISC_OUTTAKE\n");
                 state = State::DISC_OUTTAKE;
             }
         }

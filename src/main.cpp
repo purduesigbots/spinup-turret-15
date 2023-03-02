@@ -8,9 +8,17 @@
 
 #include "subsystems/subsystems.hpp"
 
+#include <atomic>
+
 using namespace pros;
 
 std::map<uint8_t, int32_t> comms_data;
+
+const int MIN_SCREEN_INDEX = 0;
+const int MAX_SCREEN_INDEX = 1;
+static std::atomic<int> screenIndex = 0;
+
+
 
 /**
  * A callback function for LLEMU's center button.
@@ -19,14 +27,50 @@ std::map<uint8_t, int32_t> comms_data;
  * "I was pressed!" and nothing.
  */
 void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
+	screenIndex = 0;
+}
+
+void on_left_button() {
+	printf("left button\n");
+	if(screenIndex > MIN_SCREEN_INDEX) {
+		screenIndex--;
 	}
 }
+
+void on_right_button() {
+	printf("right button\n");
+	if(screenIndex < MAX_SCREEN_INDEX) {
+		screenIndex++;
+	}
+}
+
+void draw_screen() 
+{
+	while(true) {
+		pros::lcd::clear();
+
+		if(screenIndex == 0) {
+			printf("Main Info:");
+			pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
+				arms::odom::getPosition().x,
+				arms::odom::getPosition().y,
+				arms::odom::getHeading()
+			);
+			pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
+			pros::lcd::print(3, "Distance to goal: %2.4f", arms::odom::getDistanceError({0,0}));
+			pros::lcd::print(4, "DiscLift Position %f", disclift::lift_motor.get_position());
+			pros::lcd::print(5, "DL Temp: %f", disclift::lift_motor.get_temperature());
+			pros::lcd::print(6, "DL Draw: %d", disclift::lift_motor.get_current_draw());
+			pros::lcd::print(7, "Is goldy: %d", !isSilva());
+		}
+		else if(screenIndex == 1) {
+			disccounter::debug_screen();
+		}
+
+		pros::delay(10);
+	}
+}
+
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -51,15 +95,16 @@ void initialize() {
 
 
 	pros::lcd::initialize();
-	pros::lcd::clear();
 	pros::lcd::set_text(1, "Hello PROS User!");
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
 	pros::lcd::set_text_color(LV_COLOR_WHITE);
-
-	// pros::lcd::register_btn1_cb(on_center_button);
+	pros::lcd::register_btn0_cb(on_left_button);
+	pros::lcd::register_btn2_cb(on_right_button);
 
 	roller::init();
 	disccounter::initialize();
+
+	Task screenTask(draw_screen);
 
 	printf("Done initializing!!!\n");
 }
@@ -130,17 +175,6 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
-		pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
-			arms::odom::getPosition().x,
-			arms::odom::getPosition().y,
-			arms::odom::getHeading()
-		);
-		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-		pros::lcd::print(3, "Distance to goal: %2.4f", arms::odom::getDistanceError({0,0}));
-		pros::lcd::print(4, "DiscLift Position %f", disclift::lift_motor.get_position());
-		pros::lcd::print(5, "DL Temp: %f", disclift::lift_motor.get_temperature());
-		pros::lcd::print(6, "DL Draw: %d", disclift::lift_motor.get_current_draw());
-		pros::lcd::print(7, "Is goldy: %d", !isSilva());
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
