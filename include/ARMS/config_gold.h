@@ -5,7 +5,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 
 #define INTAKE_PISTON {{8, 'a'}}
-#define INTAKE_LEFT 10
+#define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 6
 
@@ -38,7 +38,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define ODOM_DEBUG 0
 
 #define LEFT_MOTORS 4, -13, 12
-#define RIGHT_MOTORS -15, 17, -18
+#define RIGHT_MOTORS -16, 17, -18
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
