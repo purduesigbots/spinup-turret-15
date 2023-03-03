@@ -74,7 +74,7 @@ bool at_speed();
  * 
  * @return Current RPM of the flywheel 
  */
-double curret_speed();
+double current_speed();
 
 /**
  * Gets the target RPM that the flywheel is trying to reach
@@ -105,5 +105,7 @@ int fire(int numDiscs = 1, int timeout = 5000);
 // a vector of doubles where each double is a speed for the disk. The size
 // of the passed vector specifies how many discs are shot. 
 //int fire(std::vector<double> speeds, int timeout = 5000);
+
+void debug_screen();
 
 } // namespace flywheel

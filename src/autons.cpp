@@ -229,15 +229,25 @@ void skillsAuto() {
 extern "C" {
 
 void subsystem_test() {
+	printf("Turret going to angle\n");
+	turret::goto_angle(45);
+
+
 	printf("Intaking 3 discs:\n");
-	
 	intake::start(300);
-
-	disccounter::expect(3, 10000);
-
-	printf("Done\n");
-
+	int numFound = disccounter::expect(3, 10000);
 	intake::stop();
+	printf("    %d discs found\n", numFound);
+
+
+	printf("Firing 3 discs:\n");
+	flywheel::start(150);
+	disclift::discLiftHold();
+	pros::delay(500);
+	int numFired = flywheel::fire(3, 10000);
+	flywheel::stop();
+	printf("    %d discs fired\n", numFired);
+	disclift::discLiftDown();
 }
 
 void autonomous() {

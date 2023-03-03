@@ -23,7 +23,7 @@ using namespace pros;
 std::map<uint8_t, int32_t> comms_data;
 
 const int MIN_SCREEN_INDEX = 0;
-const int MAX_SCREEN_INDEX = 2;
+const int MAX_SCREEN_INDEX = 3;
 static std::atomic<int> screenIndex = 0;
 
 /**
@@ -52,6 +52,12 @@ void on_right_button() {
 
 void draw_screen() 
 {
+	pros::lcd::initialize();
+	pros::lcd::set_background_color(LV_COLOR_BLACK);
+	pros::lcd::set_text_color(LV_COLOR_WHITE);
+	pros::lcd::register_btn0_cb(on_left_button);
+	pros::lcd::register_btn2_cb(on_right_button);
+
 	while(true) {
 		pros::lcd::clear();
 
@@ -70,8 +76,11 @@ void draw_screen()
 		else if(screenIndex == 1) {
 			disccounter::debug_screen();
 		}
-		else if(screenIndex = 2) {
+		else if(screenIndex == 2) {
 			turret::debug_screen();
+		}
+		else if(screenIndex = 3) {
+			flywheel::debug_screen();
 		}
 
 		pros::delay(10);
@@ -89,9 +98,9 @@ void initialize() {
 	turret::initialize();
 	sylib::initialize();
 	
-	Task disklift_home_task([](void){
-		disclift::home();
-	});
+	//Task disklift_home_task([](void){
+	//	disclift::home();
+	//});
 
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
@@ -99,13 +108,6 @@ void initialize() {
 	flywheel::initialize();
 	//vision::init();
 	//Task vision(vision::task);
-
-
-	pros::lcd::initialize();
-	pros::lcd::set_background_color(LV_COLOR_BLACK);
-	pros::lcd::set_text_color(LV_COLOR_WHITE);
-	pros::lcd::register_btn0_cb(on_left_button);
-	pros::lcd::register_btn2_cb(on_right_button);
 
 	roller::init();
 	disccounter::initialize();
@@ -271,8 +273,8 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
-			//autonomous();
-			use_vision = !use_vision;
+			autonomous();
+			//use_vision = !use_vision;
 		}
 		//turret::update();
 		counter++;

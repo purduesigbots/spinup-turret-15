@@ -96,10 +96,6 @@ void task_function(void* data) {
         ) {
             state = State::NO_DISC;
             discCount--;
-        }
-
-        // Blow up the terminal if we somehow got a negative disc count; 
-        if(discCount < 0) {
             printf("ERROR: Disc count somehow negative!!!!\n");
         }
 
@@ -135,12 +131,14 @@ int expect(int numDiscs, int timeout) {
     while(disc_count() - startNumDiscs < numDiscs) {
         // Check the timeout, and if it's reached, return
         if(pros::millis() - startTime >= timeout && timeout > 0) {
+            pros::delay(500);
             return disc_count() - startNumDiscs;
         }
 
         pros::delay(10);
     }
 
+    pros::delay(500);
     return discCount - startNumDiscs;
 }
 

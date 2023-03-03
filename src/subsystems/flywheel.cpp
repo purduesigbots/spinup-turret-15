@@ -123,7 +123,7 @@ bool at_speed() {
 }
 
 
-double curret_speed() {
+double current_speed() {
     return average_speed;
 }
 
@@ -133,11 +133,11 @@ double target_speed() {
 
 // Blocks until the robot reaches a specific speed.
 bool wait_until_at_speed(uint32_t timeout) {
+    uint32_t startTime = pros::millis();
+
     while (!at_speed()) {
-        printf("wait_until_at_speed\n");
-        
         // timeout check
-        if(timeout > 0 && pros::millis() >= timeout) {
+        if(timeout > 0 && pros::millis() - startTime >= timeout) {
             return true;
         }
 
@@ -148,11 +148,11 @@ bool wait_until_at_speed(uint32_t timeout) {
 }
 
 bool wait_until_fired(uint32_t timeout) {
-    while (targetSpeed - average_speed < 20) {
-        printf("wait_until_fired\n");
-        
+    uint32_t startTime = pros::millis();
+
+    while (targetSpeed - average_speed < 20) {        
         // timeout check
-        if(timeout > 0 && pros::millis() >= timeout) {
+        if(timeout > 0 && pros::millis() - startTime >= timeout) {
             return true;
         }
 
@@ -164,15 +164,16 @@ bool wait_until_fired(uint32_t timeout) {
 
 int fire(int numDiscs, int timeout) {
     uint32_t startTime = pros::millis();
+    uint32_t endTime = startTime + timeout;
 
     int numberFired = 0;
 
     // While we haven't fired all the discs we want to fire
     while(numberFired < numDiscs) {
         // Check if we've reached the timeout and return if we have
-        uint32_t timeLeft = timeout - pros::millis();
-        if(timeout > 0 && timeLeft <= 0) {
-            return numberFired;
+        uint32_t timeLeft = endTime - pros::millis();
+        if(timeLeft <= 0 && timeout > 0) {
+            goto RETURN;
         }
 
         // We first wait to make sure that the flywheel is at the speed we want. 
@@ -184,17 +185,21 @@ int fire(int numDiscs, int timeout) {
         //       "timeout > 0" is first, the entire if will fail
         //       wait_until_at_speed() will never run
         if(wait_until_at_speed(timeLeft) && timeout > 0) {
-            return numberFired;
+            goto RETURN;
         }
 
         // Now that the flywheel is at speed, we start the indexer
         indexer.move_voltage(12000);
+        disclift::discLiftUp();
 
         // We wait until we detect that the disc is fired or that the timeout is
         // reach (if timeouts are enabled.). See the note above
         if(wait_until_fired(timeLeft) && timeout > 0) {
-            return numberFired;
+            goto RETURN;
         }
+
+        // Now that the flywheel is at speed, we start the indexer
+        indexer.move_voltage(0);
 
         // Update the disc counter and number of discs we've fired
         numberFired++;
@@ -203,7 +208,17 @@ int fire(int numDiscs, int timeout) {
         pros::delay(10);
     }
 
+RETURN:
+    disclift::discLiftDown();
+    indexer.move_voltage(0);
     return numberFired;
+}
+
+void debug_screen() {
+    pros::lcd::print(0, "Flywheel Info:");
+    pros::lcd::print(1, " Cur Speed: %f", current_speed());
+    pros::lcd::print(2, " Tgt Speed: %f", target_speed());
+    pros::lcd::print(4, " At Speed?: %d", at_speed());
 }
 
 } // namespace flywheel

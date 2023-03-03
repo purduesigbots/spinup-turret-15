@@ -19,7 +19,6 @@ namespace disclift {
         // Conditions for various states of the disc lift
         // 
 
-
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
         //Prevents lifted from changing back to false momentariily, once it's set it stays until 
