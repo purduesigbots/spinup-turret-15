@@ -1,49 +1,73 @@
 #pragma once
 
-#if 0
+#include "api.h"
+
 /**
  * Subsystem Dependencies: Disc Lift
  */
 namespace intake {
-    /**
-     * Starts the intake of the robot with a specified speed
-     * 
-     * @param speed RPM to run the intake at
-     */
-    void start(double speed);
 
-    /**
-     * Toggles the intake of the robot
-     *
-     * @param speed RPM to run the intake at, if it is toggled on
-     * @param brakeMode The brakemode to use if stopping
-     */
-    bool toggle(double speed, pros::brake_mode_e brakeMode = pros::E_BRAKE_STOP);
+/**
+ * Starts the intake of the robot with a specified speed
+ * 
+ * @param speed RPM to run the intake at
+ */
+void start(double speed);
 
-    /**
-     * Tells the halt until a certain number of discs are taken up.
-     * 
-     * This is intended for auton programming. This allows the program to wait
-     * until a number of discs are picked up, but give up 
-     * 
-     * @param numDiscs How many discs to expect/pick up
-     * @param timeout  How long to try before giving up
-     * 
-     * @return The number of discs that were detected when picking up
-     */
-    int expect(int numDiscs, int timeout = 5000);
+/**
+ * Stops the intake with a specified brake mode
+ */
+void stop();
 
-    /**
-     * Stops the intake with a specified brake mode
-     * 
-     * @param brakeMode The brakemode to use
-     */
-    void stop(pros::brake_mode_e brakeMode = pros::E_BRAKE_STOP);
+/**
+ * Toggles the intake of the robot
+ *
+ * @param speed RPM to run the intake at, if it is toggled on
+ */
+void toggle(double speed);
 
-    /**
-     * Returns whether the intake is on or not
-     */
-    bool is_on();
-}
+/**
+ * Returns whether the intake is on or not
+ */
+bool is_on();
 
-#endif
+/**
+ * Raises the intake's arm 
+ */
+void raise_arm();
+
+/**
+ * Lowers the intake's arm
+ */
+void lower_arm();
+
+/**
+ * Toggles the intake's arm 
+ */
+void toggle_arm();
+
+/**
+ * Returns whether the intake's arm is raised or not 
+ *
+ * @return True if the intake's arm is raised
+ */
+bool arm_raised();
+
+bool clear();
+
+/**
+ * Returns whether the intake is intaking or not.
+ * 
+ * @return True if the intake is intaking. 
+ */
+bool intaking();
+
+/**
+ * Returns whether the intake is outtaking or not, i.e., running in reverse
+ * 
+ * @return True if the intake is outtaking.
+ */
+bool outtaking();
+
+
+} // namespace intake

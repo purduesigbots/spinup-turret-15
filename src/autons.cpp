@@ -1,6 +1,5 @@
 #include "main.h"
 
-#include "subsystems.h"
 #include "vision.h"
 #include "ARMS/api.h"
 
@@ -17,7 +16,7 @@
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-
+#if 0
 void shoot(int count, double angle) {
 	turret::enable_vision_aim();
 	disklift::lift_motor.move_voltage(12000);
@@ -226,9 +225,36 @@ void skillsAuto() {
 	// pros::delay(500);
 	// shoot(2,-78);
 }
-
+#endif 
 extern "C" {
+
+void subsystem_test() {
+	printf("Turret going to angle\n");
+	turret::goto_angle(45);
+
+
+	printf("Intaking 3 discs:\n");
+	intake::start(300);
+	int numFound = disccounter::expect(3, 10000);
+	intake::stop();
+	printf("    %d discs found\n", numFound);
+
+
+	printf("Firing 3 discs:\n");
+	flywheel::start(150);
+	disclift::discLiftHold();
+	pros::delay(500);
+	int numFired = flywheel::fire(3, 10000);
+	flywheel::stop();
+	printf("    %d discs fired\n", numFired);
+	disclift::discLiftDown();
+}
+
 void autonomous() {
+	subsystem_test();
+
+#if 0
+
 	vision::set_vision_offset(true);
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	
@@ -241,5 +267,6 @@ void autonomous() {
 			break;
 	}
 	turret::goto_angle(0,250,true);
+#endif
 }
 }

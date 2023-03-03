@@ -2,11 +2,14 @@
 #include "ARMS/config.h"
 #include "ARMS/odom.h"
 #include "pros/misc.h"
-#include "subsystems.h"
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "vision.h"
 #include "subsystems/subsystems.hpp"
+
+#include <atomic>
+
+using namespace pros;
 
 // DO NOT REMOVE THIS. THIS IS A SANITY CHECK
 #if BOT == SILVER
@@ -18,6 +21,11 @@
 #endif
 
 std::map<uint8_t, int32_t> comms_data;
+
+const int MIN_SCREEN_INDEX = 0;
+const int MAX_SCREEN_INDEX = 3;
+static std::atomic<int> screenIndex = 0;
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -25,12 +33,57 @@ std::map<uint8_t, int32_t> comms_data;
  * "I was pressed!" and nothing.
  */
 void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
+	screenIndex = 0;
+}
+
+void on_left_button() {
+	printf("left button\n");
+	if(screenIndex > MIN_SCREEN_INDEX) {
+		screenIndex--;
+	}
+}
+
+void on_right_button() {
+	printf("right button\n");
+	if(screenIndex < MAX_SCREEN_INDEX) {
+		screenIndex++;
+	}
+}
+
+void draw_screen() 
+{
+	pros::lcd::initialize();
+	pros::lcd::set_background_color(LV_COLOR_BLACK);
+	pros::lcd::set_text_color(LV_COLOR_WHITE);
+	pros::lcd::register_btn0_cb(on_left_button);
+	pros::lcd::register_btn2_cb(on_right_button);
+
+	while(true) {
+		pros::lcd::clear();
+
+		if(screenIndex == 0) {
+			pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
+				arms::odom::getPosition().x,
+				arms::odom::getPosition().y,
+				arms::odom::getHeading()
+			);
+			pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
+			pros::lcd::print(3, "Distance to goal: %2.4f", arms::odom::getDistanceError({0,0}));
+			pros::lcd::print(4, "DiscLift Position %f", disclift::lift_motor.get_position());
+			pros::lcd::print(5, "DL Temp: %f", disclift::lift_motor.get_temperature());
+			pros::lcd::print(6, "DL Draw: %d", disclift::lift_motor.get_current_draw());
+		}
+		else if(screenIndex == 1) {
+			disccounter::debug_screen();
+		}
+		else if(screenIndex == 2) {
+			turret::debug_screen();
+		}
+		else if(screenIndex = 3) {
+			flywheel::debug_screen();
+		}
+
+		pros::delay(10);
 	}
 }
 
@@ -47,17 +100,17 @@ void initialize() {
 	disklift::home();
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
-	pros::lcd::initialize();
-	pros::lcd::clear();
-	pros::lcd::set_background_color(LV_COLOR_BLACK);
-	pros::lcd::set_text_color(LV_COLOR_WHITE);
-	//pros::delay(2000);
-	Task flywheel(flywheel::task);
-	Task vision(vision::task);
-
-	// pros::lcd::register_btn1_cb(on_center_button);
+	pros::delay(2000);
+	flywheel::initialize();
+	//vision::init();
+	//Task vision(vision::task);
 
 	roller::init();
+	disccounter::initialize();
+
+	Task screenTask(draw_screen, "Debug Daemon");
+
+	printf("Done initializing!!!\n");
 }
 
 /**
@@ -78,6 +131,7 @@ void disabled() {
  * starts.
  */
 void competition_initialize() {
+	
 }
 
 
@@ -103,7 +157,7 @@ void opcontrol() {
 	vision::start_vision();
 	
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-	flywheel::move(115);
+	//flywheel::start(115);
 
 	int counter = 0;
 	bool indexer_wait = false;
@@ -153,73 +207,69 @@ void opcontrol() {
 			}
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
-			disklift::discLiftUp();
+			//disclift::discLiftUp();
 			if(discLiftCounter < 10){
-				intake::move(100);
+				intake::start(1000);
 			} else{
-				intake::move(0);
+				intake::stop();
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-			disklift::discLiftDown();
-			turret::disable_vision_aim();
+			//	disklift::discLiftDown();
+			//turret::disable_vision_aim();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
 			deflector::toggle();
+			intake::toggle_arm();
 		}
 		if (master.get_digital_new_press(DIGITAL_RIGHT)){
 			std::cout << "Launching Endgame" << std::endl;
-			endgame::launch();
+			endgame::deploy();
 		}
 		if (master.get_digital_new_press(DIGITAL_B)){
-			intake::toggle();
+			intake::toggle(100);
 		}
 		
-		
-
 		if(master.get_digital_new_press(DIGITAL_L1)){
-			disklift::calculatePos();
+			disclift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-			if (flywheel::at_speed()) {
-				flywheel::fire();
-			} else {
-				flywheel::stopIndexer();
-			}
-			disklift::discLiftHold();
+		//	if (flywheel::at_speed()) {
+		//		flywheel::fire();
+		//	} else {
+		//		flywheel::stopIndexer();
+		//	}
+		//	disklift::discLiftHold();
 		} else {
-			flywheel::stopIndexer();
+			// flywheel::stopIndexer();
 		}
 		
 		if (master.get_digital(DIGITAL_R1)) { // intake
-			intake::move(100);
+			intake::start(100);
 			roller::move(100);
 		} else if (master.get_digital(DIGITAL_R2)) { // outake
-			intake::move(-100);
+			intake::start(-100);
 			roller::move(-100);
 		} else if (!master.get_digital(DIGITAL_L2)) { // idle
-			intake::move(0);
+			intake::stop();
 			roller::move(0);
 		}
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
-			if (flywheel::speed == 0) {
-				flywheel::move(115); // max = 200
-			} else {
-				flywheel::move(0);
-			}
+			flywheel::toggle(120);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::move(flywheel::speed + 10);
-			master.print(1, 0, "Flywheel speed: %.1f", flywheel::speed);
+			flywheel::change_target_speed(10);
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());
 		}
 
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::move(flywheel::speed - 5);
-			master.print(1, 0, "Flywheel speed: %.1f", flywheel::speed);
+			flywheel::change_target_speed(-5);
+			
+			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());		
 		}
 
 		if (vision::vision_not_working()) {
@@ -234,10 +284,10 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
-			//autonomous();
-			use_vision = !use_vision;
+			autonomous();
+			//use_vision = !use_vision;
 		}
-		turret::update();
+		//turret::update();
 		counter++;
 		pros::delay(20);
 	}
