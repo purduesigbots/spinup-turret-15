@@ -128,4 +128,21 @@ void decrement() {
     }
 }
 
+int expect(int numDiscs, int timeout) {
+    int startTime = pros::millis();
+    int startNumDiscs = disc_count();
+
+    while(disc_count() - startNumDiscs < numDiscs) {
+        // Check the timeout, and if it's reached, return
+        if(pros::millis() - startTime >= timeout && timeout > 0) {
+            return disc_count() - startNumDiscs;
+        }
+
+        pros::delay(10);
+    }
+
+    return discCount - startNumDiscs;
+}
+
+
 } // namespace disccounter

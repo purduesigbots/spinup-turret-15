@@ -78,7 +78,6 @@ void draw_screen()
 	}
 }
 
-
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -89,6 +88,7 @@ void initialize() {
 	vision::init();
 	turret::initialize();
 	sylib::initialize();
+	
 	Task disklift_home_task([](void){
 		disclift::home();
 	});
@@ -189,9 +189,9 @@ void opcontrol() {
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
-			//if (use_vision) {
-			//	turret::enable_vision_aim();
-			//}
+			if (use_vision) {
+				turret::enable_vision_aim();
+			}
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			//disclift::discLiftUp();
@@ -202,7 +202,7 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-		//	disklift::discLiftDown();
+			//	disklift::discLiftDown();
 			//turret::disable_vision_aim();
 		}
 	

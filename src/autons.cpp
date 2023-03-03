@@ -233,7 +233,7 @@ void subsystem_test() {
 	
 	intake::start(300);
 
-	intake::expect(3, 10000);
+	disccounter::expect(3, 10000);
 
 	printf("Done\n");
 

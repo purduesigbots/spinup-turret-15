@@ -46,22 +46,6 @@ void toggle(double speed) {
     }
 } 
 
-int expect(int numDiscs, int timeout) {
-    int startTime = pros::millis();
-    int startNumDiscs = disccounter::disc_count();
-
-    while(
-        disccounter::disc_count() - startNumDiscs < numDiscs &&
-        pros::millis() - startTime < timeout
-    ) {
-        pros::delay(10);
-    }
-
-    pros::delay(500);
-
-    return disccounter::disc_count() - startNumDiscs;
-}
-
 bool is_on() {
     return running;
 }

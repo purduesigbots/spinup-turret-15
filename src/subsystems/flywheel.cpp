@@ -74,9 +74,6 @@ void task_function(void* data) {
             right_flywheel.stop();
         }
         else {
-            // if autonomous, use sylib controller
-            // ^^^ This comment makes no sense. What here determines that we
-            //     are in autonomous???
             left_flywheel.set_velocity_custom_controller(targetSpeed);
             right_flywheel.set_velocity_custom_controller(targetSpeed);
         }
@@ -139,6 +136,7 @@ bool wait_until_at_speed(uint32_t timeout) {
     while (!at_speed()) {
         printf("wait_until_at_speed\n");
         
+        // timeout check
         if(timeout > 0 && pros::millis() >= timeout) {
             return true;
         }
@@ -153,6 +151,7 @@ bool wait_until_fired(uint32_t timeout) {
     while (targetSpeed - average_speed < 20) {
         printf("wait_until_fired\n");
         
+        // timeout check
         if(timeout > 0 && pros::millis() >= timeout) {
             return true;
         }
