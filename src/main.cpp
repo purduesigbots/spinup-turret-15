@@ -146,9 +146,31 @@ void opcontrol() {
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
+			if(BOT == SILVER) {
+				// if the goal color is 3, aim with odometry
+				if (vision::get_goal_color() == 3) {
+					// aim with odometry at the point {100, 0}
+
+					// get the current position
+					auto pos = arms::odom::getPosition();
+					// get the current heading
+					auto heading = arms::odom::getHeading(true);
+					// calculate the angle to the goal
+					auto angle = atan2(100 - pos.x, 0 - pos.y) - heading;
+
+					//convert to degrees
+					angle = angle * 180 * M_1_PI;
+
+					// aim at the goal
+					turret::goto_angle(angle, 400, false);
+
+				}
+			}
+
 			if (use_vision) {
 				turret::enable_vision_aim();
 			}
+
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			disklift::discLiftUp();

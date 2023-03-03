@@ -85,6 +85,10 @@ double get_latency() {
   return 40; // 40ms latency
 }
 
+int get_goal_color() {
+  return communication->get_data(GOAL_COLOR);
+}
+
 Oak_1_latency_compensator *latency_compensator;
 
 void task() {

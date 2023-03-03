@@ -1,6 +1,8 @@
+#pragma once
 #include "main.h"
 #include "pros/apix.h"
 #include <map>
+
 namespace comms {
     class ReceiveComms {
         public: 
