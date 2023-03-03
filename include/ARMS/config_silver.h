@@ -50,7 +50,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TRACK_WIDTH                                                            \
   5.925 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
-  4.75 // Distance from middle wheel to the robot turning center
+  6.25 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled

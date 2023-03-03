@@ -4,6 +4,9 @@
 #include "pros/misc.h"
 #include "comms/comms.hpp"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
+#include "subsystems/flywheel.hpp"
+#include "subsystems/intake.hpp"
+#include "subsystems/turret.hpp"
 #include "vision.h"
 #include "subsystems/subsystems.hpp"
 
@@ -62,7 +65,7 @@ void draw_screen()
 		pros::lcd::clear();
 
 		if(screenIndex == 0) {
-			pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
+			pros::lcd::print(1, "X: %2.4f, Y: %2.4f, H: %2.4f)", 
 				arms::odom::getPosition().x,
 				arms::odom::getPosition().y,
 				arms::odom::getHeading()
@@ -97,14 +100,13 @@ void initialize() {
 	vision::init();
 	turret::initialize();
 	sylib::initialize();
-	disklift::home();
+	disclift::home();
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
 	flywheel::initialize();
-	//vision::init();
-	//Task vision(vision::task);
-
+	vision::init();
+	Task vision(vision::task);
 	roller::init();
 	disccounter::initialize();
 
@@ -184,21 +186,7 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
-		pros::lcd::print(0, "Encs: %2.4f, %2.4f, %2.4f",
-			arms::odom::getLeftEncoder(),
-			arms::odom::getRightEncoder(),
-			arms::odom::getMiddleEncoder()
-		);
-		pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
-			arms::odom::getPosition().x,
-			arms::odom::getPosition().y,
-			arms::odom::getHeading()
-		);
-		pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-		// pros::lcd::print(3, "Goal Gamma: %2.4f", vision::get_goal_gamma());
-		pros::lcd::print(4, "DiscLift Position %f", disklift::lift_motor.get_position());
-		pros::lcd::print(5, "DL Temp: %f", turret::motor.get_temperature());
-		pros::lcd::print(6, "DL Draw: %d", disklift::lift_motor.get_current_draw());
+		
 
 		if (master.get_digital_new_press(DIGITAL_L2)) { // Disc lift
 			discLiftCounter = 0; 
@@ -207,7 +195,7 @@ void opcontrol() {
 			}
     	} 
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
-			//disclift::discLiftUp();
+			disclift::discLiftUp();
 			if(discLiftCounter < 10){
 				intake::start(1000);
 			} else{
@@ -215,34 +203,33 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)){
-			//	disklift::discLiftDown();
-			//turret::disable_vision_aim();
+			disclift::discLiftDown();
+			turret::disable_vision_aim();
 		}
 	
 		if (master.get_digital_new_press(DIGITAL_LEFT)){
 			deflector::toggle();
-			intake::toggle_arm();
 		}
 		if (master.get_digital_new_press(DIGITAL_RIGHT)){
 			std::cout << "Launching Endgame" << std::endl;
 			endgame::deploy();
 		}
 		if (master.get_digital_new_press(DIGITAL_B)){
-			intake::toggle(100);
+			intake::toggle_arm();
 		}
 		
 		if(master.get_digital_new_press(DIGITAL_L1)){
 			disclift::calculatePos();
 		}
 		if (master.get_digital(DIGITAL_L1)){
-		//	if (flywheel::at_speed()) {
-		//		flywheel::fire();
-		//	} else {
-		//		flywheel::stopIndexer();
-		//	}
-		//	disklift::discLiftHold();
+			if (flywheel::at_speed()) {
+				flywheel::fireControl_driver(true);
+			} else {
+				flywheel::fireControl_driver(false);
+			}
+			disclift::discLiftHold();
 		} else {
-			// flywheel::stopIndexer();
+			flywheel::fireControl_driver(false);
 		}
 		
 		if (master.get_digital(DIGITAL_R1)) { // intake
@@ -284,10 +271,9 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
-			autonomous();
-			//use_vision = !use_vision;
+			// autonomous();
+			turret::toggle_vision_aim();
 		}
-		//turret::update();
 		counter++;
 		pros::delay(20);
 	}

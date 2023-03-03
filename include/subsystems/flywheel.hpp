@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include "api.h"
 
 /**
  * Subsystem Dependencies: Disc Lift
@@ -105,6 +106,10 @@ int fire(int numDiscs = 1, int timeout = 5000);
 // a vector of doubles where each double is a speed for the disk. The size
 // of the passed vector specifies how many discs are shot. 
 //int fire(std::vector<double> speeds, int timeout = 5000);
+
+void fireControl_driver(bool enable);
+
+//sets the indexer to firing mode if enable = true, and to 0 if enable = false.
 
 void debug_screen();
 

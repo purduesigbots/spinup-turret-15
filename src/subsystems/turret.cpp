@@ -46,18 +46,17 @@ enum class State {
 State state = State::MANUAL;
 
 void task_func() {
-    static double last_error = 0.0;
+    static double last_error = 0;
     static int settler = 0;
 
     while(true) {
-        //double angle_error = vision::get_goal_gamma();
-        double angle_error = 0;
+        double angle_error = vision::get_goal_gamma();
         if (angle_error == last_error) {
             settler += 1;
         } else {
             settler = 0;
         }
-        vision_working = angle_error != 45.00 && settler < 25;
+        vision_working = angle_error != 45.00 && ! vision::vision_not_working();
         last_error = angle_error;
         switch(state) {
             case State::DISABLED:
@@ -159,12 +158,20 @@ void wait_until_settled() {
 }
 
 void debug_screen() {
-    pros::lcd::print(0, "Turret Info:");
+    if(state == State::DISABLED) {
+        pros::lcd::print(0, "State: Disabled");
+        return;
+    } else if(state == State::MANUAL) {
+        pros::lcd::print(0, "State: Manual");
+    } else if(state == State::VISION) {
+        pros::lcd::print(0, "State: Vision");
+    }
     pros::lcd::print(1, " State:");
     pros::lcd::print(2, " Cur Angle: %f", get_angle());
     pros::lcd::print(3, " Tgt Angle: %f", target_angle);
     pros::lcd::print(4, " Angle Err: %f", get_angle_error());
     pros::lcd::print(5, " Settled: %s", settled() ? "true" : "false");
+    pros::lcd::print(6, " Vision: %s", vision_working ? "true" : "false");
 }
 
 void toggle_vision_aim() {

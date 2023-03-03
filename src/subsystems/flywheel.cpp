@@ -109,7 +109,7 @@ void stop() {
 }
 
 void toggle(double targetSpeed) {
-    if(targetSpeed == STOP) {
+    if(targetSpeed != STOP && targetSpeed != flywheel::targetSpeed) {
         start(targetSpeed);
     }
     else {
@@ -212,6 +212,10 @@ RETURN:
     disclift::discLiftDown();
     indexer.move_voltage(0);
     return numberFired;
+}
+
+void fireControl_driver(bool enable) {
+    indexer.move_voltage(12000 * enable); //sets to 12000 if enable is true, 0 if false
 }
 
 void debug_screen() {

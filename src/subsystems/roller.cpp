@@ -1,5 +1,5 @@
 #include "subsystems/roller.hpp"
-
+#include "main.h"
 #include "api.h"
 #include "subsystems/subsystems.hpp"
 
@@ -35,6 +35,8 @@ void toggle_turn_roller() {
 
 void move(double speed) {
     roller::speed = speed;
+    printf("\nRoller speed: %f\n", speed);
+    printf("\nBool thing: %d\n", turning_roller);
 }
 
 void task() {
