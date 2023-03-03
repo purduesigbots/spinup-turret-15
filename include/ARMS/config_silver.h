@@ -4,12 +4,12 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #pragma once
 
 
-#define INTAKE_PISTON {{3, 'd'}}
+#define INTAKE_PISTON {{3, 'f'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 'h'
 
-#define ROLLER_MOTOR 6
+#define ROLLER_MOTOR 10
 #define ROLLER_OPTICAL 5
 
 #define LIFT_MOTOR 16
@@ -21,7 +21,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define FLYWHEEL_KP 0.5
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
-#define FLYWHEEL_LEFT 9
+#define FLYWHEEL_LEFT 8
 #define FLYWHEEL_RIGHT 9
 #define INDEXER_PORT 15
 
@@ -29,7 +29,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_LIMIT_SWITCH {{3, 'h'}}
 
 #define DEFLECTOR_PISTON {{3, 'a'}}
-#define ENDGAME_PISTON {{3, 'f'}}
+#define ENDGAME_PISTON {{3, 'd'}}
 
 #define IRIS_PORT 21
 
@@ -38,8 +38,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 // Negative numbers mean reversed motor
 
-#define LEFT_MOTORS 1, 13, -12
-#define RIGHT_MOTORS 20, 17, -18
+#define LEFT_MOTORS 1, -13, 12
+#define RIGHT_MOTORS -17, 18, -20
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
