@@ -44,10 +44,7 @@ void initialize() {
 	vision::init();
 	turret::initialize();
 	sylib::initialize();
-	Task disklift_home_task([](void){
-		disklift::home();
-	});
-
+	disklift::home();
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::lcd::initialize();
@@ -133,6 +130,11 @@ void opcontrol() {
 		int left = master.get_analog(ANALOG_LEFT_Y);
 		int right = master.get_analog(ANALOG_RIGHT_X);
 		arcade(left, right);
+		pros::lcd::print(0, "Encs: %2.4f, %2.4f, %2.4f",
+			arms::odom::getLeftEncoder(),
+			arms::odom::getRightEncoder(),
+			arms::odom::getMiddleEncoder()
+		);
 		pros::lcd::print(1, "Pose: %2.4f, %2.4f, %2.4f)", 
 			arms::odom::getPosition().x,
 			arms::odom::getPosition().y,

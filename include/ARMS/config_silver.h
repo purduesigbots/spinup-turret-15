@@ -13,7 +13,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define ROLLER_OPTICAL 5
 
 #define LIFT_MOTOR 16
-#define LIFT_UP_POS 90
+#define LIFT_UP_POS 64
 #define LIFT_DOWN_POS 7
 
 #define FLYWHEEL_THRESHOLD 150
@@ -43,18 +43,18 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
-#define TPI 310.00       // Encoder ticks per inch of forward robot movement
-#define MIDDLE_TPI 310.0 // Ticks per inch for the middle wheel
+#define TPI 326.3157       // Encoder ticks per inch of forward robot movement
+#define MIDDLE_TPI 326.3157 // Ticks per inch for the middle wheel
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  6.31 // The distance between left and right wheels (or tracker wheels)
+  5.925 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
   4.75 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
-#define ENCODER_PORTS 3, 7, -1                // Port 0 for disabled,
+#define ENCODER_PORTS -1, -5, 3               // Port 0 for disabled,
 #define EXPANDER_PORT 0                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
