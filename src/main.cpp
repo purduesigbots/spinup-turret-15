@@ -23,7 +23,7 @@ using namespace pros;
 std::map<uint8_t, int32_t> comms_data;
 
 const int MIN_SCREEN_INDEX = 0;
-const int MAX_SCREEN_INDEX = 1;
+const int MAX_SCREEN_INDEX = 2;
 static std::atomic<int> screenIndex = 0;
 
 /**
@@ -69,6 +69,9 @@ void draw_screen()
 		}
 		else if(screenIndex == 1) {
 			disccounter::debug_screen();
+		}
+		else if(screenIndex = 2) {
+			turret::debug_screen();
 		}
 
 		pros::delay(10);

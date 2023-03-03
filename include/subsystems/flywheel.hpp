@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <stdint.h>
 #include <vector>
 
 /**
@@ -52,9 +53,14 @@ void stop();
 void toggle(double targetSpeed);
 
 /**
- * Blocks the calling thread until the flywheel reaches its target speed 
+ * Blocks the calling thread until the flywheel reaches its target speed, or the
+ * timeout is reached.
+ * 
+ * @return True if the timeout was reached.
  */
-void wait_until_at_speed();
+bool wait_until_at_speed(uint32_t timeout);
+
+bool wait_until_fired(uint32_t timeout);
 
 /**
  * Returns whether the flywheel is at its target RPM or not

@@ -14,10 +14,6 @@ using namespace pros;
 
 namespace turret {
 
-#define DISABLED 0
-#define MOVE_TO_ANGLE 1
-#define MOVE_WITH_VISION 2
-
 // Devices needed for implementing the subsystem:
 
 Motor motor(TURRET_MOTOR, E_MOTOR_GEARSET_06, false, E_MOTOR_ENCODER_ROTATIONS);
@@ -26,7 +22,6 @@ ADIDigitalIn limit_switch(TURRET_LIMIT_SWITCH);
 
 double target_angle = 0.0;
 double max_velocity = 0.0;
-int state = DISABLED;
 bool vision_working = true;
 
 // This constant is used to convert the motor's possition, which is in
@@ -43,8 +38,53 @@ const double SETTLE_THRESHHOLD = 0.5;   // How many degrees to the left or right
 inline double rot_to_deg(double rot) { return rot * ROT_TO_DEG; }
 inline double deg_to_rot(double deg) { return deg / ROT_TO_DEG; }
 
+enum class State {
+    DISABLED,
+    MANUAL,
+    VISION
+};
+State state;
+
+void task_func() {
+    static double last_error = 0.0;
+    static int settler = 0;
+
+    while(true) {
+        double angle_error = vision::get_goal_gamma();
+        if (angle_error == last_error) {
+            settler += 1;
+        } else {
+            settler = 0;
+        }
+        vision_working = angle_error != 45.00 && settler < 25;
+        last_error = angle_error;
+        switch(state) {
+            case State::DISABLED:
+                motor.move(0);
+                break;
+            case State::MANUAL:
+                motor.move_absolute(target_angle, max_velocity);
+                break;
+            case State::VISION:
+                /*
+                Angle error is set to 45.00 when the goal is not detected
+                If angle error has not changed, assume vision has disconnected
+                */
+                if (vision_working) {
+                    motor.move_voltage(angle_error * 400);
+                } else {
+                    motor.move_voltage(0);
+                }
+                break;
+        }
+    }
+
+}
+
 void initialize() {
     calibrate();
+
+    pros::Task task(task_func, "Turret Task");
 }
 
 void calibrate() {
@@ -74,39 +114,6 @@ void calibrate() {
     motor.tare_position();
     pros::delay(100);
     printf("done\n");
-}
-
-double last_error = 0.0;
-int settler = 0;
-
-void update() {
-    double angle_error = vision::get_goal_gamma();
-    if (angle_error == last_error) {
-        settler += 1;
-    } else {
-        settler = 0;
-    }
-    vision_working = angle_error != 45.00 && settler < 25;
-    last_error = angle_error;
-    switch(state) {
-        case DISABLED:
-            motor.move(0);
-            break;
-        case MOVE_TO_ANGLE:
-            motor.move_absolute(target_angle, max_velocity);
-            break;
-        case MOVE_WITH_VISION:
-            /*
-            Angle error is set to 45.00 when the goal is not detected
-            If angle error has not changed, assume vision has disconnected
-            */
-            if (vision_working) {
-                motor.move_voltage(angle_error * 400);
-            } else {
-                motor.move_voltage(0);
-            }
-            break;
-    }
 }
 
 double get_angle() {
@@ -147,6 +154,26 @@ void wait_until_settled() {
         printf("    Delta: %f\n", get_angle_error);
         pros::delay(10);
     }
+}
+
+void debug_screen() {
+    pros::lcd::print(0, "Turret Info:");
+    pros::lcd::print(1, " State:");
+    pros::lcd::print(2, " Cur Angle: %d", get_angle());
+    pros::lcd::print(3, " Tgt Angle: %d", target_angle);
+    pros::lcd::print(4, " Settled: %s", settled ? "true" : "false");
+}
+
+void toggle_vision_aim() {
+    state = (state == State::VISION ? State::MANUAL : State::VISION);
+}
+
+void enable_vision_aim() {
+    state = State::VISION;
+}
+
+void disable_vision_aim() {
+    state = State::MANUAL;
 }
 
 } // namespace turret

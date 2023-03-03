@@ -36,9 +36,9 @@ bool seeing_disc() {
 
 void debug_screen() {
     pros::lcd::print(0, "Disc Counter Info:");
-    pros::lcd::print(1, "Disc Count: %d", disc_count());
-    pros::lcd::print(2, "Seeing Disc: %d", seeing_disc());
-    pros::lcd::print(3, "Sensor Value: %d", lineSensor.get_value());
+    pros::lcd::print(1, " Disc Count: %d", disc_count());
+    pros::lcd::print(2, " Seeing Disc: %d", seeing_disc());
+    pros::lcd::print(3, " Sensor Value: %d", lineSensor.get_value());
     
     const char* state_str = "";
     switch(state)

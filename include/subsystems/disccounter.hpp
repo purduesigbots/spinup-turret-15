@@ -11,8 +11,14 @@ namespace disccounter {
  */
 void initialize();
 
+/**
+ * Returns true if the robot is currently seeing a disc.
+*/
 bool seeing_disc();
 
+/**
+ * Renders the debug screen to the LVGL display 
+ */
 void debug_screen();
 
 /**

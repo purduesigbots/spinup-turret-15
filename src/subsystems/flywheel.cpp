@@ -1,5 +1,7 @@
 #include "flywheel.hpp"
 
+#include <stdint.h>
+
 #include "api.h"
 #include "main.h"
 #include "subsystems/subsystems.hpp"
@@ -133,18 +135,32 @@ double target_speed() {
 }
 
 // Blocks until the robot reaches a specific speed.
-void wait_until_at_speed(uint32_t timeout) {
+bool wait_until_at_speed(uint32_t timeout) {
     while (!at_speed()) {
         printf("wait_until_at_speed\n");
+        
+        if(timeout > 0 && pros::millis() >= timeout) {
+            return true;
+        }
+
         pros::delay(10);
     }
+
+    return false;
 }
 
-void wait_until_fired() {
+bool wait_until_fired(uint32_t timeout) {
     while (targetSpeed - average_speed < 20) {
         printf("wait_until_fired\n");
+        
+        if(timeout > 0 && pros::millis() >= timeout) {
+            return true;
+        }
+
         pros::delay(10);
     }
+
+    return false;
 }
 
 int fire(int numDiscs, int timeout) {
@@ -152,15 +168,36 @@ int fire(int numDiscs, int timeout) {
 
     int numberFired = 0;
 
-    while(pros::millis() - startTime < timeout) {
-        while(!at_speed()) {
-            if(pros::millis() - startTime < timeout) {
-                return numberFired;
-            }
-            pros::delay(10);
+    // While we haven't fired all the discs we want to fire
+    while(numberFired < numDiscs) {
+        // Check if we've reached the timeout and return if we have
+        uint32_t timeLeft = timeout - pros::millis();
+        if(timeout > 0 && timeLeft <= 0) {
+            return numberFired;
         }
 
+        // We first wait to make sure that the flywheel is at the speed we want. 
+        // This ensures the flywheel shoots consistantly. If timeouts are 
+        // enabled, and we reach the timeout before we are at speed, we return.
+        //
+        // NOTE: It is important that the call to wait_until_at_speed() is first
+        //       in these if statements due to short circuit evaluation. If the
+        //       "timeout > 0" is first, the entire if will fail
+        //       wait_until_at_speed() will never run
+        if(wait_until_at_speed(timeLeft) && timeout > 0) {
+            return numberFired;
+        }
+
+        // Now that the flywheel is at speed, we start the indexer
         indexer.move_voltage(12000);
+
+        // We wait until we detect that the disc is fired or that the timeout is
+        // reach (if timeouts are enabled.). See the note above
+        if(wait_until_fired(timeLeft) && timeout > 0) {
+            return numberFired;
+        }
+
+        // Update the disc counter and number of discs we've fired
         numberFired++;
         disccounter::decrement();
 
