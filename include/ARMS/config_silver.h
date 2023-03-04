@@ -1,10 +1,13 @@
 /**
-This file includes all of the ARMS constants as well as all robot-specific constants for the SILVER robot.
+This file includes all of the ARMS constants as well as all robot-specific
+constants for the SILVER robot.
 */
 #pragma once
 
-
-#define INTAKE_PISTON {{3, 'f'}}
+#define INTAKE_PISTON                                                          \
+	{                                                                            \
+		{ 3, 'f' }                                                                 \
+	}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 'h'
@@ -17,8 +20,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define LIFT_DOWN_POS 7
 
 #define FLYWHEEL_THRESHOLD 150
-#define FLYWHEEL_KV 57.7
-#define FLYWHEEL_KP 0.5
+#define FLYWHEEL_KV 62
+#define FLYWHEEL_KP 16
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_LEFT 8
@@ -26,10 +29,19 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define INDEXER_PORT 15
 
 #define TURRET_MOTOR 7
-#define TURRET_LIMIT_SWITCH {{3, 'h'}}
+#define TURRET_LIMIT_SWITCH                                                    \
+	{                                                                            \
+		{ 3, 'h' }                                                                 \
+	}
 
-#define DEFLECTOR_PISTON {{3, 'a'}}
-#define ENDGAME_PISTON {{3, 'd'}}
+#define DEFLECTOR_PISTON                                                       \
+	{                                                                            \
+		{ 3, 'a' }                                                                 \
+	}
+#define ENDGAME_PISTON                                                         \
+	{                                                                            \
+		{ 3, 'd' }                                                                 \
+	}
 
 #define IRIS_PORT 21
 
@@ -43,18 +55,18 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
-#define TPI 326.3157       // Encoder ticks per inch of forward robot movement
+#define TPI 326.3157        // Encoder ticks per inch of forward robot movement
 #define MIDDLE_TPI 326.3157 // Ticks per inch for the middle wheel
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  5.925 // The distance between left and right wheels (or tracker wheels)
+	5.925 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
-  6.25 // Distance from middle wheel to the robot turning center
+	6.25 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
-#define ENCODER_PORTS -1, -5, 3               // Port 0 for disabled,
+#define ENCODER_PORTS -1, -5, 3              // Port 0 for disabled,
 #define EXPANDER_PORT 0                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
@@ -73,7 +85,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define ANGULAR_KI 0
 #define ANGULAR_KD 35
 #define MIN_ERROR                                                              \
-  5 // Minimum distance to target before angular componenet is disabled
+	5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)
 
 // Auton selector configuration constants
