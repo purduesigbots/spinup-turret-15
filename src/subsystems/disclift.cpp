@@ -59,8 +59,8 @@ namespace disclift {
             // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             // lift_motor.brake();
         } else{
-            lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-            lift_motor.brake();
+            lift_motor.move_absolute(liftedPos,100);
+            // lift_motor.brake();
         }
     }
 

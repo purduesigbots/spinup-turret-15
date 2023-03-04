@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "api.h"
+#include "disccounter.hpp"
 #include "disclift.hpp"
 #include "main.h"
 #include "subsystems/subsystems.hpp"
@@ -133,7 +134,7 @@ void toggle(double targetSpeed) {
 
 bool at_speed() {
 	// Check that the turret's RPM is within 3% of the target speed.
-	return std::abs(targetSpeed - average_speed) / targetSpeed < 0.03;
+	return std::abs(targetSpeed - average_speed) / targetSpeed < 0.02;
 }
 
 double current_speed() {
@@ -163,10 +164,16 @@ bool wait_until_at_speed(uint32_t timeout) {
 		if (timeout > 0 && pros::millis() - startTime >= timeout) {
 			return true;
 		}
-
 		pros::delay(10);
 	}
-
+    pros::delay(1000); //do it a second time to make sure it's settled in 
+    while (!at_speed()) {
+		// timeout check
+		if (timeout > 0 && pros::millis() - startTime >= timeout) {
+			return true;
+		}
+		pros::delay(10);
+	}
 	return false;
 }
 
@@ -190,18 +197,18 @@ int fire(int numDiscs, int timeout) {
 	uint32_t endTime = startTime + timeout;
 
 	int numberFired = 0;
-
+    intake::start(600);
+    disclift::discLiftUp();
+    pros::delay(460);
+    intake::stop();
 	// While we haven't fired all the discs we want to fire
 	while (numberFired < numDiscs) {
+        disclift::discLiftUp();
 		// Check if we've reached the timeout and return if we have
 		uint32_t timeLeft = endTime - pros::millis();
 		if (timeLeft <= 0 && timeout > 0) {
 			goto RETURN;
 		}
-		if (numberFired == 0) {
-			intake::start(600);
-		}
-		disclift::discLiftUp();
 		// We first wait to make sure that the flywheel is at the speed we want.
 		// This ensures the flywheel shoots consistantly. If timeouts are
 		// enabled, and we reach the timeout before we are at speed, we return.
@@ -217,7 +224,6 @@ int fire(int numDiscs, int timeout) {
 		// Now that the flywheel is at speed, we start the indexer
 		indexer.move_voltage(12000);
 		disclift::discLiftHold();
-		intake::stop();
 
 		// We wait until we detect that the disc is fired or that the timeout is
 		// reach (if timeouts are enabled.). See the note above
@@ -227,15 +233,14 @@ int fire(int numDiscs, int timeout) {
 
 		// Now that the flywheel is at speed, we start the indexer
 		indexer.move_voltage(0);
-		disclift::discLiftUp();
 		// Update the disc counter and number of discs we've fired
 		numberFired++;
 		disccounter::decrement();
-
-		pros::delay(10);
+		pros::delay(numberFired * 400);
+		targetSpeed++; //increase to help recovery...???? could be gas?????
 	}
-
-RETURN:
+    RETURN:
+    intake::stop();
 	disclift::discLiftDown();
 	indexer.move_voltage(0);
 	return numberFired;
@@ -251,6 +256,8 @@ void debug_screen() {
 	pros::lcd::print(1, " Cur Speed: %f", current_speed());
 	pros::lcd::print(2, " Tgt Speed: %f", target_speed());
 	pros::lcd::print(4, " At Speed?: %d", at_speed());
+    pros::lcd::print(5, "Left temp: %3.2f", left_flywheel.get_temperature());
+    pros::lcd::print(6, "Right temp: %3.2f", right_flywheel.get_temperature());
 }
 
 } // namespace flywheel

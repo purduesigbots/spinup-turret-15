@@ -151,7 +151,7 @@ void opcontrol() {
 	using namespace arms::chassis;
 
 	turret::goto_angle(0, 400, true);
-	vision::set_vision_offset(false);
+	vision::set_vision_offset(220);
 	vision::start_vision();
 
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);

@@ -20,8 +20,8 @@ constants for the SILVER robot.
 #define LIFT_DOWN_POS 7
 
 #define FLYWHEEL_THRESHOLD 150
-#define FLYWHEEL_KV 62
-#define FLYWHEEL_KP 16
+#define FLYWHEEL_KV 57.7
+#define FLYWHEEL_KP 10.5
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_LEFT 8
@@ -84,8 +84,7 @@ constants for the SILVER robot.
 #define ANGULAR_KP 5
 #define ANGULAR_KI 0
 #define ANGULAR_KD 35
-#define MIN_ERROR                                                              \
-	5 // Minimum distance to target before angular componenet is disabled
+#define MIN_ERROR 5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)
 
 // Auton selector configuration constants

@@ -61,12 +61,9 @@ void start_vision() {
   communication->start();
 }
 
-void set_vision_offset(bool is_auto) {
-  if (is_auto) {
-    vision_offset = 220;
-  } else {
-    vision_offset = 240;
-  }
+
+void set_vision_offset(int offset) {
+  vision_offset = offset;
 }
 
 std::tuple<double, double, double> get_turret_pose() {
@@ -144,13 +141,13 @@ void task() {
     // 1 is blue
     // 3 is nothing detected
 
-    if (turret::get_angle() >= 74) {
+    if (turret::get_angle() >= 80) {
       turn_degrees = std::min(turn_degrees, 0.0);
-    } else if (turret::get_angle() <= -74) {
+    } else if (turret::get_angle() <= -80) {
       turn_degrees = std::max(turn_degrees, 0.0);
     }
 
-    float deadzone = 10.0;
+    float deadzone = 2.5;
 
     if (fabs(lr - 265) <= deadzone) {
       turn_degrees = 0.0;

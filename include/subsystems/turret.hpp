@@ -32,7 +32,7 @@ void calibrate();
 /**
  * Tells the turret to go to an angle relative to the robot's heading
  * 
- * -90 is 90 degrees to the left, 90 is 90 degrees to the right. 0 is 
+ * -90 is 90 degrees to the right, 90 is 90 degrees to the left. 0 is 
  * straight forwards with the robot's heading
  * 
  * @param angle The angle to face

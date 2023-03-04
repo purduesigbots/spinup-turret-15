@@ -1,7 +1,9 @@
 #include "ARMS/chassis.h"
+#include "ARMS/flags.h"
 #include "main.h"
 
 #include "subsystems/disccounter.hpp"
+#include "subsystems/disclift.hpp"
 #include "subsystems/flywheel.hpp"
 #include "subsystems/intake.hpp"
 #include "subsystems/roller.hpp"
@@ -25,8 +27,9 @@
 
  void fire3(){
 	flywheel::start(200);
-	flywheel::fire(3, 20000);
+	flywheel::fire(3, 8000);
  }
+
 void matchAuto(){
 	printf("Match auto\n");
 
@@ -34,75 +37,67 @@ void matchAuto(){
 	arms::odom::reset({11.25, 50.25}, 271.0); 
 
 	//FLYWHEEL INIT
-	flywheel::start(200);
+	flywheel::start(176);
 	//DISC COUNTER INIT
 	disccounter::setNum(1);
 	
-	//Get first disc
-	printf("Getting first disc\n");
+	//Get second disc
+	printf("Getting disc 2\n");
 	intake::toggle(600);
-	arms::chassis::move({11.25, 20}); //move to disc 1
+	arms::chassis::move({11.25, 19}); //move to disc 2
+
+	//Get disc 3
+	printf("Getting disc 3\n");
+	arms::chassis::move({13.2074, 32.3512}, arms::REVERSE); //move back
+	arms::chassis::turn(315); //turn to disc 3
+	arms::chassis::move({16, 27}); //pick up disc 3
 
 	//Get roller
-	printf("Getting roller, disc 2\n");
-	arms::chassis::move({12.7074, 28.3512}, arms::REVERSE); //move to roller
-	arms::chassis::turn(10); //turn to roller and pick up disc 2
-	arms::chassis::tank(-18, -18); //braindead back into roller to apply pressure
-	pros::delay(500); //get up to roller
+	printf("Getting roller\n");
+	arms::chassis::move({12.5, 28.3512}); //move back
+	arms::chassis::turn(0); //turn to roller
+	arms::chassis::tank(-25, -25); //braindead back into roller to apply pressure
+	pros::delay(1000); //get up to roller
 	roller::move(100); //turn roller
-	pros::delay(120);
+	pros::delay(70);
 	arms::chassis::tank(0, 0); //stop chassis
 	roller::move(0); //stop roller mech
+	turret::goto_angle(-60,100,true); //for shot 1
+	disclift::discLiftUp(); //for shot 1
 	
-	//Shoot discs 1, 2, 3
-	printf("Shooting discs 1, 2, 3\n");
-	turret::goto_angle(12,100,true); //for shot 1
+	//Shoot 1st shot
+	printf("Going to first shot\n");
+	arms::chassis::move({13, 28});
+	arms::chassis::turn(50, arms::THRU);
+	intake::stop();
+	arms::chassis::move({22,49, 45}); 
+	vision::set_vision_offset(196); //aim offset for long distance shot
 	turret::enable_vision_aim();
-	arms::chassis::move({15.9607, 27.2107});
-	arms::chassis::turn(0);
-	flywheel::fire(3, 7000);
+	flywheel::fire(3,8000);
 	turret::disable_vision_aim();
+	turret::goto_angle(0,100,true);
 
-	//Aim turret for next shot
-	turret::goto_angle(5,100,true); //for discs 4, 5, 6
+	//Aim turret, setup flywheel for next shot
+	flywheel::set_target_speed(165);
 
-	//Get disc 4
-	printf("Getting disc 4\n");
-	arms::chassis::move({16.1328, 24.2143}, 336.4); //move to disc 4
+	//Drive through next 3 discs
+	printf("Driving through discs\n");
+	intake::toggle(600);
+	arms::chassis::move({55, 82}, 45);
+	arms::chassis::waitUntilFinished(1);
+	pros::delay(800);
+	disclift::discLiftUp();
+	turret::goto_angle(50, 100, true);
 
-	#if 0
-	//Get disc 5
-	printf("Getting disc 5\n");
-	arms::chassis::turn(65.5, arms::THRU); //turn to disc 5
-	arms::chassis::move({28.7356, 51.7074}, arms::THRU); //move to disc 5
-
-	//Get disc 6
-	printf("Getting disc 6\n");
-	arms::chassis::turn(353, arms::THRU); //turn to disc 6
-	arms::chassis::move({36.7881, 50.344}); //move to disc 6
-
-	//Shoot discs 4, 5, 6
-	printf("Shooting discs 4, 5, 6\n");
+	//Shoot 2nd shot
+	printf("Shooting second shot\n");
+	arms::chassis::turn(290);
+	pros::delay(1500);
+	vision::set_vision_offset(203);
 	turret::enable_vision_aim();
-	flywheel::fire(disccounter::disc_count(), 5000);
+	flywheel::fire(3,8000);
+	flywheel::stop();
 	turret::disable_vision_aim();
-
-	//Aim turret for next shot
-	turret::goto_angle(0,100,true); //for shot 7, 8, 9
-
-	//Get disc 7, 8
-	printf("Getting discs 7, 8\n");
-	arms::chassis::move({23.4173, 49.509}, 50.6, arms::REVERSE | arms::THRU); //back up and aim at discs 7, 8
-	arms::chassis::move({52.6244, 84.4596}, 49, arms::THRU); //drive thru 7 and 8
-
-	//Get disc 9
-	// printf("Getting disc 9\n");
-	// arms::chassis::turn(-80, arms::THRU); //turn to disc 9
-
-	#endif
-
-
-
 
 
 }
@@ -131,8 +126,8 @@ void subsystem_test() {
 }
 
 void autonomous() {
-	// matchAuto();
-	fire3();
+	matchAuto();
+	// fire3();
 	// vision::set_vision_offset(true);
 	// roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	
