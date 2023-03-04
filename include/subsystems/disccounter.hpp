@@ -49,4 +49,13 @@ void decrement();
  */
 int expect(int numDiscs, int timeout = 5000);
 
+/**
+ * Tells the system how many discs are inside it (i.e. preloads)
+ * 
+ * This is  for overriding the current count
+ * 
+ * @param numDiscs How many discs are in the system
+ */
+void setNum(int numDiscs);
+
 } // namespace disccounter

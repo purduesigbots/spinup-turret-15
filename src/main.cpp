@@ -271,8 +271,8 @@ void opcontrol() {
 
 		if(master.get_digital_new_press(DIGITAL_X)){
 			//indexer_wait = !indexer_wait;
-			// autonomous();
-			turret::toggle_vision_aim();
+			autonomous();
+			// turret::toggle_vision_aim();
 		}
 		counter++;
 		pros::delay(20);

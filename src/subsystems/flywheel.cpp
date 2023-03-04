@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "api.h"
+#include "disclift.hpp"
 #include "main.h"
 #include "subsystems/subsystems.hpp"
 
@@ -175,7 +176,10 @@ int fire(int numDiscs, int timeout) {
         if(timeLeft <= 0 && timeout > 0) {
             goto RETURN;
         }
-
+        if(numberFired == 0){
+            intake::start(600);
+        }
+        disclift::discLiftUp();
         // We first wait to make sure that the flywheel is at the speed we want. 
         // This ensures the flywheel shoots consistantly. If timeouts are 
         // enabled, and we reach the timeout before we are at speed, we return.
@@ -190,7 +194,8 @@ int fire(int numDiscs, int timeout) {
 
         // Now that the flywheel is at speed, we start the indexer
         indexer.move_voltage(12000);
-        disclift::discLiftUp();
+        disclift::discLiftHold();
+        intake::stop();
 
         // We wait until we detect that the disc is fired or that the timeout is
         // reach (if timeouts are enabled.). See the note above
@@ -200,7 +205,7 @@ int fire(int numDiscs, int timeout) {
 
         // Now that the flywheel is at speed, we start the indexer
         indexer.move_voltage(0);
-
+        disclift::discLiftUp();
         // Update the disc counter and number of discs we've fired
         numberFired++;
         disccounter::decrement();

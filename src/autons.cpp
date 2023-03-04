@@ -1,5 +1,11 @@
+#include "ARMS/chassis.h"
 #include "main.h"
 
+#include "subsystems/disccounter.hpp"
+#include "subsystems/flywheel.hpp"
+#include "subsystems/intake.hpp"
+#include "subsystems/roller.hpp"
+#include "subsystems/turret.hpp"
 #include "vision.h"
 #include "ARMS/api.h"
 
@@ -16,216 +22,90 @@
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-#if 0
-void shoot(int count, double angle) {
+
+ void fire3(){
+	flywheel::start(200);
+	flywheel::fire(3, 20000);
+ }
+void matchAuto(){
+	printf("Match auto\n");
+
+	//STARTING POSITION
+	arms::odom::reset({11.25, 50.25}, 271.0); 
+
+	//FLYWHEEL INIT
+	flywheel::start(200);
+	//DISC COUNTER INIT
+	disccounter::setNum(1);
+	
+	//Get first disc
+	printf("Getting first disc\n");
+	intake::toggle(600);
+	arms::chassis::move({11.25, 20}); //move to disc 1
+
+	//Get roller
+	printf("Getting roller, disc 2\n");
+	arms::chassis::move({12.7074, 28.3512}, arms::REVERSE); //move to roller
+	arms::chassis::turn(10); //turn to roller and pick up disc 2
+	arms::chassis::tank(-18, -18); //braindead back into roller to apply pressure
+	pros::delay(500); //get up to roller
+	roller::move(100); //turn roller
+	pros::delay(120);
+	arms::chassis::tank(0, 0); //stop chassis
+	roller::move(0); //stop roller mech
+	
+	//Shoot discs 1, 2, 3
+	printf("Shooting discs 1, 2, 3\n");
+	turret::goto_angle(12,100,true); //for shot 1
 	turret::enable_vision_aim();
-	disklift::lift_motor.move_voltage(12000);
-	for (int i = 0; i < 125; i++) {
-		turret::update();
-		pros::delay(10);
-	}
-	disklift::lift_motor.move_voltage(6000);
-	for (int i = 1; i < count; i++) {
-		flywheel::wait_until_at_speed();
-		flywheel::fire();
-		flywheel::wait_until_fired();
-		flywheel::stopIndexer();
-	}
-	intake::move(-100);
-	flywheel::wait_until_at_speed();
-	flywheel::fire();
-	pros::delay(750);
-	flywheel::stopIndexer();
-	disklift::discLiftDown();
+	arms::chassis::move({15.9607, 27.2107});
+	arms::chassis::turn(0);
+	flywheel::fire(3, 7000);
 	turret::disable_vision_aim();
-	intake::move(100);
+
+	//Aim turret for next shot
+	turret::goto_angle(5,100,true); //for discs 4, 5, 6
+
+	//Get disc 4
+	printf("Getting disc 4\n");
+	arms::chassis::move({16.1328, 24.2143}, 336.4); //move to disc 4
+
+	#if 0
+	//Get disc 5
+	printf("Getting disc 5\n");
+	arms::chassis::turn(65.5, arms::THRU); //turn to disc 5
+	arms::chassis::move({28.7356, 51.7074}, arms::THRU); //move to disc 5
+
+	//Get disc 6
+	printf("Getting disc 6\n");
+	arms::chassis::turn(353, arms::THRU); //turn to disc 6
+	arms::chassis::move({36.7881, 50.344}); //move to disc 6
+
+	//Shoot discs 4, 5, 6
+	printf("Shooting discs 4, 5, 6\n");
+	turret::enable_vision_aim();
+	flywheel::fire(disccounter::disc_count(), 5000);
+	turret::disable_vision_aim();
+
+	//Aim turret for next shot
+	turret::goto_angle(0,100,true); //for shot 7, 8, 9
+
+	//Get disc 7, 8
+	printf("Getting discs 7, 8\n");
+	arms::chassis::move({23.4173, 49.509}, 50.6, arms::REVERSE | arms::THRU); //back up and aim at discs 7, 8
+	arms::chassis::move({52.6244, 84.4596}, 49, arms::THRU); //drive thru 7 and 8
+
+	//Get disc 9
+	// printf("Getting disc 9\n");
+	// arms::chassis::turn(-80, arms::THRU); //turn to disc 9
+
+	#endif
+
+
+
+
+
 }
-
-void matchAuto() {
-	using namespace arms::chassis;
-	
-	// setup
-	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(167);
-	intake::toggle();
-	deflector::toggle();
-	deflector::toggle();
-	intake::move(100);
-
-	// intake first disk
-    std::cout << "Fetching first disc" << std::endl;
-	//move({15,0}, 70, arms::THRU);
-	move({30, -0.5}, 50);
-	pros::delay(500);
-
-	// spin roller
-    std::cout << "Spinning roller" << std::endl;
-	move({17,0}, 50, arms::REVERSE);
-	pros::delay(100);
-	turn(90, 50);
-	pros::delay(100);
-	tank(-50,-50);
-	pros::delay(1000);
-	tank(0,0);
-	roller::move(100);
-	pros::delay(125);
-	roller::move(0);
-	
-	// shoot disks
-    std::cout << "Shooting preloads" << std::endl;
-	arms::odom::reset({18,-3},87);
-	turret::goto_angle(-13, 250, true);
-	turret::update();
-	move({18,3}, 50);
-	pros::delay(500);
-	shoot(3, -13);
-	turret::goto_angle(0, 250, true);
-	turret::update();
-	//pros::delay(500);
-
-	flywheel::move(140);
-	turn(30, 60);
-	pros::delay(100);
-	move({23,7},50);
-	pros::delay(100);
-
-	
-    std::cout << "Fetching disc 4" << std::endl;
-    turn(150, 60);
-	pros::delay(100);
-    move({0,20}, 50);
-	pros::delay(100);
-    
-    std::cout << "Fetching disc 5" << std::endl;
-    turn(65, 60);
-	turret::goto_angle(0, 250, true);
-	turret::update();
-	pros::delay(100);
-    move({3,28}, 50);
-	pros::delay(500);
-	move(-5, 50, arms::REVERSE & arms::THRU);
-	pros::delay(500);
-	shoot(3,0);
-	
-    std::cout << "Shooting discs 4, 5" << std::endl;
-	flywheel::move(135);
-	turn(150, 60);
-	pros::delay(500);
-	move({-10,30},50);
-	pros::delay(500);
-	turn(70, 60);
-	pros::delay(500);
-	move({-9,38},60);
-
-    std::cout << "Fetching discs 6" << std::endl;
-	turret::goto_angle(-75, 250, true);
-	turret::update();
-	pros::delay(500);
-    turn(155, 60);
-	pros::delay(500);
-	move({-22,45}, 50);
-	pros::delay(1000);
-	turn(110, 60);
-	pros::delay(500);
-	shoot(3, -75);
-
-    std::cout << "Fetching discs 7" << std::endl;
-	flywheel::move(165);
-	move({-21,35},50, arms::REVERSE);
-	turret::goto_angle(0, 250, true);
-	turret::update();
-	pros::delay(500);
-	turn(178, 60);
-	pros::delay(500);
-	move({-26,35},50);
-	turn(217, 60);
-	move({-28,33}, 50);
-	turn(245, 60);
-	move({-30,28});
-	pros::delay(500);
-    std::cout << "Shooting discs 6, 7" << std::endl;
-    /* TODO: Implement this when the intake gets fixed */
-	turn(55, 60);
-	pros::delay(1000);
-	shoot(3,0);
-	deflector::toggle();
-	flywheel::move(0);
-}
-
-void skillsAuto() {
-	using namespace arms::chassis;
-	
-	// setup
-	arms::odom::reset({0, 0}, 0.0); // start position
-	flywheel::move(120);
-	intake::toggle();
-	deflector::toggle();
-	deflector::toggle();
-	intake::move(100);
-	vision::set_vision_offset(false);
-
-	// spin roller
-    std::cout << "First 3 Stack" << std::endl;
-	move({15,0}, 50);
-	pros::delay(100);
-	move({32,0},30);
-	turret::goto_angle(-65, 250, true);
-	turret::update();
-	pros::delay(500);
-	turn(-45, 60);
-	pros::delay(500);
-	shoot(3, -65);
-
-	move({73,-43},50);
-	pros::delay(500);
-	turn(-95, 60);
-	pros::delay(500);
-	shoot(3, -65);
-
-	flywheel::move(165);
-	turn(-50, 60);
-	pros::delay(500);
-	move({88,-69},50);
-	pros::delay(500);
-	turn(90,60);
-	pros::delay(500);
-	tank(-50,-50);
-	pros::delay(750);
-	tank(0,0);
-	pros::delay(100);
-	arms::odom::reset({88,-81},90);
-	turret::goto_angle(-45,250,true);
-	turret::update();
-	move({88,-76},50);
-	pros::delay(500);
-	turn(0, 60);
-	pros::delay(500);
-	move({125,-78},50);
-	pros::delay(500);
-	turn(135,60);
-	pros::delay(500);
-	move({116,-69},50);
-	pros::delay(500);
-	shoot(2,-45);
-
-	flywheel::move(145);
-	move({101,-50},30);
-	turret::goto_angle(-50,250,true);
-	turret::update();
-	pros::delay(1000);
-	intake::move(-100);
-	move(105, 50);
-	pros::delay(500);
-	turn(-45, 60);
-
-	// flywheel::move(120);
-	// move({71,-32},50);
-	// turret::goto_angle(-78,250,true);
-	// turret::update();
-	// pros::delay(500);
-	// shoot(2,-78);
-}
-#endif 
 extern "C" {
 
 void subsystem_test() {
@@ -251,22 +131,19 @@ void subsystem_test() {
 }
 
 void autonomous() {
-	subsystem_test();
-
-#if 0
-
-	vision::set_vision_offset(true);
-	roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	// matchAuto();
+	fire3();
+	// vision::set_vision_offset(true);
+	// roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	
-	switch (arms::selector::auton) {
-		case 0:
-			skillsAuto();
-			break;
-		default:
-			matchAuto();
-			break;
-	}
-	turret::goto_angle(0,250,true);
-#endif
+	// switch (arms::selector::auton) {
+	// 	case 0:
+	// 		// skillsAuto();
+	// 		break;
+	// 	default:
+	// 		matchAuto();
+	// 		break;
+	// }
+	// turret::goto_angle(0,250,true);
 }
 }

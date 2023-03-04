@@ -77,10 +77,12 @@ namespace disclift {
     }
 
     void home() {
+        intake::start(600);
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         lift_motor.move_voltage(12000);
         pros::delay(100);
         lift_motor.move_voltage(-5000);
+        intake::stop();
         pros::delay(100);
         int timestamp = pros::millis();
         while (lift_motor.get_current_draw() < 1200) {

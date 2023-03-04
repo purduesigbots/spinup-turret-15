@@ -142,5 +142,9 @@ int expect(int numDiscs, int timeout) {
     return discCount - startNumDiscs;
 }
 
+void setNum(int numDiscs){
+    discCount = numDiscs;
+}
+
 
 } // namespace disccounter
