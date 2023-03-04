@@ -765,7 +765,8 @@
       }
     },
     "upload_options": {
-      "after": "none"
+      "after": "none",
+      "slot": 2
     }
   }
 }
