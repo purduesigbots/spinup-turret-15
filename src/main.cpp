@@ -103,7 +103,6 @@ void initialize() {
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
 	flywheel::initialize();
-	vision::init();
 	Task vision(vision::task);
 	roller::init();
 	disccounter::initialize();
@@ -151,28 +150,18 @@ void opcontrol() {
 	using namespace arms::chassis;
 
 	turret::goto_angle(0, 400, true);
-	vision::set_vision_offset(220);
-	vision::start_vision();
-
+	vision::set_vision_offset(240);
+	turret::disable_vision_aim();
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-	// flywheel::start(115);
+	flywheel::start(135);
+	deflector::up();
 
 	int counter = 0;
 	bool indexer_wait = false;
-	bool use_vision = true;
+	bool use_vision = false;
 	bool vision_good = false;
 
-	// move(30, 70);
-	// move(-4, 50, arms::REVERSE);
-	// turn(89);
-	// move(-6, 50, arms::REVERSE);
-	// move(5, 50, arms::REVERSE);
-	// turn(51, arms::RELATIVE);
-	// move(36, 70);
-	// turn(-90, arms::RELATIVE);
-	// move(5, 50);
 
-	// flywheel::move(90);
 
 	int discLiftCounter = 0;
 	bool prevDLButton = false;
@@ -200,6 +189,7 @@ void opcontrol() {
 		} else if (!master.get_digital(DIGITAL_L1)) {
 			disclift::discLiftDown();
 			turret::disable_vision_aim();
+			turret::goto_angle(0,100,true);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_LEFT)) {
@@ -220,6 +210,7 @@ void opcontrol() {
 			if (flywheel::at_speed()) {
 				flywheel::fireControl_driver(true);
 			} else {
+				//set to false for rpm babysitter
 				flywheel::fireControl_driver(false);
 			}
 			disclift::discLiftHold();
@@ -229,10 +220,10 @@ void opcontrol() {
 
 		if (master.get_digital(DIGITAL_R1)) { // intake
 			intake::start(100);
-			roller::move(100);
+			roller::move(65);
 		} else if (master.get_digital(DIGITAL_R2)) { // outake
 			intake::start(-100);
-			roller::move(-100);
+			roller::move(-65);
 		} else if (!master.get_digital(DIGITAL_L2)) { // idle
 			intake::stop();
 			roller::move(0);
@@ -240,7 +231,7 @@ void opcontrol() {
 
 		// Flywheel control
 		if (master.get_digital_new_press(DIGITAL_A)) {
-			flywheel::toggle(200);
+			flywheel::toggle(120);
 		}
 
 		if (master.get_digital_new_press(DIGITAL_UP)) {
@@ -266,8 +257,11 @@ void opcontrol() {
 
 		if (master.get_digital_new_press(DIGITAL_X)) {
 			// indexer_wait = !indexer_wait;
-			autonomous();
+			// autonomous();
 			// turret::toggle_vision_aim();
+		}
+		if(master.get_digital_new_press(DIGITAL_Y)){
+			use_vision = !use_vision;
 		}
 		counter++;
 

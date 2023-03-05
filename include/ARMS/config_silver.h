@@ -16,12 +16,12 @@ constants for the SILVER robot.
 #define ROLLER_OPTICAL 5
 
 #define LIFT_MOTOR 16
-#define LIFT_UP_POS 64
+#define LIFT_UP_POS 110
 #define LIFT_DOWN_POS 7
 
-#define FLYWHEEL_THRESHOLD 150
-#define FLYWHEEL_KV 57.7
-#define FLYWHEEL_KP 10.5
+#define FLYWHEEL_THRESHOLD 200
+#define FLYWHEEL_KV 58
+#define FLYWHEEL_KP 20
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_LEFT 8

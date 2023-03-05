@@ -11,8 +11,8 @@ using namespace pros;
 namespace deflector {
 
 ADIDigitalOut deflector_piston(DEFLECTOR_PISTON);
-bool isUp = false;
-bool state = true;
+bool isUp = true;
+bool state = false;
 
 void up() {
     if(!isUp) {

@@ -6,6 +6,8 @@
 #include "disccounter.hpp"
 #include "disclift.hpp"
 #include "main.h"
+#include "pros/motors.h"
+#include "pros/motors.hpp"
 #include "subsystems/subsystems.hpp"
 
 #include "ARMS/config.h"
@@ -13,20 +15,6 @@
 using namespace pros;
 
 namespace flywheel {
-
-sylib::SpeedControllerInfo
-    auton_speed_controller([](double rpm) { return 120; }, // kV function - 120
-                           16,                             // kP - 1
-                           0.001,                          // kI
-                           0,                              // kD - 0.5
-                           0,                              // kH
-                           true,  // anti-windup enabled
-                           36,    // anti-windup range
-                           false, // p controller bounds threshold enabled
-                           3,     // p controller bounds cutoff enabled - 5
-                           4,     // kP2 for when over threshold - 0.25
-                           50     // range to target to apply max voltage - 10
-    );
 
 // flywheel tuning
 int threshold = FLYWHEEL_THRESHOLD;
@@ -41,16 +29,16 @@ sylib::SpeedControllerInfo motor_speed_controller(
     kI,                            // kI
     kD,                            // kD - 0.5
     0,                             // kH
-    true,                          // anti-windup enabled
+    false,                          // anti-windup enabled
     36,                            // anti-windup range
     false,                         // p controller bounds threshold enabled
     3,                             // p controller bounds cutoff enabled - 5
-    kP / 4,                        // kP2 for when over threshold - 0.25
+    0,                        // kP2 for when over threshold - 0.25
     threshold                      // range to target to apply max voltage - 10
 );
 
 sylib::Motor left_flywheel(FLYWHEEL_LEFT, 200, false, motor_speed_controller);
-sylib::Motor right_flywheel(FLYWHEEL_RIGHT, 200, true, motor_speed_controller);
+pros::Motor right_flywheel(FLYWHEEL_RIGHT, true);
 
 pros::Motor indexer(INDEXER_PORT, pros::E_MOTOR_GEARSET_18, false,
                     pros::E_MOTOR_ENCODER_DEGREES);
@@ -68,7 +56,7 @@ void task_function(void* data) {
 	uint32_t clock = sylib::millis();
 
 	left_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
-	right_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
+	right_flywheel.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
 	bool stopped = false;
 
@@ -88,10 +76,11 @@ void task_function(void* data) {
 		// proper speed
 		if (targetSpeed == STOP) {
 			left_flywheel.stop();
-			right_flywheel.stop();
+			right_flywheel = 0;
 		} else {
+			
 			left_flywheel.set_velocity_custom_controller(targetSpeed);
-			right_flywheel.set_velocity_custom_controller(targetSpeed);
+			right_flywheel.move_voltage(left_flywheel.get_applied_voltage());
 		}
 	}
 }
@@ -142,13 +131,7 @@ double current_speed() {
 }
 
 double current_speed(int n) {
-	if (n == 1) {
-		return left_flywheel.get_velocity();
-	} else if (n == 2) {
-		return right_flywheel.get_velocity();
-	} else {
-		return 0;
-	}
+	return left_flywheel.get_velocity();
 }
 
 double target_speed() {
@@ -237,7 +220,7 @@ int fire(int numDiscs, int timeout) {
 		numberFired++;
 		disccounter::decrement();
 		pros::delay(numberFired * 400);
-		targetSpeed++; //increase to help recovery...???? could be gas?????
+		targetSpeed += numberFired; //increase to help recovery...???? could be gas?????
 	}
     RETURN:
     intake::stop();
@@ -253,11 +236,12 @@ void fireControl_driver(bool enable) {
 
 void debug_screen() {
 	pros::lcd::print(0, "Flywheel Info:");
-	pros::lcd::print(1, " Cur Speed: %f", current_speed());
-	pros::lcd::print(2, " Tgt Speed: %f", target_speed());
-	pros::lcd::print(4, " At Speed?: %d", at_speed());
-    pros::lcd::print(5, "Left temp: %3.2f", left_flywheel.get_temperature());
-    pros::lcd::print(6, "Right temp: %3.2f", right_flywheel.get_temperature());
+	pros::lcd::print(1, " Cur Speed: %3.2f, Tgt: %3.2f", current_speed(), target_speed());
+	// pros::lcd::print(2, " Tgt Speed: %f", target_speed());
+	pros::lcd::print(2, " At Speed?: %d", at_speed());
+    pros::lcd::print(3, "Left temp: %3.2f", left_flywheel.get_temperature());
+    pros::lcd::print(4, "Right temp: %3.2f", right_flywheel.get_temperature());
+	pros::lcd::print(5, "(Applied) R: %5d L: %5d", right_flywheel.get_voltage(), left_flywheel.get_applied_voltage());
 }
 
 } // namespace flywheel

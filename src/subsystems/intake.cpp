@@ -21,7 +21,7 @@ bool running = false;
 double speed = 0;
 
 // Data for the intake's arm. The arm should start raised for every match.
-ADIDigitalOut armPiston({{8, 'a'}});
+ADIDigitalOut armPiston(INTAKE_PISTON);
 bool armRaised = true;
 bool armState = false;
 

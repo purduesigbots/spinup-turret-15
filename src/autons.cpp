@@ -2,6 +2,7 @@
 #include "ARMS/flags.h"
 #include "main.h"
 
+#include "subsystems/deflector.hpp"
 #include "subsystems/disccounter.hpp"
 #include "subsystems/disclift.hpp"
 #include "subsystems/flywheel.hpp"
@@ -37,10 +38,14 @@ void matchAuto(){
 	arms::odom::reset({11.25, 50.25}, 271.0); 
 
 	//FLYWHEEL INIT
-	flywheel::start(176);
+	flywheel::start(167);
 	//DISC COUNTER INIT
 	disccounter::setNum(1);
-	
+	//INTAKE INIT
+	intake::toggle_arm();
+	//DEFLECTOR INIT
+	deflector::down();
+
 	//Get second disc
 	printf("Getting disc 2\n");
 	intake::toggle(600);
@@ -54,15 +59,15 @@ void matchAuto(){
 
 	//Get roller
 	printf("Getting roller\n");
-	arms::chassis::move({12.5, 28.3512}); //move back
-	arms::chassis::turn(0); //turn to roller
+	arms::chassis::move({12.5, 27.3512}); //move back
+	arms::chassis::turn(5); //turn to roller
 	arms::chassis::tank(-25, -25); //braindead back into roller to apply pressure
 	pros::delay(1000); //get up to roller
 	roller::move(100); //turn roller
 	pros::delay(70);
 	arms::chassis::tank(0, 0); //stop chassis
 	roller::move(0); //stop roller mech
-	turret::goto_angle(-60,100,true); //for shot 1
+	turret::goto_angle(-61,100,true); //for shot 1
 	disclift::discLiftUp(); //for shot 1
 	
 	//Shoot 1st shot
@@ -71,14 +76,14 @@ void matchAuto(){
 	arms::chassis::turn(50, arms::THRU);
 	intake::stop();
 	arms::chassis::move({22,49, 45}); 
-	vision::set_vision_offset(196); //aim offset for long distance shot
+	vision::set_vision_offset(205); //aim offset for long distance shot
 	turret::enable_vision_aim();
 	flywheel::fire(3,8000);
 	turret::disable_vision_aim();
 	turret::goto_angle(0,100,true);
 
 	//Aim turret, setup flywheel for next shot
-	flywheel::set_target_speed(165);
+	flywheel::set_target_speed(160);
 
 	//Drive through next 3 discs
 	printf("Driving through discs\n");
@@ -87,17 +92,58 @@ void matchAuto(){
 	arms::chassis::waitUntilFinished(1);
 	pros::delay(800);
 	disclift::discLiftUp();
-	turret::goto_angle(50, 100, true);
+	turret::goto_angle(41, 100, true);
 
 	//Shoot 2nd shot
 	printf("Shooting second shot\n");
 	arms::chassis::turn(290);
 	pros::delay(1500);
-	vision::set_vision_offset(203);
-	turret::enable_vision_aim();
+	vision::set_vision_offset(220);
+	// turret::enable_vision_aim();
 	flywheel::fire(3,8000);
 	flywheel::stop();
 	turret::disable_vision_aim();
+	turret::goto_angle(0,100,true);
+	flywheel::set_target_speed(0);
+	#if 0
+	flywheel::set_target_speed(160);
+
+	//get disc 7
+	intake::toggle(600);
+	arms::chassis::move({55, 72}, arms::THRU);
+	arms::chassis::move({55, 82}, arms::REVERSE);
+
+	//get disc 8
+	arms::chassis::turn(180, arms::THRU); //turn to face disc 8
+	arms::chassis::move({49, 65, 270}, arms::THRU);
+	turret::goto_angle(20, 100, true); //turn turret for next shot
+	arms::chassis::turn(315); //turn through disc, pick it up
+	arms::chassis::waitUntilFinished(1);
+	turret::enable_vision_aim();
+	pros::delay(800); //wait until disc picked all the way up
+
+	//take next shot
+	flywheel::fire(2, 6000);
+	turret::disable_vision_aim();
+	turret::goto_angle(0, 100, true);
+	
+	//setup for next discs
+	intake::start(600);
+	arms::chassis::turn(90, arms::THRU);
+	arms::chassis::move({43, 76});
+	arms::chassis::move({43, 70}, arms::REVERSE);
+	arms::chassis::move({35, 76, 135});
+	arms::chassis::move({35, 70, 90}, 40, arms::REVERSE);
+	arms::chassis::move({27, 76, 135});
+	arms::chassis::waitUntilFinished(1);
+	pros::delay(800);
+	turret::goto_angle(0, 100, true);
+	arms::chassis::move({48, 72}, arms::REVERSE);
+	arms::chassis::turn(327);
+	turret::enable_vision_aim();
+	flywheel::fire(3, 9000);
+	turret::disable_vision_aim();
+	#endif 
 
 
 }
