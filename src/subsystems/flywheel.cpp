@@ -123,7 +123,7 @@ void toggle(double targetSpeed) {
 
 bool at_speed() {
 	// Check that the turret's RPM is within 3% of the target speed.
-	return std::abs(targetSpeed - average_speed) / targetSpeed < 0.02;
+	return std::abs(targetSpeed - average_speed) / targetSpeed < 0.20;
 }
 
 double current_speed() {
