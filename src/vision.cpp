@@ -26,6 +26,8 @@ const double GOAL_HEIGHT = 13.87;
 const double GOAL_WIDTH = 16;
 const double FOCAL_LENGTH = 0.5;
 
+uint64_t color = 0;
+
 // Important, this is the size of the physical sensor, not its height off the
 // ground!
 // https://stackoverflow.com/questions/50125574/calculate-image-size-of-an-object-from-real-size
@@ -81,6 +83,14 @@ double get_latency() {
   return 40; // 40ms latency
 }
 
+int get_goal_color() {
+  return color; // Last seen color (at least it is 40ms old)
+}
+
+bool get_goal_detected(){
+  return color != 3; //if 3, then no goal detected
+}
+
 Oak_1_latency_compensator *latency_compensator;
 
 void task() {
@@ -103,7 +113,7 @@ void task() {
   float counter = 0;
 
   while (true) {
-    uint64_t color = communication->get_data(GOAL_COLOR);
+    color = communication->get_data(GOAL_COLOR);
     uint64_t lr = communication->get_data(LEFT_RIGHT);
     uint64_t height = communication->get_data(HEIGHT);
     uint64_t width = communication->get_data(WIDTH);

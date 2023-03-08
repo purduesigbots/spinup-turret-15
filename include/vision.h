@@ -44,6 +44,20 @@ namespace vision {
     *  Starts the vision system.
     */
     void start_vision();
+
+    /**
+    * Gets the color of the goal seen most recently.
+    * 
+    * @return 0 if red, 1 if blue
+    */
+    int get_goal_color();
+
+    /**
+    * Whetehr or not the camera sees a goal
+    *
+    * @return true if a goal is currently in view
+    */
+    bool get_goal_detected();
 }
 
 #endif

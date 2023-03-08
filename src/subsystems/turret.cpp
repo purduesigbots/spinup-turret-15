@@ -1,9 +1,12 @@
 #include "subsystems/turret.hpp"
+#include "ARMS/odom.h"
+#include "ARMS/point.h"
 #include "pros/adi.hpp"
 #include "main.h"
 #include "vision.h"
 #include "api.h"
 #include "ARMS/config.h"
+#include "main.h"
 #include <cmath>
 #include <algorithm>
 
@@ -23,6 +26,8 @@ namespace turret {
     double max_velocity = 0.0; 
     //Whether or not the vision system is working
     bool vision_working = true; 
+    
+    arms::Point last_goal_position = {0, -1000};
 
     //Conversion factor from motor rotations to degrees
     const double ROT_TO_DEG = 37.5;
@@ -58,8 +63,80 @@ namespace turret {
         VISION
     };
 
+    /**
+     * Enumerated class containing the team color
+     * 
+     * RED: Red goal
+     * 
+     * BLUE: Blue goal
+     * 
+     * BOTH: Both goals, preference for last seen
+     */
+    enum class Goal {
+        RED,
+        BLUE,
+        BOTH
+    };
+    
     //Current state of the turret
     State state = State::MANUAL; //Set state to manual by default
+    Goal targColor = Goal::BOTH; //Set target color to both by default 
+
+    namespace{ //ANONYMOUS NAMESPACE FOR PRIVATE METHODS
+
+        //CONTROLLER CONSTANTS
+        const double kP = TURRET_KP;
+        const double kI = TURRET_KI;
+        const double kD = TURRET_KD;
+        const bool use_ff = TURRET_FF;
+        const bool use_antiwindup = TURRET_AW;
+        const double ff_voltage = TURRET_FF_V;
+        //Local variables
+        double integral = 0;
+        double last_error = 0;
+        double last_heading = 0;
+
+        /**
+         * Checks if the vision system sees a valid target (based on the target color)
+         * CONTAINS CHECK FOR VISION BROKEN
+         * 
+         * @return True if the last seen goal is a valid target, false otherwise
+         */
+        bool is_valid_target(){
+            if(!vision::vision_not_working()){
+                //If vision is working and actively looking at a goal, check the color
+                switch(targColor){
+                    case Goal::RED:
+                        return vision::get_goal_color() == 0;
+                    case Goal::BLUE:
+                        return vision::get_goal_color() == 1;
+                    case Goal::BOTH:
+                        return true;
+                }
+            } else return false; //If vision is not working, return false
+        }
+
+        double get_vision_voltage(double angle_error){
+            //Calculate PID output:
+            double pOut = kP * angle_error;
+            if(use_antiwindup){
+                //Prevents i from increasing if it would just push the total output beyond max motor voltage
+                integral += angle_error * fabs(pOut) < 12000; //(abs value thing is 1 or 0 depenidng on if already saturated)
+            } else{ 
+                integral += angle_error;
+            }
+            double iOut = kI * integral;
+            double dOut = kD * (angle_error - last_error);
+            last_error = angle_error;
+            double output = pOut + iOut + dOut;
+            //Calculate feedforward output:
+            if(use_ff){
+                output += ff_voltage * (arms::odom::getHeading() - last_heading);
+                last_heading = arms::odom::getHeading();
+            }
+            return output;
+        }
+    }
 
     void task_func() {
         static double last_error = 0;
@@ -72,24 +149,58 @@ namespace turret {
             } else {
                 settler = 0;
             }
-            vision_working = angle_error != 45.00 && ! vision::vision_not_working();
             last_error = angle_error;
             switch(state) {
                 case State::DISABLED:
-                    motor.move(0);
+                    motor.move_voltage(0);
+                    target_angle = 0;
                     break;
                 case State::MANUAL:
-                    motor.move_absolute(deg_to_rot(target_angle), max_velocity);
+                    motor.move_absolute(target_angle, 100);
                     break;
                 case State::VISION:
-                    /*
-                    Angle error is set to 45.00 when the goal is not detected
-                    If angle error has not changed, assume vision has disconnected
-                    */
-                    if (vision_working) {
-                        motor.move_voltage(angle_error * 300);
+                    // If the vision system is working, enable vision control
+                    if (!vision::vision_not_working()) {
+                        if(is_valid_target() && vision::get_goal_detected()){
+                            //If the vision system sees a valid target, move the turret to face it
+                            motor.move_voltage(get_vision_voltage(angle_error));
+                            //Log the position of the goal 
+                            last_goal_position = {
+                                arms::odom::getPosition().x + vision::get_goal_distance() * cos(arms::odom::getHeading() + rot_to_deg(motor.get_position())), 
+                                arms::odom::getPosition().y + vision::get_goal_distance() * sin(arms::odom::getHeading() + rot_to_deg(motor.get_position()))
+                            };
+                            //Update target angle
+                            target_angle = motor.get_position() + deg_to_rot(angle_error);
+                        } else if(last_goal_position.y != -1000){
+                            //At some point, the system has seen and logged a valid target
+                            //Turn the turret to face that target
+                            
+                            //Calculate global angle to point
+                            double global_angle_to_goal = atan2(last_goal_position.y - arms::odom::getPosition().y, 
+                                last_goal_position.x - arms::odom::getPosition().x);
+                            global_angle_to_goal *= 180/M_PI; //Convert to degrees
+
+                            //Calculate robot heading error
+                            double heading_error = global_angle_to_goal - arms::odom::getHeading();
+
+                            //Check if the angle is within the limits
+                            if(heading_error > RIGHT_LIMIT && heading_error < LEFT_LIMIT) {
+                                //Turret can aim at the target, so move to it
+                                motor.move_voltage(get_vision_voltage(heading_error));
+                                //Update target angle
+                                target_angle = motor.get_position() + deg_to_rot(heading_error);
+                                
+                            } else{
+                                motor.move_absolute(0, 100); //async center turret
+                                //Update target angle
+                                target_angle = 0.0;
+                            }
+                        }
                     } else {
-                        motor.move_voltage(0);
+                        // If the vision system is not working, async center turret
+                        motor.move_absolute(0, 100);
+                        //Update target angle
+                        target_angle = 0.0;
                     }
                     break;
             }
@@ -101,7 +212,6 @@ namespace turret {
 
     void initialize() {
         calibrate();
-
         pros::Task task(task_func, "Turret Task");
     }
 
@@ -183,11 +293,18 @@ namespace turret {
         } else if(state == State::VISION) {
             pros::lcd::print(1, " State: Vision");
         }
-        pros::lcd::print(2, " Vision Status: %s", vision_working ? "OPERATIONAL" : "SUSPENDED, ERROR DETECTED!");
-        pros::lcd::print(3, " Current Angle: %f", get_angle());
-        pros::lcd::print(4, " Target Angle: %f", target_angle);
-        pros::lcd::print(5, " Angle Error: %f", get_angle_error());
-        pros::lcd::print(6, " Settled: %s", settled() ? "True" : "False");
+        if(targColor == Goal::BOTH){
+            pros::lcd::print(2, " Target Color: Both");
+        } else if(targColor == Goal::RED){
+            pros::lcd::print(2, " Target Color: Red");
+        } else if(targColor == Goal::BLUE){
+            pros::lcd::print(2, " Target Color: Blue");
+        }
+        pros::lcd::print(3, " Vision Status: %s", vision_working ? "OPERATIONAL" : "SUSPENDED, ERROR DETECTED!");
+        pros::lcd::print(4, " Current Angle: %f", get_angle());
+        pros::lcd::print(5, " Target Angle: %f", target_angle);
+        pros::lcd::print(6, " Angle Error: %f", get_angle_error());
+        pros::lcd::print(7, " Settled: %s", settled() ? "True" : "False");
     }
 
     void toggle_vision_aim() {
