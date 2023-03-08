@@ -4,7 +4,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #pragma once
 
 
-#define INTAKE_PISTON {{8, 'a'}}
+#define INTAKE_PISTON {{20, 'a'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 6
@@ -28,10 +28,10 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_MOTOR 7
 #define TURRET_LIMIT_SWITCH 'e'
 
-#define DEFLECTOR_PISTON {{8, 'c'}}
+#define DEFLECTOR_PISTON {{20, 'c'}}
 #define ENDGAME_PISTON {{20, 'f'}}
 
-#define IRIS_PORT 3
+#define IRIS_PORT 8
 
 
 // Debug
