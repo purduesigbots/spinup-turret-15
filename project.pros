@@ -766,7 +766,7 @@
     },
     "upload_options": {
       "after": "none",
-      "slot": 2
+      "slot": 1
     }
   }
 }
