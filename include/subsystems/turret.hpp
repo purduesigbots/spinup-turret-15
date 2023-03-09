@@ -13,9 +13,15 @@
 namespace turret {
 
     /**
-     * The motor that controls the turret
+     * Enumerated classs containing the target goal color(s)
+     * 
+     * RED: Red goal
+     * 
+     * BLUE: Blue goal
+     *
+     * BOTH: Both goals, preference for last seen
      */
-    extern pros::Motor motor;
+    enum class Goal;
 
     /**
      * Initilalize the turret subsystem. This also calibrates the turret.
@@ -30,7 +36,6 @@ namespace turret {
      * reset and coordinate system is established.
      */
     void calibrate();
-
 
     /**
      * Tells the turret to go to an angle relative to the robot's heading
@@ -57,6 +62,8 @@ namespace turret {
     /**
      * Returns the angle of the turret in degrees, where 0 is directly forward,
      * 90 is 90 degrees to the left, and -90 is 90 degrees to the right
+     *
+     * @return The angle of the turret in degrees
      */
     double get_angle();
 
@@ -96,7 +103,5 @@ namespace turret {
      * Disables the turret entirely
      */
     void disable_turret();
-
-    
 
 }
