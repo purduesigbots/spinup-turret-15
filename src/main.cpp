@@ -103,10 +103,8 @@ void initialize() {
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
 	flywheel::initialize();
-	Task vision(vision::task);
 	roller::init();
 	disccounter::initialize();
-
 	Task screenTask(draw_screen, "Debug Daemon");
 
 	printf("Done initializing!!!\n");
