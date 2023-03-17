@@ -148,7 +148,7 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	turret::goto_angle(0, 400, true);
+	turret::goto_angle(0, 250, true);
 	vision::set_vision_offset(240);
 	turret::disable_vision_aim();
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);

@@ -6,7 +6,7 @@ constants for the SILVER robot.
 
 #define INTAKE_PISTON                                                          \
 	{                                                                            \
-		{ 3, 'f' }                                                                 \
+		{ 6, 'f' }                                                                 \
 	}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
@@ -29,7 +29,7 @@ constants for the SILVER robot.
 #define INDEXER_PORT 15
 
 #define TURRET_MOTOR 7
-#define TURRET_LIMIT_SWITCH {{3, 'h'}}
+#define TURRET_LIMIT_SWITCH {{6, 'h'}}
 #define TURRET_KP 300
 #define TURRET_KI 0.01
 #define TURRET_KD 0
@@ -39,11 +39,11 @@ constants for the SILVER robot.
 
 #define DEFLECTOR_PISTON                                                       \
 	{                                                                            \
-		{ 3, 'a' }                                                                 \
+		{ 6, 'a' }                                                                 \
 	}
 #define ENDGAME_PISTON                                                         \
 	{                                                                            \
-		{ 3, 'd' }                                                                 \
+		{ 6, 'd' }                                                                 \
 	}
 
 #define IRIS_PORT 2

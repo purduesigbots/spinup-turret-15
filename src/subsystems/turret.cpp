@@ -71,7 +71,9 @@ void task_func() {
                 If angle error has not changed, assume vision has disconnected
                 */
                 if (vision_working) {
-                    motor.move_voltage(angle_error * 300);
+                    int power = angle_error * 400;
+                    power = std::clamp(power, -6000, 6000);
+                    motor.move_voltage(power);
                 } else {
                     motor.move_voltage(0);
                 }
