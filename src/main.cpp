@@ -106,7 +106,10 @@ void initialize() {
 	Task vision(vision::task);
 	roller::init();
 	disccounter::initialize();
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 985ae65... Started Skills Pathing
 	Task screenTask(draw_screen, "Debug Daemon");
 
 	printf("Done initializing!!!\n");

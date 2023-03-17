@@ -29,10 +29,20 @@ constants for the SILVER robot.
 #define INDEXER_PORT 15
 
 #define TURRET_MOTOR 7
+<<<<<<< HEAD
 #define TURRET_LIMIT_SWITCH                                                    \
 	{                                                                            \
 		{ 3, 'h' }                                                                 \
 	}
+=======
+#define TURRET_LIMIT_SWITCH {{3, 'h'}}
+#define TURRET_KP 300
+#define TURRET_KI 0.01
+#define TURRET_KD 0
+#define TURRET_AW true; //switch for anti integral windup
+#define TURRET_FF true; //switch for turn feedforward
+#define TURRET_FF_V 0.0; //feedforward voltage (mV)
+>>>>>>> parent of 985ae65... Started Skills Pathing
 
 #define DEFLECTOR_PISTON                                                       \
 	{                                                                            \
