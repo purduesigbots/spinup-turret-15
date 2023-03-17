@@ -96,7 +96,7 @@ void draw_screen() {
  */
 void initialize() {
 	vision::init();
-	turret::initialize();
+	//turret::initialize();
 	sylib::initialize();
 	disclift::home();
 	arms::init();
@@ -105,7 +105,7 @@ void initialize() {
 	flywheel::initialize();
 	roller::init();
 	disccounter::initialize();
-	Task screenTask(draw_screen, "Debug Daemon");
+	//Task screenTask(draw_screen, "Debug Daemon");
 
 	printf("Done initializing!!!\n");
 }
@@ -151,7 +151,7 @@ void opcontrol() {
 	vision::set_vision_offset(240);
 	turret::disable_vision_aim();
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-	flywheel::start(135);
+	//flywheel::start(135);
 	deflector::up();
 
 	int counter = 0;
@@ -255,7 +255,7 @@ void opcontrol() {
 
 		if (master.get_digital_new_press(DIGITAL_X)) {
 			// indexer_wait = !indexer_wait;
-			// autonomous();
+			autonomous();
 			// turret::toggle_vision_aim();
 		}
 		if(master.get_digital_new_press(DIGITAL_Y)){

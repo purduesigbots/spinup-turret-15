@@ -25,7 +25,7 @@ constants for the SILVER robot.
 #define FLYWHEEL_RIGHT 9
 #define INDEXER_PORT 15
 
-#define TURRET_MOTOR 7
+#define TURRET_MOTOR -7
 #define TURRET_LIMIT_SWITCH {{3, 'h'}}
 #define TURRET_KP 300
 #define TURRET_KI 0.01

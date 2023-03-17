@@ -171,8 +171,55 @@ void subsystem_test() {
 	disclift::discLiftDown();
 }
 
+void skillsAuto() {
+	using namespace arms;
+
+	flywheel::start(140);
+
+	odom::reset({126, 81}, 180);
+
+	//FLYWHEEL INIT
+	flywheel::start(167);
+	//DISC COUNTER INIT
+	disccounter::setNum(1);
+	//INTAKE INIT
+	intake::toggle_arm();
+	//DEFLECTOR INIT
+	deflector::down();
+
+	intake::start(600);
+	chassis::move({106, 84}, 80);
+	chassis::turn(223, 100);
+	chassis::move({82, 58, 223}, 50);
+	pros::delay(500);
+	intake::stop();
+	chassis::turn(315);
+
+	flywheel::fire(3, 4000);
+
+	chassis::turn(223);
+	intake::start(600);
+	chassis::move({60, 34, 223}, 60);
+	pros::delay(500);
+	chassis::move(16, 30);
+	pros::delay(500);
+	intake::stop();
+	chassis::turn(0);
+
+	flywheel::fire(3, 4000);
+
+	intake::start(600);
+	chassis::turn(180);
+	chassis::move({12, 12}, 40);
+	pros::delay(500);
+	intake::stop();
+	chassis::turn(45);
+
+	flywheel::fire(2, 4000);
+}
+
 void autonomous() {
-	matchAuto();
+	skillsAuto();
 	// fire3();
 	// vision::set_vision_offset(true);
 	// roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
