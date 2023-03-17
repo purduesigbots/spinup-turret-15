@@ -4,7 +4,7 @@
 
 #include "subsystems/deflector.hpp"
 #include "subsystems/disccounter.hpp"
-#include "subsystems/disclift.hpp"
+#include "subsystems/discLift.hpp"
 #include "subsystems/flywheel.hpp"
 #include "subsystems/intake.hpp"
 #include "subsystems/roller.hpp"
@@ -68,7 +68,7 @@ void matchAuto(){
 	arms::chassis::tank(0, 0); //stop chassis
 	roller::move(0); //stop roller mech
 	turret::goto_angle(-61,100,true); //for shot 1
-	disclift::discLiftUp(); //for shot 1
+	discLift::discLiftUp(); //for shot 1
 	
 	//Shoot 1st shot
 	printf("Going to first shot\n");
@@ -91,7 +91,7 @@ void matchAuto(){
 	arms::chassis::move({55, 82}, 45);
 	arms::chassis::waitUntilFinished(1);
 	pros::delay(800);
-	disclift::discLiftUp();
+	discLift::discLiftUp();
 	turret::goto_angle(41, 100, true);
 
 	//Shoot 2nd shot
@@ -163,12 +163,12 @@ void subsystem_test() {
 
 	printf("Firing 3 discs:\n");
 	flywheel::start(150);
-	disclift::discLiftHold();
+	discLift::discLiftHold();
 	pros::delay(500);
 	int numFired = flywheel::fire(3, 10000);
 	flywheel::stop();
 	printf("    %d discs fired\n", numFired);
-	disclift::discLiftDown();
+	discLift::discLiftDown();
 }
 
 void skillsAuto() {

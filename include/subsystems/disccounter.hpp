@@ -4,7 +4,7 @@
  * The disc counting subsystem is in charge of keeping track of when discs enter
  * or leave the robot. 
  */
-namespace disccounter {
+namespace discCounter {
 
     /**
     * Initializes the disc counter subsystem: Creates tasks, sets defaults, etc. 
@@ -39,6 +39,11 @@ namespace disccounter {
     * @param numDiscs How many discs are in the system
     */
     void setNum(int numDiscs);
+
+    /**
+    * Decreases the number of discs in the robot by one
+    */
+    void decrement();
 
     /**
     * Renders the debug screen to the LLEMU display 

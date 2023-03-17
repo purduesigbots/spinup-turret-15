@@ -4,6 +4,7 @@
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
 #include "comms/comms.hpp"
 #include "pros/misc.h"
+#include "subsystems/discCounter.hpp"
 #include "subsystems/flywheel.hpp"
 #include "subsystems/intake.hpp"
 #include "subsystems/subsystems.hpp"
@@ -26,7 +27,7 @@ using namespace pros;
 std::map<uint8_t, int32_t> comms_data;
 
 const int MIN_SCREEN_INDEX = 0;
-const int MAX_SCREEN_INDEX = 3;
+const int MAX_SCREEN_INDEX = 4;
 static std::atomic<int> screenIndex = 0;
 
 /**
@@ -62,28 +63,25 @@ void draw_screen() {
 
 	while (true) {
 		pros::lcd::clear();
-
 		if (screenIndex == 0) {
-			pros::lcd::print(1, "X: %2.4f, Y: %2.4f, H: %2.4f)",
-			                 arms::odom::getPosition().x, arms::odom::getPosition().y,
-			                 arms::odom::getHeading());
-			pros::lcd::print(2, "Turret Angle: %3.5f", turret::get_angle());
-			pros::lcd::print(3, "Distance to goal: %2.4f",
-			                 arms::odom::getDistanceError({0, 0}));
-			pros::lcd::print(4, "DiscLift Position %f",
-			                 disclift::lift_motor.get_position());
-			pros::lcd::print(5, "DL Temp: %f",
-			                 disclift::lift_motor.get_temperature());
-			pros::lcd::print(6, "DL Draw: %d",
-			                 disclift::lift_motor.get_current_draw());
+			pros::lcd::print(0, "General Info:");
+			pros::lcd::print(1, "Robot: %s", BOT == GOLD ? "Goldilocks" : "Octavio \"Octane\" Silva");
+			pros::lcd::print(2, " X: %2.4f, Y: %2.4f, H: %2.4f)", 
+				arms::odom::getPosition().x, 
+				arms::odom::getPosition().y, 
+				arms::odom::getHeading());
+			pros::lcd::print(3, " Turret Angle: %3.5f", turret::get_angle());
+			pros::lcd::print(4, " Distance to goal: %2.4f", arms::odom::getDistanceError({0, 0}));
+			
 		} else if (screenIndex == 1) {
-			disccounter::debug_screen();
+			discLift::debug_screen();
 		} else if (screenIndex == 2) {
 			turret::debug_screen();
-		} else if (screenIndex = 3) {
+		} else if (screenIndex == 3) {
 			flywheel::debug_screen();
+		} else if (screenIndex == 4){
+			discCounter::debug_screen();
 		}
-
 		pros::delay(10);
 	}
 }
@@ -98,13 +96,13 @@ void initialize() {
 	vision::init();
 	//turret::initialize();
 	sylib::initialize();
-	disclift::home();
+	discLift::home();
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
 	pros::delay(2000);
 	flywheel::initialize();
 	roller::init();
-	disccounter::initialize();
+	discCounter::initialize();
 	//Task screenTask(draw_screen, "Debug Daemon");
 
 	printf("Done initializing!!!\n");
@@ -177,7 +175,7 @@ void opcontrol() {
 			}
 		}
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
-			disclift::discLiftUp();
+			discLift::discLiftUp();
 			if (discLiftCounter < 10) {
 				intake::start(1000);
 			} else {
@@ -185,7 +183,7 @@ void opcontrol() {
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)) {
-			disclift::discLiftDown();
+			discLift::discLiftDown();
 			turret::disable_vision_aim();
 			turret::goto_angle(0,100,true);
 		}
@@ -201,9 +199,6 @@ void opcontrol() {
 			intake::toggle_arm();
 		}
 
-		if (master.get_digital_new_press(DIGITAL_L1)) {
-			disclift::calculatePos();
-		}
 		if (master.get_digital(DIGITAL_L1)) {
 			if (flywheel::at_speed()) {
 				flywheel::fireControl_driver(true);
@@ -211,7 +206,7 @@ void opcontrol() {
 				//set to false for rpm babysitter
 				flywheel::fireControl_driver(false);
 			}
-			disclift::discLiftHold();
+			discLift::discLiftHold();
 		} else {
 			flywheel::fireControl_driver(false);
 		}

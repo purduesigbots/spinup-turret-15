@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+* The deflector subsystem is responsible for moving the deflector up and down in order to 
+* change the trajectory of discs as they leave the flywheel.
+*/
 namespace deflector {
 
     /**

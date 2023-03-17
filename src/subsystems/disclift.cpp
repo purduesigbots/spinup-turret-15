@@ -1,20 +1,39 @@
-#include "disclift.hpp"
-
+#include "discLift.hpp"
 #include "ARMS/config.h"
-
 #include "api.h"
 #include "subsystems.hpp"
 
 using namespace pros;
 
-namespace disclift {
+namespace discLift {
     
-    //LOCAL DEFS:
-    pros::Motor lift_motor(LIFT_MOTOR, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
-    bool lifted = false; //if true, keep true until a disc is fired
-    bool reachedSpeed = false;
-    int targState = 0; // 0 = down, 1 = up, 2 = hold
-    float liftedPos;
+    namespace{ //Anonymous namespace for private data and methods
+
+        /**
+        *
+        * PRIVATE DATA
+        * 
+        */
+
+        //The motor used to move the disc lift
+        pros::Motor lift_motor(LIFT_MOTOR, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+        //State variable: turns true once a disc reaches the indexer wheels;
+        //remains true until that disc is fired
+        bool lifted = false; 
+        //State variable: turns true once the flywheel reaches speed;
+        //remains true until the flywheel drops below speed AND the above state variable is true
+        bool reachedSpeed = false;
+        //The position of the lift when the lifted state variable switches to true
+        float liftedPos;
+
+        //NO PRIVATE METHODS
+    }
+    
+    /**
+    *
+    * PUBLIC METHODS (see header file for documentation)
+    * 
+    */
 
     void discLiftUp(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -48,10 +67,6 @@ namespace disclift {
         }
     }
     
-    void calculatePos(){
-        // newPos = lift_motor.get_position();
-    }
-
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         if(lift_motor.get_position() < LIFT_UP_POS){
@@ -96,5 +111,14 @@ namespace disclift {
         lift_motor.move(0);
         pros::delay(200);
         lift_motor.tare_position();
+    }
+
+    void debug_screen(){
+        pros::lcd::print(0, "Disc Lift Info: ");
+        pros::lcd::print(1, " Lift Position: %3.2f", lift_motor.get_position());
+        pros::lcd::print(2, " Lift Velocity: %3.2f", lift_motor.get_actual_velocity());
+        pros::lcd::print(3, " Lift Current: %3.2f", lift_motor.get_current_draw());
+        pros::lcd::print(4, " Lifted: %s", lifted?"true":"false");
+        pros::lcd::print(5, " Reached Speed: %s", reachedSpeed?"true":"false");
     }
 }

@@ -4,7 +4,7 @@
 
 #include "api.h"
 #include "disccounter.hpp"
-#include "disclift.hpp"
+#include "discLift.hpp"
 #include "main.h"
 #include "pros/motors.h"
 #include "pros/motors.hpp"
@@ -181,12 +181,12 @@ int fire(int numDiscs, int timeout) {
 
 	int numberFired = 0;
     intake::start(600);
-    disclift::discLiftUp();
+    discLift::discLiftUp();
     pros::delay(460);
     intake::stop();
 	// While we haven't fired all the discs we want to fire
 	while (numberFired < numDiscs) {
-        disclift::discLiftUp();
+        discLift::discLiftUp();
 		// Check if we've reached the timeout and return if we have
 		uint32_t timeLeft = endTime - pros::millis();
 		if (timeLeft <= 0 && timeout > 0) {
@@ -206,7 +206,7 @@ int fire(int numDiscs, int timeout) {
 
 		// Now that the flywheel is at speed, we start the indexer
 		indexer.move_voltage(12000);
-		disclift::discLiftHold();
+		discLift::discLiftHold();
 
 		// We wait until we detect that the disc is fired or that the timeout is
 		// reach (if timeouts are enabled.). See the note above
@@ -218,13 +218,13 @@ int fire(int numDiscs, int timeout) {
 		indexer.move_voltage(0);
 		// Update the disc counter and number of discs we've fired
 		numberFired++;
-		disccounter::decrement();
+		discCounter::decrement();
 		pros::delay(numberFired * 400);
 		targetSpeed += numberFired; //increase to help recovery...???? could be gas?????
 	}
     RETURN:
     intake::stop();
-	disclift::discLiftDown();
+	discLift::discLiftDown();
 	indexer.move_voltage(0);
 	return numberFired;
 }

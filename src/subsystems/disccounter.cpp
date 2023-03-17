@@ -1,4 +1,4 @@
-#include "subsystems/disccounter.hpp"
+#include "subsystems/discCounter.hpp"
 #include "main.h"
 #include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
@@ -7,7 +7,7 @@
 
 using namespace pros;
 
-namespace disccounter {
+namespace discCounter {
 
     namespace{ //Anonymous namespace for private data and methods
 
@@ -48,6 +48,18 @@ namespace disccounter {
         *
         */
 
+        /**
+        * Whether the line sensor is currently seeing a disc. 
+        *
+        * This could probably be drastically improved with a gausian filter 
+        * tuned to each competition location, but that's more work. 
+        *
+        * @return True if the line sensor is currently seeing a disc
+        */
+        bool seeing_disc() {
+            return lineSensor.get_value() < 2400;
+        }   
+        
         /**
         * The task callback function used to keep track of the number of discs in 
         * the robot. This loops to keep track of the number of discs in the robot. 
@@ -94,29 +106,6 @@ namespace disccounter {
                 pros::delay(10);
             }
         }
-
-        /**
-        * Whether the line sensor is currently seeing a disc. 
-        *
-        * This could probably be drastically improved with a gausian filter 
-        * tuned to each competition location, but that's more work. 
-        *
-        * @return True if the line sensor is currently seeing a disc
-        */
-        bool seeing_disc() {
-            return lineSensor.get_value() < 2400;
-        }   
-
-        /**
-        * Decrements the number of discs in the robot by one.
-        */
-        void decrement() {
-            discCount--;
-
-            if(discCount < 0) {
-                printf("ERROR: Disc count somehow negative!!!!\n");
-            }
-        }
     }
 
     /**
@@ -125,6 +114,14 @@ namespace disccounter {
     *
     */
     
+    void decrement() {
+        discCount--;
+
+        if(discCount < 0) {
+            printf("ERROR: Disc count somehow negative!!!!\n");
+        }
+    }
+
     void initialize() {
         printf("Initializing Disc Counter Subsystem: ");
         pros::Task task(task_function, nullptr, "Disc Counter Task");

@@ -1,14 +1,37 @@
 #pragma once
-
 #include "api.h"
 
-namespace disclift {
+/**
+* The disc lift subsystem is responsible for moving the disc lift up and down in order to
+* load the turret with discs.
+*/
+namespace discLift {
 
-extern pros::Motor lift_motor;
-extern void discLiftUp();
-extern void discLiftHold();
-extern void discLiftDown();
-extern void calculatePos();
-extern void home();
+    /**
+     * Raises the disc lift.
+     */
+    void discLiftUp();
 
-} // namespace disklift
+    /**
+     * Holds the disc lift (for firing).
+     */
+    void discLiftHold();
+
+    /**
+     * Lowers the disc lift.
+     */
+    void discLiftDown();
+
+    /**
+     * Homes the disc lift's position.
+     *
+     * This is blocking unless called in a task.
+     */
+    void home();
+
+    /**
+    * Renders the debug screen to the LLEMU display 
+    */
+    void debug_screen();
+
+}
