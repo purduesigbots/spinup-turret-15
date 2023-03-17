@@ -15,6 +15,7 @@ class Oak_1_latency_compensator
             );
         virtual ~Oak_1_latency_compensator();
         double get_new_goal_distance(double gamme);
+        std::array<double, 2> update_goal_pose(double distance, double gamma);
         
     private:
         void latency_comp_task_fn();

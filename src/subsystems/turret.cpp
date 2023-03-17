@@ -50,7 +50,7 @@ void task_func() {
     static int settler = 0;
 
     while(true) {
-        double angle_error = vision::get_goal_gamma();
+        double angle_error = vision::get_goal_point_gamma();
         if (angle_error == last_error) {
             settler += 1;
         } else {
@@ -71,7 +71,9 @@ void task_func() {
                 If angle error has not changed, assume vision has disconnected
                 */
                 if (vision_working) {
-                    motor.move_voltage(angle_error * 300);
+                    int power = angle_error * 600;
+                    power = std::clamp(power, -6000, 6000);
+                    motor.move_voltage(power);
                 } else {
                     motor.move_voltage(0);
                 }
@@ -168,8 +170,8 @@ void debug_screen() {
     }
     pros::lcd::print(1, " State:");
     pros::lcd::print(2, " Cur Angle: %f", get_angle());
-    pros::lcd::print(3, " Tgt Angle: %f", target_angle);
-    pros::lcd::print(4, " Angle Err: %f", get_angle_error());
+    pros::lcd::print(3, " Tgt Angle: %f", vision::get_goal_gamma());
+    pros::lcd::print(4, " Tgt Angle Pt: %f", vision::get_goal_point_gamma());
     pros::lcd::print(5, " Settled: %s", settled() ? "true" : "false");
     pros::lcd::print(6, " Vision: %s", vision_working ? "true" : "false");
 }

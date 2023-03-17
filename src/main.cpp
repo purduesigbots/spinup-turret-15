@@ -106,10 +106,6 @@ void initialize() {
 	Task vision(vision::task);
 	roller::init();
 	disccounter::initialize();
-<<<<<<< HEAD
-
-=======
->>>>>>> parent of 985ae65... Started Skills Pathing
 	Task screenTask(draw_screen, "Debug Daemon");
 
 	printf("Done initializing!!!\n");
@@ -152,7 +148,7 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	using namespace arms::chassis;
 
-	turret::goto_angle(0, 400, true);
+	turret::goto_angle(0, 250, true);
 	vision::set_vision_offset(240);
 	turret::disable_vision_aim();
 	roller::set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);

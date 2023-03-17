@@ -1,5 +1,6 @@
 #ifndef _VISION_H_
 #define _VISION_H_
+#include "ARMS/api.h"
 
 namespace vision {
     void init();
@@ -7,6 +8,9 @@ namespace vision {
 
     double get_goal_distance();
     double get_goal_gamma();
+    arms::Point get_goal_point();
+    double get_goal_point_distance();
+    double get_goal_point_gamma();
     bool vision_not_working();
     /**
     *  Sets the offset of the aimbot. Higher = more left offset.
