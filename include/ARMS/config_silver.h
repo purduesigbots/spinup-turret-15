@@ -4,7 +4,10 @@ constants for the SILVER robot.
 */
 #pragma once
 
-#define INTAKE_PISTON {{3, 'd'}}
+#define INTAKE_PISTON                                                          \
+	{                                                                            \
+		{ 3, 'd' }                                                                 \
+	}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 'h'
@@ -26,16 +29,25 @@ constants for the SILVER robot.
 #define INDEXER_PORT 15
 
 #define TURRET_MOTOR -7
-#define TURRET_LIMIT_SWITCH {{3, 'h'}}
+#define TURRET_LIMIT_SWITCH                                                    \
+	{                                                                            \
+		{ 3, 'h' }                                                                 \
+	}
 #define TURRET_KP 300
 #define TURRET_KI 0.01
 #define TURRET_KD 0
-#define TURRET_AW true; //switch for anti integral windup
-#define TURRET_FF true; //switch for turn feedforward
-#define TURRET_FF_V 0.0; //feedforward voltage (mV)
+#define TURRET_AW true;  // switch for anti integral windup
+#define TURRET_FF true;  // switch for turn feedforward
+#define TURRET_FF_V 0.0; // feedforward voltage (mV)
 
-#define DEFLECTOR_PISTON {{3, 'a'}}
-#define ENDGAME_PISTON {{3, 'd'}}
+#define DEFLECTOR_PISTON                                                       \
+	{                                                                            \
+		{ 3, 'a' }                                                                 \
+	}
+#define ENDGAME_PISTON                                                         \
+	{                                                                            \
+		{ 3, 'd' }                                                                 \
+	}
 
 #define IRIS_PORT 21
 
@@ -44,7 +56,7 @@ constants for the SILVER robot.
 
 // Negative numbers mean reversed motor
 
-#define LEFT_MOTORS 1, -13, 12
+#define LEFT_MOTORS 14, -13, 12
 #define RIGHT_MOTORS -17, 18, -20
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
@@ -78,7 +90,8 @@ constants for the SILVER robot.
 #define ANGULAR_KP 5
 #define ANGULAR_KI 0
 #define ANGULAR_KD 35
-#define MIN_ERROR 5 // Minimum distance to target before angular componenet is disabled
+#define MIN_ERROR                                                              \
+	5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)
 
 // Auton selector configuration constants
