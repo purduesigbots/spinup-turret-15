@@ -5,7 +5,7 @@
 #include "ARMS/api.h"
 #include "subsystems/deflector.hpp"
 #include "subsystems/discLift.hpp"
-#include "subsystems/disccounter.hpp"
+#include "subsystems/discCounter.hpp"
 #include "subsystems/flywheel.hpp"
 #include "subsystems/intake.hpp"
 #include "subsystems/roller.hpp"
@@ -40,7 +40,7 @@ void matchAuto() {
 	// FLYWHEEL INIT
 	flywheel::start(167);
 	// DISC COUNTER INIT
-	disccounter::setNum(1);
+	discCounter::setNum(1);
 	// INTAKE INIT
 	intake::toggle_arm();
 	// DEFLECTOR INIT
@@ -68,7 +68,7 @@ void matchAuto() {
 	arms::chassis::tank(0, 0);          // stop chassis
 	roller::move(0);                    // stop roller mech
 	turret::goto_angle(-61, 100, true); // for shot 1
-	disclift::discLiftUp();             // for shot 1
+	discLift::discLiftUp();             // for shot 1
 
 	// Shoot 1st shot
 	printf("Going to first shot\n");
@@ -153,7 +153,7 @@ void subsystem_test() {
 
 	printf("Intaking 3 discs:\n");
 	intake::start(300);
-	int numFound = disccounter::expect(3, 10000);
+	int numFound = discCounter::expect(3, 10000);
 	intake::stop();
 	printf("    %d discs found\n", numFound);
 

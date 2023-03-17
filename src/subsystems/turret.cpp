@@ -118,7 +118,8 @@ namespace turret {
                     case Goal::BOTH:
                         return true;
                 }
-            } else return false; //If vision is not working, return false
+            } 
+            return false; //If vision is not working, return false
         }
 
         /**
