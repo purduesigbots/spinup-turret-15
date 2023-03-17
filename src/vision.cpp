@@ -35,6 +35,13 @@ namespace vision {
 
 std::shared_ptr<comms::ReceiveComms> communication;
 double vision_offset = 240;
+arms::Point goal_point = {0,0};
+int no_new_comm_count = 0;
+
+uint64_t goal_color = 0;
+uint64_t left_right = 0;
+uint64_t height = 0;
+uint64_t width = 0;
 
 void init() {
   communication =
@@ -42,19 +49,43 @@ void init() {
 }
 
 double get_goal_gamma() {
-  return atan2((GOAL_WIDTH / (double)communication->get_data(WIDTH) *
-                (vision_offset - (double)communication->get_data(LEFT_RIGHT))),
+  return atan2((GOAL_WIDTH / (double)width *
+                (vision_offset - (double)left_right)),
                get_goal_distance()) *
          (180 * M_1_PI);
 }
 
 double get_goal_distance() {
   return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) /
-         (communication->get_data(HEIGHT) * SENSOR_HEIGHT);
+         (height * SENSOR_HEIGHT);
+}
+
+arms::Point get_goal_point() {
+  return goal_point;
+}
+
+double get_goal_point_gamma() {
+  arms::Point diff = goal_point - arms::odom::getPosition();
+  double gamma = atan2(diff.y, diff.x);
+  if (diff.x < 0) {
+    gamma += M_PI;
+  }
+  gamma *= 180 * M_1_PI;
+  gamma -= arms::odom::getHeading() + turret::get_angle();
+  while (gamma > 180)
+    gamma -= 360;
+  while (gamma < -180)
+    gamma += 360;
+  return gamma;
+}
+
+double get_goal_point_distance() {
+  arms::Point diff = goal_point - arms::odom::getPosition();
+  return arms::length(diff);
 }
 
 bool vision_not_working() {
-  return communication->get_data(GOAL_COLOR) == 0 && communication->get_data(HEIGHT) == 0;
+  return (goal_color == 0 && height == 0) || no_new_comm_count > 100;
 }
 
 void start_vision() {
@@ -73,8 +104,8 @@ std::tuple<double, double, double> get_turret_pose() {
   //-7.5
   // 7.2
   return std::make_tuple(p.x, p.y,
-                         arms::odom::getHeading() + turret::get_angle() +
-                             get_goal_gamma());
+                         arms::odom::getHeading() + turret::get_angle()
+                        );
 }
 
 double get_latency() {
@@ -95,66 +126,23 @@ void task() {
       get_latency,       // function to get the latency of the current frame
       false);
 
-  float previous_speed = 0;
-
-  float previous_height;
-  float previous_lr;
-  float previous_color;
-  float counter = 0;
-
   while (true) {
-    uint64_t color = communication->get_data(GOAL_COLOR);
-    uint64_t lr = communication->get_data(LEFT_RIGHT);
-    uint64_t height = communication->get_data(HEIGHT);
-    uint64_t width = communication->get_data(WIDTH);
-
-    double turn_degrees =
-        latency_compensator->get_new_goal_distance(get_goal_gamma());
-    if (color == 0) {
-      turn_degrees = 0;
-    }
-
-    // printf("Color:      %llu\n", color);
-    // printf("Left/Right: %llu\n", lr);
-    // printf("Height:     %llu\n", height);
-    // printf("Width:      %llu\n", width);
-    // printf("Gamma:      %f\n", get_goal_gamma());
-    // printf("Turn Degrees: %f\n", turn_degrees);
-    // printf("Goal Distance: %f\n", get_goal_distance());
-    // printf("Turrent Angle %f\n", turret::get_angle());
-    // printf("Turrent Pose %f\n", std::get<2>(get_turret_pose()));
-    // printf("Time:       %f\n", counter);
-
-    if (previous_height != height || previous_lr != lr ||
-        previous_color != color) {
-      counter = 0;
+    if (communication->get_read(GOAL_COLOR)) {
+      no_new_comm_count = 0;
+      goal_color = communication->get_data(GOAL_COLOR);
+      left_right = communication->get_data(LEFT_RIGHT);
+      height = communication->get_data(HEIGHT);
+      width = communication->get_data(WIDTH);
+      
+      if (goal_color == 1 || goal_color == 2) {
+        std::array<double, 2> goal_point_arr = latency_compensator->update_goal_pose(get_goal_distance(), get_goal_gamma());
+        goal_point.x = goal_point_arr[0];
+        goal_point.y = goal_point_arr[1];
+      }
     } else {
-      counter += 10;
+      no_new_comm_count += 1;
     }
-
-    previous_height = height;
-    previous_lr = lr;
-    previous_color = color;
-    //printf("----------------\n");
-
-    // 0 is red
-    // 1 is blue
-    // 3 is nothing detected
-
-    if (turret::get_angle() >= 80) {
-      turn_degrees = std::min(turn_degrees, 0.0);
-    } else if (turret::get_angle() <= -80) {
-      turn_degrees = std::max(turn_degrees, 0.0);
-    }
-
-    float deadzone = 2.5;
-
-    if (fabs(lr - 265) <= deadzone) {
-      turn_degrees = 0.0;
-    }
-
-    //turret::move(turn_degrees * 7.5);
-
+    printf("No New Com Count: %d\n", no_new_comm_count);
     pros::delay(10);
   }
 }

@@ -50,7 +50,7 @@ void task_func() {
     static int settler = 0;
 
     while(true) {
-        double angle_error = vision::get_goal_gamma();
+        double angle_error = vision::get_goal_point_gamma();
         if (angle_error == last_error) {
             settler += 1;
         } else {
@@ -168,8 +168,8 @@ void debug_screen() {
     }
     pros::lcd::print(1, " State:");
     pros::lcd::print(2, " Cur Angle: %f", get_angle());
-    pros::lcd::print(3, " Tgt Angle: %f", target_angle);
-    pros::lcd::print(4, " Angle Err: %f", get_angle_error());
+    pros::lcd::print(3, " Tgt Angle: %f", vision::get_goal_gamma());
+    pros::lcd::print(4, " Tgt Angle Pt: %f", vision::get_goal_point_gamma());
     pros::lcd::print(5, " Settled: %s", settled() ? "true" : "false");
     pros::lcd::print(6, " Vision: %s", vision_working ? "true" : "false");
 }
