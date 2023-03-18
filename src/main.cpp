@@ -262,7 +262,7 @@ void opcontrol() {
 		printf("time (ms),f1 velocity (rpm),f2 velocity (rpm), "
 		       "target|%d,%.2f,%.2f,%.2f\n",
 		       pros::millis(), flywheel::current_speed(1),
-		       flywheel::current_speed(2), flywheel::target_speed());
+		       flywheel::current_speed(), flywheel::target_speed());
 
 		pros::delay(20);
 	}
