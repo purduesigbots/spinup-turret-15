@@ -14,14 +14,20 @@ using namespace pros;
 
 namespace turret {
 
+    /**
+    *
+    * PUBLIC DATA (see header file for documentation)
+    *
+    */
+
     enum class Goal {
         RED,
         BLUE,
         BOTH
-    }; //commeted in header file because it is GLOBAL
-    
+    };
 
-    namespace{ //ANONYMOUS NAMESPACE FOR PRIVATE METHODS, DATA
+
+    namespace{ //Anonymous namespace for private methods and data
 
         /*
         *
@@ -225,7 +231,7 @@ namespace turret {
 
     /*
     *
-    * PUBLIC METHODS (all commented in their header files)
+    * PUBLIC METHODS (see header file for documentation)
     *
     */
 
@@ -290,9 +296,6 @@ namespace turret {
         return fabs(get_angle_error()) <= SETTLE_THRESHHOLD;
     }
 
-    /**
-     * Blocks execution until the turret reaches the point it is supposed to. 
-     */
     void wait_until_settled() {
         // While the target_angle is outside the range we want, we sleep.
         // Once it is within SETTLE_THRESHHOLD degrees of the target angle, we quit
