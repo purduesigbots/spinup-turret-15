@@ -1,7 +1,5 @@
 #include "main.h"
 #include "ARMS/api.h"
-#include "pros/misc.h"
-#include "pros/misc.hpp"
 #include "vision.h"
 #include "subsystems/subsystems.hpp"
 

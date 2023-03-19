@@ -1,14 +1,6 @@
-#include "flywheel.hpp"
-#include <stdint.h>
-#include "ARMS/config_silver.h"
-#include "api.h"
-#include "discCounter.hpp"
-#include "discLift.hpp"
 #include "main.h"
-#include "pros/motors.h"
-#include "pros/motors.hpp"
+#include "ARMS/config_silver.h"
 #include "subsystems/subsystems.hpp"
-#include "ARMS/config.h"
 
 using namespace pros;
 

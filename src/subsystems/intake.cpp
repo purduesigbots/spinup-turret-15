@@ -1,13 +1,5 @@
 #include "main.h"
-#include "math.h"
-#include "pros/adi.hpp"
-#include "pros/misc.hpp"
-#include "pros/motors.h"
 #include "subsystems/subsystems.hpp"
-#include <cmath>
-
-#include "subsystems/flywheel.hpp"
-
 #include "ARMS/config.h"
 
 using namespace pros;

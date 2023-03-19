@@ -1,14 +1,7 @@
+#include "main.h"
 #include "subsystems/turret.hpp"
-#include "ARMS/odom.h"
-#include "ARMS/point.h"
-#include "pros/adi.hpp"
-#include "main.h"
 #include "vision.h"
-#include "api.h"
 #include "ARMS/config.h"
-#include "main.h"
-#include <cmath>
-#include <algorithm>
 
 using namespace pros;
 

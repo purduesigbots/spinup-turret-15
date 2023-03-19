@@ -1,6 +1,5 @@
-#include "discLift.hpp"
+#include "main.h"
 #include "ARMS/config.h"
-#include "api.h"
 #include "subsystems.hpp"
 
 using namespace pros;
