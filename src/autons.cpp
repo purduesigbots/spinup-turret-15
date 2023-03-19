@@ -1,36 +1,19 @@
-#include "ARMS/chassis.h"
-#include "ARMS/flags.h"
 #include "main.h"
-
 #include "ARMS/api.h"
-#include "subsystems/deflector.hpp"
-#include "subsystems/discLift.hpp"
-#include "subsystems/discCounter.hpp"
-#include "subsystems/flywheel.hpp"
-#include "subsystems/intake.hpp"
-#include "subsystems/roller.hpp"
-#include "subsystems/turret.hpp"
+#include "pros/misc.h"
+#include "pros/misc.hpp"
 #include "vision.h"
-
 #include "subsystems/subsystems.hpp"
 
 /**
- * Runs the user autonomous code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the autonomous
- * mode. Alternatively, this function may be called in initialize or opcontrol
- * for non-competition testing purposes.
- *
- * If the robot is disabled or communications is lost, the autonomous task
- * will be stopped. Re-enabling the robot will restart the task, not re-start it
- * from where it left off.
- */
+*
+* ROUTINE METHODS
+*
+*/
 
-void fire3() {
-	flywheel::start(200);
-	flywheel::fire(3, 8000);
-}
-
+/**
+* Standard match autonomous routine
+*/
 void matchAuto() {
 	printf("Match auto\n");
 
@@ -105,48 +88,11 @@ void matchAuto() {
 	turret::disable_vision_aim();
 	turret::goto_angle(0, 100, true);
 	flywheel::set_target_speed(0);
-#if 0
-	flywheel::set_target_speed(160);
-
-	//get disc 7
-	intake::toggle(600);
-	arms::chassis::move({55, 72}, arms::THRU);
-	arms::chassis::move({55, 82}, arms::REVERSE);
-
-	//get disc 8
-	arms::chassis::turn(180, arms::THRU); //turn to face disc 8
-	arms::chassis::move({49, 65, 270}, arms::THRU);
-	turret::goto_angle(20, 100, true); //turn turret for next shot
-	arms::chassis::turn(315); //turn through disc, pick it up
-	arms::chassis::waitUntilFinished(1);
-	turret::enable_vision_aim();
-	pros::delay(800); //wait until disc picked all the way up
-
-	//take next shot
-	flywheel::fire(2, 6000);
-	turret::disable_vision_aim();
-	turret::goto_angle(0, 100, true);
-	
-	//setup for next discs
-	intake::start(600);
-	arms::chassis::turn(90, arms::THRU);
-	arms::chassis::move({43, 76});
-	arms::chassis::move({43, 70}, arms::REVERSE);
-	arms::chassis::move({35, 76, 135});
-	arms::chassis::move({35, 70, 90}, 40, arms::REVERSE);
-	arms::chassis::move({27, 76, 135});
-	arms::chassis::waitUntilFinished(1);
-	pros::delay(800);
-	turret::goto_angle(0, 100, true);
-	arms::chassis::move({48, 72}, arms::REVERSE);
-	arms::chassis::turn(327);
-	turret::enable_vision_aim();
-	flywheel::fire(3, 9000);
-	turret::disable_vision_aim();
-#endif
 }
-extern "C" {
 
+/**
+* Subsystem test routine
+*/
 void subsystem_test() {
 	printf("Turret going to angle\n");
 	turret::goto_angle(45);
@@ -167,6 +113,9 @@ void subsystem_test() {
 	discLift::discLiftDown();
 }
 
+/**
+* Skils autonomous routine
+*/
 void skillsAuto() {
 	using namespace arms;
 
@@ -229,20 +178,29 @@ void skillsAuto() {
 	flywheel::fire(3, 4000);
 }
 
-void autonomous() {
-	skillsAuto();
-	// fire3();
-	// vision::set_vision_offset(true);
-	// roller::set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+/**
+*
+* MAIN AUTONOMOUS METHOD
+*
+*/
 
-	// switch (arms::selector::auton) {
-	// 	case 0:
-	// 		// skillsAuto();
-	// 		break;
-	// 	default:
-	// 		matchAuto();
-	// 		break;
-	// }
-	// turret::goto_angle(0,250,true);
-}
+/**
+* Autonomous method--calls a method routine. 
+* Implements autonomous selector (if competition is connected).
+*/
+void autonomous() {
+	if(pros::competition::is_connected()){
+		//Switch based on auton selector for matches
+		switch (arms::selector::auton) {
+			case 0:
+				// skillsAuto();
+				break;
+			default:
+				matchAuto();
+				break;
+		}
+	} else{
+		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
+		skillsAuto();
+	}
 }
