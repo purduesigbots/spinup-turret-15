@@ -1,5 +1,5 @@
 #include "main.h"
-#include "ARMS/config_silver.h"
+#include "ARMS/config.h"
 #include "subsystems/subsystems.hpp"
 
 using namespace pros;
