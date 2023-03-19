@@ -1,6 +1,7 @@
 #include "subsystems/roller.hpp"
 #include "main.h"
 #include "api.h"
+#include "pros/motors.h"
 #include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
 
@@ -87,6 +88,7 @@ namespace roller {
     }
 
     void init() {
+        motor.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
         optical.set_led_pwm(100);
         pros::Task roller_task(task_func);
     }
