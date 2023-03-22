@@ -175,11 +175,6 @@ namespace turret {
                             if(is_valid_target() && vision::get_goal_detected()){
                                 //If the vision system sees a valid target, move the turret to face it
                                 motor.move_voltage(get_vision_voltage(angle_error));
-                                //Log the position of the goal 
-                                last_goal_position = {
-                                    arms::odom::getPosition().x + vision::get_goal_distance() * cos(arms::odom::getHeading() + rot_to_deg(motor.get_position())), 
-                                    arms::odom::getPosition().y + vision::get_goal_distance() * sin(arms::odom::getHeading() + rot_to_deg(motor.get_position()))
-                                };
                                 //Update target angle
                                 target_angle = motor.get_position() + deg_to_rot(angle_error);
                             } else if(last_goal_position.y != -1000){
