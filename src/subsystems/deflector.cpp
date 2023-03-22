@@ -1,39 +1,50 @@
-#include "subsystems/deflector.hpp"
-
+#include "main.h"
 #include "ARMS/config.h"
-
-#include "api.h"
 #include "subsystems/subsystems.hpp"
-
-
-using namespace pros;
 
 namespace deflector {
 
-ADIDigitalOut deflector_piston(DEFLECTOR_PISTON);
-bool isUp = true;
-bool state = false;
+    namespace{ //Anonymous namespace for private data and methods
+        
+        /*
+        *
+        * PRIVATE DATA
+        *
+        */
 
-void up() {
-    if(!isUp) {
-        toggle();
+        //Piston declaration
+        pros::ADIDigitalOut deflector_piston(DEFLECTOR_PISTON);
+        
+        //Whether or not the deflector is up
+        bool isUp = true;
     }
-}
+    
+    /**
+    *
+    * PUBLIC METHODS (all comment)
+    *
+    */
 
-void down() {
-    if(isUp) {
-        toggle();
+    void up() {
+        if(!isUp) {
+            toggle(); //toggle if not already up
+        }
     }
-}
 
-void toggle(){
-    state = !state;
-    isUp = !isUp;
-    deflector_piston.set_value(state);
-}
+    void down() {
+        if(isUp) {
+            toggle(); //toggle if not already down
+        }
+    }
 
-bool is_up() {
-    return isUp;
-}
+    void toggle(){
+        isUp = !isUp; //flip state variable
+        //Activate solenoid
+        deflector_piston.set_value(!isUp); //state variable is reversed in relation to piston, hence the not operator
+    }
+
+    bool is_up() {
+        return isUp;
+    }
 
 } // namespace deflector

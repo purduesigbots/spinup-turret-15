@@ -1,19 +1,14 @@
-// clang-format off
 #include "vision.h"
 #include "subsystems/subsystems.hpp"
 #include "comms/comms.hpp"
 #include "ARMS/odom.h"
 #include "pros/misc.h"
 #include "LatPullDown/Oak_1_latency_compensator.hpp"
-// clang-format on
-#if BOT == SILVER
-    #include "../include/ARMS/config_silver.h"
-#elif BOT == GOLD
-    #include "../include/ARMS/config_gold.h"
-#endif
+#include "ARMS/config.h"
+
+//IRIS COMMUNICATIONS MACROS
 #define START_CHAR 0b11001100
 #define END_CHAR 0b00110011
-
 #define GOAL_COLOR 0b00000001
 #define LEFT_RIGHT 0b00000010
 #define HEIGHT 0b00000011
@@ -146,4 +141,3 @@ void task() {
     pros::delay(10);
   }
 }
-} // namespace vision
