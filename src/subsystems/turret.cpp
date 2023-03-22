@@ -1,6 +1,7 @@
 #include "main.h"
 #include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
+#include "vision.hpp"
 
 using namespace pros;
 
@@ -17,7 +18,6 @@ namespace turret {
         BLUE,
         BOTH
     };
-
 
     namespace{ //Anonymous namespace for private methods and data
 
@@ -159,7 +159,7 @@ namespace turret {
         void task_func() { 
             while(true) {
                 //Get the angle error between the turret and the goal
-                double angle_error = vision::get_goal_gamma();
+                double angle_error = vision::get_goal_point_gamma();
                 //Switch for desired control mode
                 switch(state) {
                     case State::DISABLED: //Emergency stop basically
@@ -177,30 +177,11 @@ namespace turret {
                                 motor.move_voltage(get_vision_voltage(angle_error));
                                 //Update target angle
                                 target_angle = motor.get_position() + deg_to_rot(angle_error);
-                            } else if(last_goal_position.y != -1000){
-                                //At some point, the system has seen and logged a valid target,
-                                // so we should turn the turret to face that target.
-
-                                //Calculate global angle to point:
-                                double global_angle_to_goal = atan2(last_goal_position.y - arms::odom::getPosition().y, 
-                                    last_goal_position.x - arms::odom::getPosition().x);
-                                global_angle_to_goal *= 180/M_PI; //Convert to degrees
-
-                                //Calculate robot heading error:
-                                double heading_error = global_angle_to_goal - arms::odom::getHeading();
-
-                                //Check if the angle is within the limits
-                                if(heading_error > RIGHT_LIMIT && heading_error < LEFT_LIMIT) {
-                                    //Turret can aim at the target, so move to it
-                                    motor.move_voltage(get_vision_voltage(heading_error));
-                                    //Update target angle
-                                    target_angle = motor.get_position() + deg_to_rot(heading_error);
-                                    
-                                } else {
-                                    motor.move_absolute(0, 100); //async center turret
-                                    //Update target angle
-                                    target_angle = 0.0;
-                                }
+                            } else {
+                                //If the vision system does not see a valid target, async center the turret
+                                motor.move_absolute(0, 100);
+                                //Update target angle
+                                target_angle = 0.0;
                             }
                         } else {
                             // If the vision system is not working, async center turret
