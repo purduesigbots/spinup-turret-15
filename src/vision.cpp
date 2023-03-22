@@ -14,139 +14,130 @@
 #define HEIGHT 0b00000011
 #define WIDTH 0b00000100
 
-namespace vision{
-  
-  namespace{ //Anonymous namespace for private data and methods
+const std::tuple<double, double> GOAL_POS = {50 * sqrt(2), 0};
 
-    /*
-    *
-    * PRIVATE DATA
-    *
-    */
+const double IMAGE_HEIGHT = 416;
+const double GOAL_HEIGHT = 13.87;
+const double GOAL_WIDTH = 16;
+const double FOCAL_LENGTH = 0.5;
 
-    const std::tuple<double, double> GOAL_POS = {50 * sqrt(2), 0};
+// Important, this is the size of the physical sensor, not its height off the
+// ground!
+// https://stackoverflow.com/questions/50125574/calculate-image-size-of-an-object-from-real-size
+const double SENSOR_HEIGHT = 0.3074803;
 
-    const double IMAGE_HEIGHT = 416;
-    const double GOAL_HEIGHT = 13.87;
-    const double GOAL_WIDTH = 16;
-    const double FOCAL_LENGTH = 0.5;
+namespace vision {
 
-    uint64_t color = 0;
+std::shared_ptr<comms::ReceiveComms> communication;
+double vision_offset = 240;
+arms::Point goal_point = {0,0};
+int no_new_comm_count = 0;
 
-    // Important, this is the size of the physical sensor, not its height off the
-    // ground!
-    // https://stackoverflow.com/questions/50125574/calculate-image-size-of-an-object-from-real-size
-    const double SENSOR_HEIGHT = 0.3074803;
+uint64_t goal_color = 0;
+uint64_t left_right = 0;
+uint64_t height = 0;
+uint64_t width = 0;
 
-    std::shared_ptr<comms::ReceiveComms> communication;
+void init() {
+  communication =
+      std::make_shared<comms::ReceiveComms>(IRIS_PORT, 115200, START_CHAR, END_CHAR);
+}
 
-    double vision_offset = 240;
+double get_goal_gamma() {
+  return atan2((GOAL_WIDTH / (double)width *
+                (vision_offset - (double)left_right)),
+               get_goal_distance()) *
+         (180 * M_1_PI);
+}
 
-    //NOT BEING USED - Jack
-    // Oak_1_latency_compensator *latency_compensator;
+double get_goal_distance() {
+  return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) /
+         (height * SENSOR_HEIGHT);
+}
 
-    /**
-    *
-    * PRIVATE METHODS
-    *
-    */
+arms::Point get_goal_point() {
+  return goal_point;
+}
 
-    /**
-     * Gets the position of the robot except heading is the turret's global heading instead of the chassis'
-     *
-     * @return an arms pose comprised of the robot's x, y and the turret's global angle
-     */
-    std::tuple<double, double, double> get_turret_pose() {
-      arms::Point p = arms::odom::getPosition();
-      return std::make_tuple(p.x, p.y, arms::odom::getHeading() + turret::get_angle() +get_goal_gamma());
-    }
+double get_goal_point_gamma() {
+  arms::Point diff = goal_point - arms::odom::getPosition();
+  double gamma = atan2(diff.y, diff.x);
+  if (diff.x < 0) {
+    gamma += M_PI;
+  }
+  gamma *= 180 * M_1_PI;
+  gamma -= arms::odom::getHeading() + turret::get_angle();
+  while (gamma > 180)
+    gamma -= 360;
+  while (gamma < -180)
+    gamma += 360;
+  return gamma;
+}
 
-    /**
-     * gets the latency of the iris system
-     *
-     * @return the latency of the iris system in ms
-     */
-    double get_latency(){
-      return 40; //40ms latency (for lat comp thingy)
-    }
+double get_goal_point_distance() {
+  arms::Point diff = goal_point - arms::odom::getPosition();
+  return arms::length(diff);
+}
 
-    /**
-     * Task function governing communication in between project IRIS and the rest of the program
-     */
-    void task_func() {
-      communication->start(); //start comms with iris box
+bool vision_not_working() {
+  return (goal_color == 0 && height == 0) || no_new_comm_count > 100;
+}
 
-      //THIS IS NOT BEING USED, LEAVING IT HERE FOR NOW UNTIL LAT COMP IS DONE - Jack
-      /* latency_compensator = new Oak_1_latency_compensator( //init latency compensator
-        7,                 // max buffer of 7
-        10,                // get odom position every 10ms
-        get_turret_pose,   // function to get pose of the turret
-        get_goal_distance, // function to calulate the vector to the goal based on our distance from it
-        get_latency,       // 40 ms latency
-        false);
-      */
+void start_vision() {
+  communication->start();
+}
 
-      //THESE ARE NOT BEING USED, leaving here in case that changs - Jack
-      // float previous_height;
-      // float previous_lr;
-      // float previous_color;
 
-      //MAIN TASK LOOP
-      while (true) {
-        color = communication->get_data(GOAL_COLOR);
-        uint64_t lr = communication->get_data(LEFT_RIGHT);
-        uint64_t height = communication->get_data(HEIGHT);
-        uint64_t width = communication->get_data(WIDTH);
+void set_vision_offset(int offset) {
+  vision_offset = offset;
+}
 
-        //NOT BEING USED - Jack
-        // previous_height = height; 
-        //NOT BEING USED - Jack
-        // previous_lr = lr;
-        //NOT BEING USED - Jack
-        // previous_color = color;
+std::tuple<double, double, double> get_turret_pose() {
+  // get odom x,y, and heading
+  // get turret heading
+  arms::Point p = arms::odom::getPosition();
+  //-7.5
+  // 7.2
+  return std::make_tuple(p.x, p.y,
+                         arms::odom::getHeading() + turret::get_angle()
+                        );
+}
 
-        //Loop delay
-        pros::delay(10);
+double get_latency() {
+  return 40; // 40ms latency
+}
+
+Oak_1_latency_compensator *latency_compensator;
+
+void task() {
+  communication->start();
+
+  latency_compensator = new Oak_1_latency_compensator(
+      7,                 // max buffer of 7
+      10,                // get odom position every 10ms
+      get_turret_pose,   // function to get pose of the turret
+      get_goal_distance, // function to calulate the vector to the goal based on
+                         // the distance
+      get_latency,       // function to get the latency of the current frame
+      false);
+
+  while (true) {
+    if (communication->get_read(GOAL_COLOR)) {
+      no_new_comm_count = 0;
+      goal_color = communication->get_data(GOAL_COLOR);
+      left_right = communication->get_data(LEFT_RIGHT);
+      height = communication->get_data(HEIGHT);
+      width = communication->get_data(WIDTH);
+      
+      if (goal_color == 1 || goal_color == 2) {
+        std::array<double, 2> goal_point_arr = latency_compensator->update_goal_pose(get_goal_distance(), get_goal_gamma());
+        goal_point.x = goal_point_arr[0];
+        goal_point.y = goal_point_arr[1];
       }
+    } else {
+      no_new_comm_count += 1;
     }
-  }
-
-  /**
-  *
-  * PUBLIC METHODS (commented in the header file)
-  *
-  */
-
-  void init() {
-    communication = std::make_shared<comms::ReceiveComms>(IRIS_PORT, 115200, START_CHAR, END_CHAR);
-    pros::Task vision_task(task_func, "Vision task");
-  }
-
-  double get_goal_gamma() {
-    return atan2((GOAL_WIDTH / (double)communication->get_data(WIDTH) *
-                  (vision_offset - (double)communication->get_data(LEFT_RIGHT))),
-                get_goal_distance()) *
-          (180 * M_1_PI);
-  }
-
-  double get_goal_distance() {
-    return (FOCAL_LENGTH * GOAL_HEIGHT * IMAGE_HEIGHT) /
-          (communication->get_data(HEIGHT) * SENSOR_HEIGHT);
-  }
-
-  bool vision_not_working() {
-    return communication->get_data(GOAL_COLOR) == 0 && communication->get_data(HEIGHT) == 0;
-  }
-
-  void set_vision_offset(int offset) {
-    vision_offset = offset;
-  }
-
-  int get_goal_color() {
-    return color; // Last seen color (at least it is 40ms old)
-  }
-
-  bool get_goal_detected(){
-    return color != 3; //if 3, then no goal detected
+    printf("No New Com Count: %d\n", no_new_comm_count);
+    pros::delay(10);
   }
 }

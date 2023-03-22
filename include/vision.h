@@ -1,5 +1,6 @@
 #ifndef _VISION_H_
 #define _VISION_H_
+#include "ARMS/api.h"
 
 namespace vision {
     /**
@@ -26,7 +27,11 @@ namespace vision {
      *
      * @return whether or not the vision system is operating correctly.
      */
-    bool vision_not_working();
+     bool vision_not_working();
+
+    arms::Point get_goal_point();
+    double get_goal_point_distance();
+    double get_goal_point_gamma();
 
     /**
      * Sets the offset of the aimbot. Higher = more left offset.

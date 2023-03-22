@@ -28,7 +28,7 @@
         "version": "3.1.1"
       },
       "LatPullDown": {
-        "location": "/Users/kunwarsahni/Library/Application Support/PROS/templates/LatPullDown@1.0.0",
+        "location": "C:\\Users\\andre\\AppData\\Roaming\\PROS\\templates\\LatPullDown@1.0.1",
         "metadata": {
           "origin": "local"
         },
@@ -36,15 +36,15 @@
         "py/object": "pros.conductor.templates.local_template.LocalTemplate",
         "supported_kernels": "^3.7.3",
         "system_files": [
-          "include/LatPullDown/Oak_1_latency_compensator.hpp",
-          "firmware/LatPullDown.a"
+          "include\\LatPullDown\\Oak_1_latency_compensator.hpp",
+          "firmware\\LatPullDown.a"
         ],
         "target": "v5",
         "user_files": [],
-        "version": "1.0.0"
+        "version": "1.0.1"
       },
       "SerialVision": {
-        "location": "/Users/kunwarsahni/Library/Application Support/PROS/templates/SerialVision@1.0.0",
+        "location": "C:\\Users\\andre\\AppData\\Roaming\\PROS\\templates\\SerialVision@1.0.1",
         "metadata": {
           "origin": "local"
         },
@@ -52,12 +52,12 @@
         "py/object": "pros.conductor.templates.local_template.LocalTemplate",
         "supported_kernels": "^3.7.3",
         "system_files": [
-          "firmware/SerialVision.a",
-          "include/comms/comms.hpp"
+          "include\\comms\\comms.hpp",
+          "firmware\\SerialVision.a"
         ],
         "target": "v5",
         "user_files": [],
-        "version": "1.0.0"
+        "version": "1.0.1"
       },
       "kernel": {
         "location": "/Users/kunwarsahni/Library/Application Support/PROS/templates/kernel@3.7.3",

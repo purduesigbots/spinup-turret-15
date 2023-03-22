@@ -82,7 +82,7 @@ void competition_initialize() {
 void opcontrol() {
 
 	//Further initialization business--competition + not competition
-	turret::goto_angle(0, 400, true);
+	turret::goto_angle(0, 250, true);
 	vision::set_vision_offset(240);
 	turret::disable_vision_aim();
 

@@ -7,7 +7,7 @@ constants for the SILVER robot.
 #define INTAKE_PISTON                                                          \
 	{                                                                            \
 		{ 3, 'd' }                                                                 \
-	}
+  }
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 'h'
@@ -29,6 +29,7 @@ constants for the SILVER robot.
 #define FLYWHEEL_RIGHT 9
 #define INDEXER_PORT 15
 
+
 #define TURRET_MOTOR -7
 #define TURRET_LIMIT_SWITCH                                                    \
 	{                                                                            \
@@ -41,16 +42,17 @@ constants for the SILVER robot.
 #define TURRET_FF true;  // switch for turn feedforward
 #define TURRET_FF_V 0.0; // feedforward voltage (mV)
 
+
 #define DEFLECTOR_PISTON                                                       \
 	{                                                                            \
-		{ 3, 'a' }                                                                 \
+		{ 6, 'a' }                                                                 \
 	}
 #define ENDGAME_PISTON                                                         \
 	{                                                                            \
-		{ 3, 'd' }                                                                 \
+		{ 6, 'd' }                                                                 \
 	}
 
-#define IRIS_PORT 21
+#define IRIS_PORT 2
 
 // Debug
 #define ODOM_DEBUG 0
