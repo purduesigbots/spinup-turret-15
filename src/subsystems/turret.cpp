@@ -1,6 +1,5 @@
 #include "main.h"
-#include "subsystems/turret.hpp"
-#include "vision.h"
+#include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
 
 using namespace pros;
@@ -272,35 +271,8 @@ namespace turret {
         target_angle = std::clamp(angle, RIGHT_LIMIT, LEFT_LIMIT);
         max_velocity = velocity;
 
-    while(true) {
-        double angle_error = vision::get_goal_point_gamma();
-        if (angle_error == last_error) {
-            settler += 1;
-        } else {
-            settler = 0;
-        }
-        vision_working = angle_error != 45.00 && ! vision::vision_not_working();
-        last_error = angle_error;
-        switch(state) {
-            case State::DISABLED:
-                motor.move(0);
-                break;
-            case State::MANUAL:
-                motor.move_absolute(deg_to_rot(target_angle), max_velocity);
-                break;
-            case State::VISION:
-                /*
-                Angle error is set to 45.00 when the goal is not detected
-                If angle error has not changed, assume vision has disconnected
-                */
-                if (vision_working) {
-                    int power = angle_error * 600;
-                    power = std::clamp(power, -6000, 6000);
-                    motor.move_voltage(power);
-                } else {
-                    motor.move_voltage(0);
-                }
-                break;
+        if(!async){
+            wait_until_settled();
         }
     }
 

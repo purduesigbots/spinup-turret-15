@@ -141,6 +141,13 @@ namespace flywheel {
 		return average_speed;
 	}
 
+	double current_speed(int n){
+		if(n == 0){
+			return left_flywheel.get_velocity();
+		}
+		return right_flywheel.get_actual_velocity();
+	}
+
 	double target_speed() {
 		return targetSpeed;
 	}

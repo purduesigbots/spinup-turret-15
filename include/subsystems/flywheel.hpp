@@ -76,14 +76,14 @@ namespace flywheel {
     bool at_speed();
 
     /**
-    * Gets the current RPM that the flywheel is running at
+    * Gets the current RPM that the flywheel is running at.
     *
     * @return Current RPM of the flywheel
     */
     double current_speed();
 
     /**
-    * Gets the current RPM of one of the flywheel motors
+    * Gets the current RPM of one of the flywheel motors. 0 = Left, 1 = Right.
     *
     * @return Current RPM of the flywheel
     */

@@ -1,5 +1,5 @@
-#ifndef _VISION_H_
-#define _VISION_H_
+#pragma once
+
 #include "ARMS/api.h"
 
 namespace vision {
@@ -55,4 +55,3 @@ namespace vision {
     bool get_goal_detected();
 }
 
-#endif

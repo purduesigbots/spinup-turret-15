@@ -10,4 +10,4 @@
 #include "subsystems/intake.hpp"
 #include "subsystems/roller.hpp"
 #include "subsystems/turret.hpp"
-    
+#include "subsystems/vision.hpp"
