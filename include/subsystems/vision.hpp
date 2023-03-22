@@ -16,22 +16,32 @@ namespace vision {
     double get_goal_distance();
 
     /**
-     * Gets the angle to the goal.
-     *
-     * @return angle error in degrees
-     */
-    double get_goal_gamma();
+    * Gets the vision's estimate of the location of the goal.
+    *
+    * @return a point representing the goal's position.
+    */
+    arms::Point get_goal_point();
 
     /**
+    * Gets the angle to the goal.
+    *
+    * @return angle to the goal in degrees
+    */
+    double get_goal_point_gamma();
+
+    /**
+    * Gets the distance to the goal.
+    *
+    * @return distance to the goal in inches
+    */
+    double get_goal_point_distance();
+
+    /** 
      * Gets the status of the vision system.
      *
      * @return whether or not the vision system is operating correctly.
      */
      bool vision_not_working();
-
-    arms::Point get_goal_point();
-    double get_goal_point_distance();
-    double get_goal_point_gamma();
 
     /**
      * Sets the offset of the aimbot. Higher = more left offset.
