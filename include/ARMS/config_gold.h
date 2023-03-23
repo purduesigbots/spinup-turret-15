@@ -44,7 +44,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 // Debug
 #define ODOM_DEBUG 0
 
-#define LEFT_MOTORS 4, -13, 12
+#define LEFT_MOTORS 3, -13, 12
 #define RIGHT_MOTORS -16, 17, -18
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
@@ -61,7 +61,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
 #define ENCODER_PORTS 3, 7, -1                // Port 0 for disabled,
-#define EXPANDER_PORT 0                      // Port 0 for disabled
+#define EXPANDER_PORT 15                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
 // Movement tuning
