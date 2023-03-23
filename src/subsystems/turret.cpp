@@ -162,9 +162,9 @@ namespace turret {
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
                         motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
-                        if(vision::get_error() > 40) {
+                        if(vision::get_error() > 70) {
                             motor.move_voltage(-1500);
-                        } else if (vision::get_error() < -40) {
+                        } else if (vision::get_error() < -70) {
                             motor.move_voltage(1500);
                         } else {
                             motor.move_voltage(0);
