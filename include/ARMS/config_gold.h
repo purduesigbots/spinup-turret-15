@@ -4,7 +4,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #pragma once
 
 
-#define INTAKE_PISTON {{20, 'a'}}
+#define INTAKE_PISTON {{15, 'a'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 6
@@ -21,8 +21,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define FLYWHEEL_KP 0.5
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
-#define FLYWHEEL_KH
-#define FLYWHEEL_LEFT 9
+#define FLYWHEEL_KH 0
+#define FLYWHEEL_LEFT 5
 #define FLYWHEEL_RIGHT 10
 #define INDEXER_PORT 14
 
@@ -35,8 +35,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_FF true; //switch for turn feedforward
 #define TURRET_FF_V 0.0; //feedforward voltage (mV)
 
-#define DEFLECTOR_PISTON {{20, 'c'}}
-#define ENDGAME_PISTON {{20, 'f'}}
+#define DEFLECTOR_PISTON {{15, 'c'}}
+#define ENDGAME_PISTON {{15, 'f'}}
 
 #define IRIS_PORT 8
 
@@ -44,7 +44,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 // Debug
 #define ODOM_DEBUG 0
 
-#define LEFT_MOTORS 4, -13, 12
+#define LEFT_MOTORS 3, -13, 12
 #define RIGHT_MOTORS -16, 17, -18
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
