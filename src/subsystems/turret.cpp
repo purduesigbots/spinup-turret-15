@@ -13,12 +13,6 @@ namespace turret {
     *
     */
 
-    enum class Goal {
-        RED,
-        BLUE,
-        BOTH
-    };
-
     namespace{ //Anonymous namespace for private methods and data
 
         /*
