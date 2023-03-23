@@ -83,8 +83,8 @@ namespace roller {
 
     void move(double speed) {
         roller::speed = speed;
-        printf("\nRoller speed: %f\n", speed);
-        printf("\nBool thing: %d\n", turning_roller);
+        // printf("\nRoller speed: %f\n", speed);
+        // printf("\nBool thing: %d\n", turning_roller);
     }
 
     void init() {

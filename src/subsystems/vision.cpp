@@ -39,10 +39,12 @@ namespace vision{
           height = communication->get_data(HEIGHT);
           width = communication->get_data(WIDTH);
           color = communication->get_data(GOAL_COLOR);
-          printf("\nLEFT: %d, RIGHT %d", left, right);
-          printf("\nColor: %d", color);
-          printf("\nWidth: %d", width);
-          printf("\nHeight: %d", height);
+          printf("LEFT: %d, RIGHT %d\n", left, right);
+          printf("Color: %d\n", color);
+          printf("VISION ERROR: %d\n", vision::get_error());
+          printf("------------------------\n");
+          // printf("\nWidth: %d", width);
+          // printf("\nHeight: %d", height);
           pros::delay(10);
         }
         communication->pause();

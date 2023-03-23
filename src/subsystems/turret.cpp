@@ -161,13 +161,11 @@ namespace turret {
                         break;
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
-                        // print value of vision::get_error() to the terminal
-                        printf("VISION ERROR: %d\n", vision::get_error());
                         motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
-                        if(vision::get_error() >= 50) {
-                            motor.move_voltage(-1000);
-                        } else if (vision::get_error() <= 50) {
-                            motor.move_voltage(1000);
+                        if(vision::get_error() > 40) {
+                            motor.move_voltage(-1500);
+                        } else if (vision::get_error() < -40) {
+                            motor.move_voltage(1500);
                         } else {
                             motor.move_voltage(0);
                         }
