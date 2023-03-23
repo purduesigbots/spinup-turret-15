@@ -118,7 +118,6 @@ void draw_screen() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	vision::init();
 	printf("\nHELLO THERE");
 	turret::initialize();
 	sylib::initialize();
@@ -131,6 +130,7 @@ void initialize() {
 	discCounter::initialize();
 	pros::Task screenTask(draw_screen, "Debug Daemon");
 	printf("Done initializing!!!\n");
+	vision::init();
 }
 
 /**
@@ -223,6 +223,7 @@ void opcontrol() {
 		}
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			discLift::discLiftUp();
+			turret::enable_vision_aim();
 			if (discLiftCounter < 10) {
 				intake::start(1000);
 			} else {

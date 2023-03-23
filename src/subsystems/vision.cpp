@@ -1,4 +1,4 @@
-#include "ARMS/config_silver.h"
+// #include "ARMS/config.h"
 #include "comms/comms.hpp"
 #include <cstddef>
 namespace vision{
@@ -12,11 +12,11 @@ namespace vision{
     #define HEIGHT 0b00000011
     #define WIDTH 0b00000100
 
-    uint64_t left;
-    uint64_t right;
-    uint64_t height;
-    uint64_t color;
-    uint64_t width;
+    int left;
+    int right;
+    int height;
+    int color;
+    int width;
 
     /**
     *
@@ -24,8 +24,14 @@ namespace vision{
     *
     */
 
-    void task_func(void* param){
-        std::shared_ptr<comms::ReceiveComms> communication = std::make_shared<comms::ReceiveComms>(IRIS_PORT, 115200, START_CHAR, END_CHAR); 
+
+   // Make a function that returns the left and right values error
+    int get_error(){
+      return (left - right);
+    }
+
+    void task_func(){
+        std::shared_ptr<comms::ReceiveComms> communication = std::make_shared<comms::ReceiveComms>(8, 115200, START_CHAR, END_CHAR); 
         communication->start();
         while(true){
           left = communication->get_data(LEFT);
@@ -33,16 +39,18 @@ namespace vision{
           height = communication->get_data(HEIGHT);
           width = communication->get_data(WIDTH);
           color = communication->get_data(GOAL_COLOR);
-          printf("\nLEFT: %llu, RIGHT %llu", left, right);
-          printf("\nColor: %llu", color);
-          printf("\nWidth: %llu", width);
-          printf("\nHeight: %llu", height);
+          printf("\nLEFT: %d, RIGHT %d", left, right);
+          printf("\nColor: %d", color);
+          printf("\nWidth: %d", width);
+          printf("\nHeight: %d", height);
           pros::delay(10);
         }
+        communication->pause();
     }
 
     void init(){
       pros::Task(task_func, "vision");
+
     }
 
 } //End namespace vision

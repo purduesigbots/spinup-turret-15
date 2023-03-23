@@ -7,5 +7,7 @@ namespace vision {
      * Initializes the vision system.
      */
     void init();
+
+    int get_error();
 }
 

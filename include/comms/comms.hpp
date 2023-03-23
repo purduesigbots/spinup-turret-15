@@ -7,7 +7,6 @@ namespace comms {
             ReceiveComms(uint8_t port, int baud, uint8_t start_char, uint8_t end_char);
             uint64_t get_data(char name);
             void set_data(char name, uint64_t data);
-            bool get_read(char name);
             void start();
             void pause();
 
@@ -16,7 +15,6 @@ namespace comms {
             uint8_t byte_buf[7];
             std::shared_ptr<pros::Serial> ser;
             std::map<char, uint64_t> data;
-            std::map<char, bool> read;
             std::shared_ptr<pros::Task> data_task = nullptr;
             char sc, ec;
             uint8_t bytecount = 0;
