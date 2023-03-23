@@ -106,17 +106,7 @@ namespace turret {
          * @return True if the last seen goal is a valid target, false otherwise
          */
         bool is_valid_target(){
-            if(!vision::vision_not_working()){
-                //If vision is working and actively looking at a goal, check the color
-                switch(targColor){
-                    case Goal::RED:
-                        return vision::get_goal_color() == 0;
-                    case Goal::BLUE:
-                        return vision::get_goal_color() == 1;
-                    case Goal::BOTH:
-                        return true;
-                }
-            } 
+            
             return false; //If vision is not working, return false
         }
 
@@ -159,7 +149,7 @@ namespace turret {
         void task_func() { 
             while(true) {
                 //Get the angle error between the turret and the goal
-                double angle_error = vision::get_goal_point_gamma();
+
                 //Switch for desired control mode
                 switch(state) {
                     case State::DISABLED: //Emergency stop basically
@@ -171,24 +161,7 @@ namespace turret {
                         break;
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
-                        if (!vision::vision_not_working()) {
-                            if(is_valid_target() && vision::get_goal_detected()){
-                                //If the vision system sees a valid target, move the turret to face it
-                                motor.move_voltage(get_vision_voltage(angle_error));
-                                //Update target angle
-                                target_angle = motor.get_position() + deg_to_rot(angle_error);
-                            } else {
-                                //If the vision system does not see a valid target, async center the turret
-                                motor.move_absolute(0, 100);
-                                //Update target angle
-                                target_angle = 0.0;
-                            }
-                        } else {
-                            // If the vision system is not working, async center turret
-                            motor.move_absolute(0, 100);
-                            //Update target angle
-                            target_angle = 0.0;
-                        }
+                        
                         break;
                 }
                 //Loop delay

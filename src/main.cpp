@@ -119,6 +119,8 @@ void draw_screen() {
  */
 void initialize() {
 	vision::init();
+	printf("\nHELLO THERE");
+	turret::initialize();
 	sylib::initialize();
 	discLift::home();
 	arms::init();
@@ -169,9 +171,9 @@ void competition_initialize() {
 void opcontrol() {
 
 	//Further initialization business--competition + not competition
-	turret::goto_angle(0, 250, true);
-	vision::set_vision_offset(240);
-	turret::disable_vision_aim();
+	// turret::goto_angle(0, 250, true);
+	// vision::set_vision_offset(240);
+	// turret::disable_vision_aim();
 
 	//Further initialization business--ONLY competition
 	if(pros::competition::is_connected()){
@@ -303,18 +305,18 @@ void opcontrol() {
 		* VISION CONTROLS
 		*
 		*/
-		if (vision::vision_not_working()) {
-			vision_good = false;
-			if (counter % 5 == 0) {
-				master.print(0, 0, "Vision Bad");
-			}
-		} else if (!vision_good && counter % 5 == 0) {
-			master.clear_line(0);
-			vision_good = true;
-		}
-		if(master.get_digital_new_press(DIGITAL_Y)){
-			use_vision = !use_vision;
-		}
+		// if (vision::vision_not_working()) {
+		// 	vision_good = false;
+		// 	if (counter % 5 == 0) {
+		// 		master.print(0, 0, "Vision Bad");
+		// 	}
+		// } else if (!vision_good && counter % 5 == 0) {
+		// 	master.clear_line(0);
+		// 	vision_good = true;
+		// }
+		// if(master.get_digital_new_press(DIGITAL_Y)){
+		// 	use_vision = !use_vision;
+		// }
 
 		/**
 		*
@@ -332,11 +334,11 @@ void opcontrol() {
 		counter++;
 
 		//Flywheel speed graphing utility prints
-		printf("graph_data\n");
-		printf("time (ms),f1 velocity (rpm),f2 velocity (rpm), "
-		       "target|%d,%.2f,%.2f,%.2f\n",
-		       pros::millis(), flywheel::current_speed(1),
-		       flywheel::current_speed(), flywheel::target_speed());
+		// printf("graph_data\n");
+		// printf("time (ms),f1 velocity (rpm),f2 velocity (rpm), "
+		//        "target|%d,%.2f,%.2f,%.2f\n",
+		//        pros::millis(), flywheel::current_speed(1),
+		//        flywheel::current_speed(), flywheel::target_speed());
 
 		//LOOP DELAY
 		pros::delay(20);

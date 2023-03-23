@@ -21,7 +21,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define FLYWHEEL_KP 0.5
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
-#define FLYWHEEL_KH
+#define FLYWHEEL_KH 0
 #define FLYWHEEL_LEFT 9
 #define FLYWHEEL_RIGHT 10
 #define INDEXER_PORT 14
