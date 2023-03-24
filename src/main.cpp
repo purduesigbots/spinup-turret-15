@@ -191,7 +191,7 @@ void opcontrol() {
 	//Controller print counter
 	int counter = 0;
 	//State variable: should be using vision aim
-	bool use_vision = true;
+	bool use_vision = false;
 	//State variable: is vision good
 	bool vision_good = false;
 	//Counter for disc lift intaking to avoid jamming
