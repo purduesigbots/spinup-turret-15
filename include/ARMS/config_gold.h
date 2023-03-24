@@ -3,11 +3,11 @@ This file includes all of the ARMS constants as well as all robot-specific const
 */
 #pragma once
 
-
-#define INTAKE_PISTON {{20, 'a'}}
+#define ADI_EXPANDER 15
+#define INTAKE_PISTON {{ADI_EXPANDER, 'a'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
-#define INTAKE_LINE 6
+#define INTAKE_LINE 'H'
 
 #define ROLLER_MOTOR 6
 #define ROLLER_OPTICAL 5
@@ -22,21 +22,21 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define FLYWHEEL_KI 0.001
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_KH 0
-#define FLYWHEEL_LEFT 9
+#define FLYWHEEL_LEFT 5
 #define FLYWHEEL_RIGHT 10
 #define INDEXER_PORT 14
 
 #define TURRET_MOTOR 7
-#define TURRET_LIMIT_SWITCH 'e'
+#define TURRET_LIMIT_SWITCH 'g'
 #define TURRET_KP 300
-#define TURRET_KI 0.01
+#define TURRET_KI 0.0
 #define TURRET_KD 0
 #define TURRET_AW true; //switch for anti integral windup
 #define TURRET_FF true; //switch for turn feedforward
 #define TURRET_FF_V 0.0; //feedforward voltage (mV)
 
-#define DEFLECTOR_PISTON {{20, 'c'}}
-#define ENDGAME_PISTON {{20, 'f'}}
+#define DEFLECTOR_PISTON {{ADI_EXPANDER, 'c'}}
+#define ENDGAME_PISTON {{ADI_EXPANDER, 'f'}}
 
 #define IRIS_PORT 8
 
@@ -60,8 +60,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
-#define ENCODER_PORTS 3, 7, -1                // Port 0 for disabled,
-#define EXPANDER_PORT 15                      // Port 0 for disabled
+#define ENCODER_PORTS 3, 5, -1                // Port 0 for disabled,
+#define EXPANDER_PORT 0                      // Port 0 for disabled
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
 // Movement tuning

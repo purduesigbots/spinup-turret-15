@@ -2,6 +2,7 @@
 #include "ARMS/config.h"
 #include "comms/comms.hpp"
 #include "subsystems/subsystems.hpp"
+#include "subsystems/vision.hpp"
 
 /**
 *
@@ -124,7 +125,7 @@ void initialize() {
 	discLift::home();
 	arms::init();
 	arms::odom::reset({0, 0}, 0.0); // start position
-	pros::delay(2000);
+	pros::delay(500);
 	flywheel::initialize();
 	roller::init();
 	discCounter::initialize();
@@ -190,7 +191,7 @@ void opcontrol() {
 	//Controller print counter
 	int counter = 0;
 	//State variable: should be using vision aim
-	bool use_vision = false;
+	bool use_vision = true;
 	//State variable: is vision good
 	bool vision_good = false;
 	//Counter for disc lift intaking to avoid jamming
@@ -306,18 +307,18 @@ void opcontrol() {
 		* VISION CONTROLS
 		*
 		*/
-		// if (vision::vision_not_working()) {
-		// 	vision_good = false;
-		// 	if (counter % 5 == 0) {
-		// 		master.print(0, 0, "Vision Bad");
-		// 	}
-		// } else if (!vision_good && counter % 5 == 0) {
-		// 	master.clear_line(0);
-		// 	vision_good = true;
-		// }
-		// if(master.get_digital_new_press(DIGITAL_Y)){
-		// 	use_vision = !use_vision;
-		// }
+		if (!vision::is_working()) {
+			vision_good = false;
+			if (counter % 5 == 0) {
+				master.print(0, 0, "Vision Bad");
+			}
+		} else if (!vision_good && counter % 5 == 0) {
+			master.clear_line(0);
+			vision_good = true;
+		}
+		if(master.get_digital_new_press(DIGITAL_Y)){
+			use_vision = !use_vision;
+		}
 
 		/**
 		*

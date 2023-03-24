@@ -25,18 +25,27 @@ namespace vision {
     void init();    
     
     /**
-     * Returns the aim error of the vision system.
+     * Returns the aim error of the vision system. Positive values 
+     * mean the turret needs to adjust to the left, 
+     * negative values mean the turret needs to adjust to the right.
      * 
      * @return The aim error of the vision system
      */
-    int get_error();
+    double get_error();
 
     /**
     * Sets the goal targetting mode (color).
     *
     * @param targ The goal color to target (RED, BLUE, or BOTH)
     */
-    void set_targ_color(Goal targ);
+    void set_targ_goal(Goal targ);
+
+    /**
+    * Gets the goal targetting mode (color).
+    *
+    * @return The goal color to target (RED, BLUE, or BOTH)
+    */
+    Goal get_targ_goal();
 
     /**
     * Gets whether or not the vision system is working

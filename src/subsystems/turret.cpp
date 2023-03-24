@@ -1,6 +1,7 @@
 #include "main.h"
 #include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
+#include "turret.hpp"
 #include "vision.hpp"
 
 using namespace pros;
@@ -32,9 +33,7 @@ namespace turret {
         //Turret speed limit in RPM
         double max_velocity = 0.0; 
         //Whether or not the vision system is working
-        bool vision_working = true; 
-        //arms point containing the location of the last seen (color validated) goal
-        arms::Point last_goal_position = {0, -1000};
+        bool vision_working = true;
 
         //Conversion factor from motor rotations to degrees
         const double ROT_TO_DEG = 37.5;
@@ -75,7 +74,9 @@ namespace turret {
         //Current state of the turret
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
-        Goal targColor = Goal::BOTH; //Set target color to both by default 
+
+        #define TURRET_DEBUG true
+        int printCounter = 0;
 
         /*
         *
@@ -155,13 +156,12 @@ namespace turret {
                         break;
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
-                        motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
-                        if(vision::get_error() > 70) {
-                            motor.move_voltage(-1500);
-                        } else if (vision::get_error() < -70) {
-                            motor.move_voltage(1500);
-                        } else {
-                            motor.move_voltage(0);
+                        double error = vision::get_error();
+                        target_angle = get_angle(false) - error;
+                        double target = get_vision_voltage(error);
+                        motor.move_voltage(target);
+                        if(TURRET_DEBUG && printCounter++ % 5 == 0){
+                            printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
                         }
                         break;
                 }
@@ -211,8 +211,8 @@ namespace turret {
         printf("done\n");
     }
 
-    double get_angle() {
-        return rot_to_deg(motor.get_position());
+    double get_angle(bool radians) {
+        return rot_to_deg(motor.get_position()) * (radians? M_PI/180 : 1);
     }
 
     void goto_angle(double angle, double velocity, bool async) {
@@ -257,14 +257,14 @@ namespace turret {
         } else if(state == State::VISION) {
             pros::lcd::print(1, " State: Vision");
         }
-        if(targColor == Goal::BOTH){
+        if(vision::get_targ_goal() == vision::Goal::BOTH){
             pros::lcd::print(2, " Target Color: Both");
-        } else if(targColor == Goal::RED){
+        } else if(vision::get_targ_goal() == vision::Goal::RED){
             pros::lcd::print(2, " Target Color: Red");
-        } else if(targColor == Goal::BLUE){
+        } else if(vision::get_targ_goal() == vision::Goal::BLUE){
             pros::lcd::print(2, " Target Color: Blue");
         }
-        pros::lcd::print(3, " Vision Status: %s", vision_working ? "OPERATIONAL" : "SUSPENDED, ERROR DETECTED!");
+        pros::lcd::print(3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
         pros::lcd::print(4, " Current Angle: %f", get_angle());
         pros::lcd::print(5, " Target Angle: %f", target_angle);
         pros::lcd::print(6, " Angle Error: %f", get_angle_error());

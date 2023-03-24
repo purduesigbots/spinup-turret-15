@@ -1,6 +1,7 @@
 #include "ARMS/config.h"
 #include "ARMS/odom.h"
 #include "ARMS/point.h"
+#include "flywheel.hpp"
 #include "subsystems/subsystems.hpp"
 #include "comms/comms.hpp"
 #include "turret.hpp"
@@ -57,11 +58,11 @@ namespace vision{
     const double SENSOR_HEIGHT = 0.3074803;
 
     //y distance between turret center of rotation and robot center of rotation (negative means turret COR is behind robot COR)
-    const double Y_OFFSET_TURET_ROT = -2; 
-    const double TURRET_CAMERA_RADIUS = 4; //radius of turret camera from turret COR
+    const double Y_OFFSET_TURET_ROT = -1.5; 
+    const double TURRET_CAMERA_RADIUS = 4.5; //radius of turret camera from turret COR
 
     //Target goal
-    Goal targColor = Goal::BOTH; //default to both goal colors
+    Goal target_color = Goal::BOTH; //default to both goal colors
 
     //Estimated goal location
     arms::Point goal_location = {0, -1000}; //Set to 0, -1000 to indicate no goal seen yet
@@ -70,10 +71,15 @@ namespace vision{
     std::queue<arms::Point> position_queue;
     //Queue of turret angles
     std::queue<double> angle_queue;
+    //Queue of robot headings
+    std::queue<double> heading_queue;
 
     //Debug flag, counter
-    #define VISION_DEBUG false
+    #define VISION_DEBUG true
     int printCounter = 0;
+
+    //Shoot while moving flag
+    #define SHOOT_WHILE_MOVING false
 
     /**
     *
@@ -110,11 +116,11 @@ namespace vision{
     * @return true if the color is a valid target, false if not
     */
     bool is_valid_target(int color){
-        if(targColor == Goal::BOTH){
+        if(target_color == Goal::BOTH){
           return color == 1 || color == 2;
-        } else if(targColor == Goal::RED){
+        } else if(target_color == Goal::RED){
           return color == 1;
-        } else if(targColor == Goal::BLUE){
+        } else if(target_color == Goal::BLUE){
           return color == 2;
         } else{
           return false;
@@ -128,7 +134,7 @@ namespace vision{
     * @return The distance to the goal in inches
     */
     double get_camera_distance(){
-      if(left == 0 || right == 0){
+      if(left <= 80 || right <= 80){
         //If the bounding box is against the frame, we are unlikely to be aiming at the CENTER
         //of the goal, so we return -1 to indicate failure to calculate.
         //NOTE: This eliminates an edge case for half goal detection (YAY!)
@@ -153,12 +159,12 @@ namespace vision{
     /**
     * Updates the goal location based on the current image data
     */
-    void update_goal_position(){
+    void update_goal_position_and_turret_error(){
       //Calculate pixel to inch ratio for this frame
-      double pixel_to_inch = width / GOAL_WIDTH;
+      double pixel_to_inch = GOAL_WIDTH / width;
 
       //Calculate the inch error
-      double inch_error = pixel_to_inch * .5 * IMAGE_DIM - (left + 0.5 * width);
+      double inch_error = pixel_to_inch * (.5 * IMAGE_DIM - (left + 0.5 * width));
 
       //Calculate turret angle error (theta)
       turret_error = atan(inch_error / distance); //radians
@@ -166,21 +172,74 @@ namespace vision{
       //Calculate camera x and y
       double corr_bot_y = position_queue.front().y;
       double corr_bot_x = position_queue.front().x;
+      double corr_heading_rad = heading_queue.front();
       double corr_turret_angle = angle_queue.front();
       double cam_y = corr_bot_y 
-        + sin(arms::odom::getHeading(true)) * Y_OFFSET_TURET_ROT 
-        + TURRET_CAMERA_RADIUS * sin(arms::odom::getHeading(true) - corr_turret_angle);
+        + sin(corr_heading_rad) * Y_OFFSET_TURET_ROT 
+        + TURRET_CAMERA_RADIUS * sin(corr_heading_rad - corr_turret_angle);
       double cam_x = corr_bot_x 
-        + TURRET_CAMERA_RADIUS * cos(arms::odom::getHeading(true) - corr_turret_angle);
-
+        + cos(corr_heading_rad) * Y_OFFSET_TURET_ROT
+        + TURRET_CAMERA_RADIUS * cos(corr_heading_rad - corr_turret_angle);
+  
       //Calculate goal x and y
-      double goal_y = cam_y + distance * sin(arms::odom::getHeading(true) - corr_turret_angle - turret_error);
-      double goal_x = cam_x + distance * cos(arms::odom::getHeading(true) - corr_turret_angle - turret_error);
-
+      double goal_y = cam_y + distance * sin(corr_heading_rad + corr_turret_angle + turret_error);
+      double goal_x = cam_x + distance * cos(corr_heading_rad + corr_turret_angle + turret_error);
+      if(VISION_DEBUG && printCounter % 5 == 0){
+        printf("Heading: %3.2f, Total %3.2f, Turret: %3.2f\n", corr_heading_rad * 180/M_PI, (corr_heading_rad + corr_turret_angle + turret_error) * 180 / M_PI, corr_turret_angle * 180 / M_PI);
+      }
       //Update goal location
       goal_location = {goal_x, goal_y};
     }
 
+    /**
+    * Calculates the distance to the goal based on the current image data
+    * or the last known goal location
+    *
+    * @return The distance to the goal FROM THE CAMERA in inches
+    */
+    double calculate_distance(double cameraDistance){
+      //Attempt to calculate camera distance
+      if(cameraDistance != -1){
+        //If we successfully calculated the camera distance, perform
+        //an update of the goal location and return the distance
+        distance = cameraDistance;
+        update_goal_position_and_turret_error();
+
+        //Return distance
+        return distance;
+      } else if (goal_location.y != -1000){
+        //Calculate based on saved goal location, including offset for camera
+        //Calculate camera x and y
+        double cam_y = arms::odom::getPosition().y 
+          + sin(arms::odom::getHeading(true)) * Y_OFFSET_TURET_ROT 
+          + TURRET_CAMERA_RADIUS * sin(arms::odom::getHeading(true) - turret::get_angle(true));
+        double cam_x = arms::odom::getPosition().x 
+          + TURRET_CAMERA_RADIUS * cos(arms::odom::getHeading(true) - turret::get_angle(true));
+        
+        //Calculate distance
+        distance = sqrt(pow(goal_location.x - cam_x, 2) 
+          + pow(goal_location.y - cam_y, 2));
+
+        //Return distance
+        return distance;
+      }
+      return -1; //Return -1 if no goal saved and/or none in sight
+    }
+
+    double calculate_turret_error_odom(double cameraDistance){
+      if(cameraDistance == -1){
+        //If we failed to calculate the camera distance, calculate turret error based on 
+        //current robot location, current goal location, and current turret angle
+        //Test values: goal {x: 5, y: 125}, robot {x: 20, y: 30}, turret angle: 0, heading: 90
+        turret_error = 
+          atan((goal_location.y - arms::odom::getPosition().y) / (goal_location.x - arms::odom::getPosition().x)) 
+          + arms::odom::getHeading(true) 
+          - turret::get_angle(true);
+        return -turret_error; //reversed to follow convention
+      }
+      //don't update turret error if we can see the goal; update_goal_position_and_turret_error() does that
+      return turret_error; 
+    }
     /**
     * Asynchronous task function for vision subsystem
     */
@@ -201,7 +260,9 @@ namespace vision{
         //Put in new odom state
         position_queue.push(arms::odom::getPosition());
         //Put in new turet angle
-        angle_queue.push(turret::get_angle());
+        angle_queue.push(turret::get_angle(true));
+        //Put in heading
+        heading_queue.push(arms::odom::getHeading(true));
         //if there are more than 4 states in the position queue, remove the oldest one
         if(position_queue.size() > 4){
           position_queue.pop();
@@ -209,6 +270,10 @@ namespace vision{
         //if there are more than 4 states in the angle queue, remove the oldest one
         if(angle_queue.size() > 4){
           angle_queue.pop();
+        }
+        //if there are more than 4 states in the heading queue, remove the oldest one
+        if(heading_queue.size() > 4){
+          heading_queue.pop();
         }
 
         //Get data from IRIS
@@ -219,12 +284,20 @@ namespace vision{
         previous_color = color;
         color = communication->get_data(GOAL_COLOR);
 
+        //Update distance
+        double cameraDistance = get_camera_distance();
+        distance = calculate_distance(cameraDistance);
+        turret_error = calculate_turret_error_odom(cameraDistance);
+
         //Debug statements
         if(VISION_DEBUG && printCounter % 5 == 0){
+          printf("------------------------\n");
           printf("LEFT: %d, RIGHT %d\n", left, right);
           printf("Color: %d\n", color);
-          printf("VISION ERROR: %d\n", get_error());
-          printf("------------------------\n");
+          printf("Width: %3d, Height: %3d\n", width, height);
+          printf("Camera Distance: %f\n", cameraDistance);
+          printf("Goal X: %3.2f, Goal Y: %3.2f\n", goal_location.x, goal_location.y);
+          printf("VISION ERROR: %f\n", get_error());
         }
         printCounter++;
 
@@ -234,69 +307,68 @@ namespace vision{
     }
   } //End anonymous namespace
     
-    /**
-    *
-    * PUBLIC METHODS (see header file for documentation)
-    *
-    */
+  /**
+  *
+  * PUBLIC METHODS (see header file for documentation)
+  *
+  */
     
-    int get_error(){
-      if(robot_is_settled()){
-        //If we are not moving we do not have to lead our shot. Return turret's theta error in degrees
-        return turret_error * 180 / M_PI;
-      } else{
-        //If we are moving, we have to lead our shot. 
-        //Calculate the x and y velocities of the robot
-        arms::Point curPos = position_queue.front();
-        std::queue<arms::Point> temp = position_queue;
-        temp.pop();
-        arms::Point prevPos = temp.front();
-        //calculate x and y velocity assuming no acceleration (teehee)
-        double x_vel = (curPos.x - prevPos.x) / 0.01;
-        double y_vel = (curPos.y - prevPos.y) / 0.01;
-        //calculate the magnitude of the velocity perpendicular to the goal
-        double perp_vel = fabs(x_vel * sin(turret_error) + y_vel * cos(turret_error)); //CHECK THIS
-      }
+  double get_error(){
+    if(SHOOT_WHILE_MOVING && robot_is_settled()){
+      //If we are not moving we do not have to lead our shot. Return turret's theta error in degrees
+      return turret_error * 180 / M_PI;
+    } else if(SHOOT_WHILE_MOVING){
+      //If we are moving, we have to lead our shot. 
+      //Calculate the x and y velocities of the robot
+      std::queue<arms::Point> temp = position_queue;
+      temp.pop();
+      temp.pop();
+      arms::Point prevPos = temp.front();
+      temp.pop();
+      arms::Point curPos = temp.front();
+      //calculate x and y velocity assuming no acceleration (teehee)
+      double x_vel = (curPos.x - prevPos.x) / 0.01;
+      double y_vel = (curPos.y - prevPos.y) / 0.01;
+      double vel_heading = atan2(y_vel, x_vel); //radians, accounts for getting pushed or whatever
+      //calculate the magnitude of the velocity
+      double vel = sqrt(x_vel * x_vel + y_vel * y_vel);
+      //magnitude of velocity perpendicular to a line drawn from the robot to the goal
+      double perp_vel = 
+        vel * sin(vel_heading - arms::odom::getHeading(true) 
+          + turret::get_angle(true) + turret_error);
+      //calculate the velocity of the disc as it leaves the flywheel
+      double disc_vel = 1.5 * (flywheel::current_speed() * (3600.0 / 200.0) * (360.0 / 60) * (M_PI / 180.0));
+      //get angle between the disc velocity and the perpendicular velocity
+      turret_error = sin(perp_vel / disc_vel); //radians
+      //return the error in degrees
+      return turret_error * 180 / M_PI;
+    } else{
+      //If we are moving and we are not allowed to shoot while moving, return standard error
+      return turret_error * 180 / M_PI;
     }
+  }
 
-    void init(){
-      pros::Task(task_func, "vision");
-    }
+  void init(){
+    pros::Task(task_func, "vision");
+  }
 
-    bool is_working(){
-      //Color = 1 if red, 2 if blue, 3 if no goal but recieving data, 0 if no data
-      return color != 0; 
-    }
+  bool is_working(){
+    //Color = 1 if red, 2 if blue, 3 if no goal but recieving data, 0 if no data
+    return color != 0; 
+  }
 
-    double get_distance(){
-      //Attempt to calculate camera distance
-      double cameraDistance = get_camera_distance();
-      if(cameraDistance != -1){
-        //If we successfully calculated the camera distance, perform
-        //an update of the goal location and return the distance
-        distance = cameraDistance;
-        update_goal_position();
+  double get_distance(){
+    return distance;
+  }
+  
+  void set_targ_goal(Goal targ){
+    //Set target color
+    target_color = targ;
+  }
 
-        //Return distance
-        return distance;
-      } else if (goal_location.y != -1000){
-        //Calculate based on saved goal location, including offset for camera
-
-        //Calculate camera x and y
-        double cam_y = arms::odom::getPosition().y 
-          + sin(arms::odom::getHeading(true)) * Y_OFFSET_TURET_ROT 
-          + TURRET_CAMERA_RADIUS * sin(arms::odom::getHeading(true) - turret::get_angle());
-        double cam_x = arms::odom::getPosition().x 
-          + TURRET_CAMERA_RADIUS * cos(arms::odom::getHeading(true) - turret::get_angle());
-        
-        //Calculate distance
-        distance = sqrt(pow(goal_location.x - cam_x, 2) 
-          + pow(goal_location.y - cam_y, 2));
-
-        //Return distance
-        return distance;
-      }
-      return -1; //Return -1 if no goal saved and/or none in sight
-    }
+  Goal get_targ_goal(){
+    //Get target color
+    return target_color;
+  }
 
 } //End namespace vision
