@@ -125,15 +125,15 @@ namespace turret {
                 last_heading = arms::odom::getHeading(); //update last heading
             }  
 
-            // if(TURRET_MIN_V != 0.0){
-            //     if(output < 0 && output > -TURRET_MIN_V){
-            //         //If the output is negative and less than the minimum voltage, set it to the minimum voltage
-            //         output = -TURRET_MIN_V;
-            //     } else if(output > 0 && output < TURRET_MIN_V){
-            //         //If the output is positive and less than the minimum voltage, set it to the minimum voltage
-            //         output = TURRET_MIN_V;
-            //     }
-            // }
+            if(TURRET_MIN_V != 0.0){
+                if(output < 0 && output > -TURRET_MIN_V){
+                    //If the output is negative and less than the minimum voltage, set it to the minimum voltage
+                    output = -TURRET_MIN_V;
+                } else if(output > 0 && output < TURRET_MIN_V){
+                    //If the output is positive and less than the minimum voltage, set it to the minimum voltage
+                    output = TURRET_MIN_V;
+                }
+            }
 
             if(get_angle() < RIGHT_LIMIT || get_angle() > LEFT_LIMIT){
                 //If the turret is at a limit, set the output to 0 to prevent turret damage
