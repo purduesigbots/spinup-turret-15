@@ -4,6 +4,8 @@
 #include "subsystems/subsystems.hpp"
 #include "subsystems/vision.hpp"
 
+#define FLYWHEEL_GRAPHING false
+
 /**
 *
 * COMPILATION SANITY CHECK (DO NOT REMOVE)
@@ -24,6 +26,7 @@
 */
 
 namespace{ //Anonymous namespace for private data and methods
+
     /**
     *
     * PRIVATE DATA
@@ -50,9 +53,9 @@ void on_center_button() {
 }
 
 /**
-* A callback function for LLEMU's left button.
-* Decrements screen index.
-*/
+ * A callback function for LLEMU's left button.
+ * Decrements screen index.
+ */
 void on_left_button() {
 	printf("left button\n");
 	if (screenIndex > MIN_SCREEN_INDEX) {
@@ -61,9 +64,9 @@ void on_left_button() {
 }
 
 /**
-* A callback function for LLEMU's right button.
-* Increments screen index.
-*/
+ * A callback function for LLEMU's right button.
+ * Increments screen index.
+ */
 void on_right_button() {
 	printf("right button\n");
 	if (screenIndex < MAX_SCREEN_INDEX) {
@@ -72,8 +75,8 @@ void on_right_button() {
 }
 
 /**
-* Renders debug screens to LLEMU
-*/
+ * Renders debug screens to LLEMU
+ */
 void draw_screen() {
 	pros::lcd::initialize();
 	pros::lcd::set_background_color(LV_COLOR_BLACK);
@@ -173,7 +176,6 @@ void opcontrol() {
 
 	//Further initialization business--competition + not competition
 	// turret::goto_angle(0, 250, true);
-	// vision::set_vision_offset(240);
 	// turret::disable_vision_aim();
 
 	//Further initialization business--ONLY competition
@@ -191,7 +193,7 @@ void opcontrol() {
 	//Controller print counter
 	int counter = 0;
 	//State variable: should be using vision aim
-	bool use_vision = false;
+	bool use_vision = true; //Default to true--vision will enable on DL button press
 	//State variable: is vision good
 	bool vision_good = false;
 	//Counter for disc lift intaking to avoid jamming
@@ -224,7 +226,6 @@ void opcontrol() {
 		}
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			discLift::discLiftUp();
-			turret::enable_vision_aim();
 			if (discLiftCounter < 10) {
 				intake::start(1000);
 			} else {
@@ -335,12 +336,14 @@ void opcontrol() {
 		//Increment controller printing counter
 		counter++;
 
-		//Flywheel speed graphing utility prints
-		// printf("graph_data\n");
-		// printf("time (ms),f1 velocity (rpm),f2 velocity (rpm), "
-		//        "target|%d,%.2f,%.2f,%.2f\n",
-		//        pros::millis(), flywheel::current_speed(1),
-		//        flywheel::current_speed(), flywheel::target_speed());
+		#if FLYWHEEL_GRAPHING
+			//Flywheel speed graphing utility prints
+			printf("graph_data\n");
+			printf("time (ms),f1 velocity (rpm),f2 velocity (rpm), "
+				"target|%d,%.2f,%.2f,%.2f\n",
+				pros::millis(), flywheel::current_speed(1),
+				flywheel::current_speed(), flywheel::target_speed());
+		#endif
 
 		//LOOP DELAY
 		pros::delay(20);

@@ -8,13 +8,13 @@
 #include <cstddef>
 
 /**
-* The vision subsystem is responsible for tracking the goal and providing data
-* to the turret subsystem.
-*
-* Template Dependencies: ARMS, comms, serialvision
-*
-* Subsystem Dependencies: None
-*/
+ * The vision subsystem is responsible for tracking the goal and providing data
+ * to the turret subsystem.
+ *
+ * Template Dependencies: ARMS, comms, serialvision
+ *
+ * Subsystem Dependencies: None
+ */
 namespace vision{
 
   namespace{ //Anonymous namespace for private methods and data
@@ -50,6 +50,7 @@ namespace vision{
     const double DISTANCE_SWITCH_THRESHOLD = 40; //ESTIMATE
     const double GOAL_HEIGHT_HALF = 4; //ESTIMATE
     const double GOAL_WIDTH = 15.73;
+    const double GOAL_RADIUS = 8; //So that we calculate the center of the goal not the edge of it
     const double FOCAL_LENGTH = 0.5;
 
     // Important, this is the size of the physical sensor, not its height off the
@@ -80,6 +81,9 @@ namespace vision{
 
     //Shoot while moving flag
     #define SHOOT_WHILE_MOVING false
+
+    //Odom guessing flag
+    #define ODOM_GUESS_FLAG false
 
     /**
     *
@@ -134,26 +138,29 @@ namespace vision{
     * @return The distance to the goal in inches
     */
     double get_camera_distance(){
-      if(left <= 80 || right <= 80){
+      double dist;
+      if(left <= 30 || right <= 30){
         //If the bounding box is against the frame, we are unlikely to be aiming at the CENTER
         //of the goal, so we return -1 to indicate failure to calculate.
         //NOTE: This eliminates an edge case for half goal detection (YAY!)
-        return -1;
+        dist = -1;
       } else if(width / height > 2 && is_valid_target(color)){
         //If the width to height ratio is greater than 2, we are likely seeing half a goal.
         //NO edge cases for thinking it's half a goal when it's not.
         //So, if we think it's half a goal due to w/h ratio and it's a valid target,
         //then we operate under the assumption that it's half a goal and we calculate distance
         //as such:
-        return (FOCAL_LENGTH * GOAL_HEIGHT_HALF * IMAGE_DIM) / (height * SENSOR_HEIGHT);
+        dist = GOAL_RADIUS + (FOCAL_LENGTH * GOAL_HEIGHT_HALF * IMAGE_DIM) / (height * SENSOR_HEIGHT);
       } else if(is_valid_target(color)){
         //We are seeing a valid target. It is not half a goal. It is not against the frame.
         //There are no remaining edge cases. We calculate distance as normal.
-        return (FOCAL_LENGTH * GOAL_HEIGHT_FULL * IMAGE_DIM) / (height * SENSOR_HEIGHT);
+        dist = GOAL_RADIUS + (FOCAL_LENGTH * GOAL_HEIGHT_FULL * IMAGE_DIM) / (height * SENSOR_HEIGHT);
       } else{
         //If we are not seeing a valid target, we return -1 to indicate failure to calculate
-        return -1;
+        dist = -1;
       }
+      //If the distance is greater than 130 inches, we return -1 to indicate failure to calculate
+      return dist < 130? dist : -1; 
     }
 
     /**
@@ -169,26 +176,31 @@ namespace vision{
       //Calculate turret angle error (theta)
       turret_error = atan(inch_error / distance); //radians
 
-      //Calculate camera x and y
-      double corr_bot_y = position_queue.front().y;
-      double corr_bot_x = position_queue.front().x;
-      double corr_heading_rad = heading_queue.front();
-      double corr_turret_angle = angle_queue.front();
-      double cam_y = corr_bot_y 
-        + sin(corr_heading_rad) * Y_OFFSET_TURET_ROT 
-        + TURRET_CAMERA_RADIUS * sin(corr_heading_rad - corr_turret_angle);
-      double cam_x = corr_bot_x 
-        + cos(corr_heading_rad) * Y_OFFSET_TURET_ROT
-        + TURRET_CAMERA_RADIUS * cos(corr_heading_rad - corr_turret_angle);
-  
-      //Calculate goal x and y
-      double goal_y = cam_y + distance * sin(corr_heading_rad + corr_turret_angle + turret_error);
-      double goal_x = cam_x + distance * cos(corr_heading_rad + corr_turret_angle + turret_error);
-      if(VISION_DEBUG && printCounter % 5 == 0){
-        printf("Heading: %3.2f, Total %3.2f, Turret: %3.2f\n", corr_heading_rad * 180/M_PI, (corr_heading_rad + corr_turret_angle + turret_error) * 180 / M_PI, corr_turret_angle * 180 / M_PI);
+      //Only allow update to occur if turret error is less than 10 degrees
+      //Prevent update if not settled (want to only do this when we are still and have a good picture of goal)
+      if(fabs(turret_error) < 10.0 && robot_is_settled()){ 
+        //Calculate camera x and y
+        double corr_bot_y = position_queue.front().y;
+        double corr_bot_x = position_queue.front().x;
+        double corr_heading_rad = heading_queue.front();
+        double corr_turret_angle = angle_queue.front();
+        double cam_y = corr_bot_y 
+          + sin(corr_heading_rad) * Y_OFFSET_TURET_ROT 
+          + TURRET_CAMERA_RADIUS * sin(corr_heading_rad - corr_turret_angle);
+        double cam_x = corr_bot_x 
+          + cos(corr_heading_rad) * Y_OFFSET_TURET_ROT
+          + TURRET_CAMERA_RADIUS * cos(corr_heading_rad - corr_turret_angle);
+    
+        //Calculate goal x and y
+        double goal_y = cam_y + distance * sin(corr_heading_rad + corr_turret_angle + turret_error);
+        double goal_x = cam_x + distance * cos(corr_heading_rad + corr_turret_angle + turret_error);
+        if(VISION_DEBUG && (printCounter + 1) % 5 == 0){
+          printf("Heading: %3.2f, Total %3.2f, Turret: %3.2f\n", corr_heading_rad * 180/M_PI, (corr_heading_rad + corr_turret_angle + turret_error) * 180 / M_PI, corr_turret_angle * 180 / M_PI);
+        }
+        //Update goal location
+        goal_location = {goal_x, goal_y};
+
       }
-      //Update goal location
-      goal_location = {goal_x, goal_y};
     }
 
     /**
@@ -227,7 +239,7 @@ namespace vision{
     }
 
     double calculate_turret_error_odom(double cameraDistance){
-      if(cameraDistance == -1){
+      if(cameraDistance == -1 && ODOM_GUESS_FLAG){
         //If we failed to calculate the camera distance, calculate turret error based on 
         //current robot location, current goal location, and current turret angle
         //Test values: goal {x: 5, y: 125}, robot {x: 20, y: 30}, turret angle: 0, heading: 90
@@ -237,7 +249,7 @@ namespace vision{
           - turret::get_angle(true);
         return -turret_error; //reversed to follow convention
       }
-      //don't update turret error if we can see the goal; update_goal_position_and_turret_error() does that
+      //don't update turret error if we can see the goal; update_goal_position_and_turret_error() does that.
       return turret_error; 
     }
     /**

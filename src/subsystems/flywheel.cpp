@@ -125,7 +125,7 @@ namespace flywheel {
 	}
 
 	void toggle(double targetSpeed) {
-		if (targetSpeed != STOP && targetSpeed != flywheel::targetSpeed) {
+		if (targetSpeed != STOP) {
 			start(targetSpeed);
 		} else {
 			stop();

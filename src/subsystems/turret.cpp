@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/motors.h"
 #include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
 #include "turret.hpp"
@@ -42,7 +43,7 @@ namespace turret {
         //Right limit of turret in degrees
         const double RIGHT_LIMIT = -80.0; 
         //How close the turret needs to be to the target angle to be settled
-        const double SETTLE_THRESHHOLD = 1.0; 
+        const double SETTLE_THRESHHOLD = 1.2; 
 
         /**
         * Enumerated class containing the state of the turret
@@ -59,13 +60,6 @@ namespace turret {
             VISION
         };
 
-        //CONTROLLER CONSTANTS
-        const double kP = TURRET_KP;
-        const double kI = TURRET_KI;
-        const double kD = TURRET_KD;
-        const bool use_ff = TURRET_FF;
-        const bool use_antiwindup = TURRET_AW;
-        const double ff_voltage = TURRET_FF_V;
         //Local variables
         double integral = 0;
         double last_error = 0;
@@ -113,53 +107,79 @@ namespace turret {
          */
         double get_vision_voltage(double angle_error){
             //Calculate PID output:
-            double pOut = kP * angle_error; //proportional term
+            double pOut = TURRET_KP * angle_error; //proportional term
             //Anti-windup for integral term:
-            if(use_antiwindup){
+            if(TURRET_AW){
                 //Prevents i from increasing if it would just push the total output beyond max motor voltage
                 integral += angle_error * fabs(pOut) < 12000; //(abs value thing is 1 or 0 depenidng on if already saturated)
             } else{ 
                 //basic version if antiwindup is turned off for some reason
                 integral += angle_error;
             }
-            double iOut = kI * integral; //integral term
-            double dOut = kD * (angle_error - last_error); //derivative term
+            double iOut = TURRET_KI * integral; //integral term
+            double dOut = TURRET_KD * (angle_error - last_error); //derivative term
             last_error = angle_error; //update last error
             double output = pOut + iOut + dOut; //output = sum of PID terms
 
             //Calculate feedforward output:
-            if(use_ff){
+            if(TURRET_FF){
                 //Add feedforward term to output (feedforward voltage times change in heading since last calculation)
-                output += ff_voltage * (arms::odom::getHeading() - last_heading);
+                output += -TURRET_FF_V * (arms::odom::getHeading() - last_heading); //Reversed due to motor directions
                 last_heading = arms::odom::getHeading(); //update last heading
+            }  
+
+            if(output < 0 && output > -TURRET_MIN_V){
+                //If the output is negative and less than the minimum voltage, set it to the minimum voltage
+                output = -TURRET_MIN_V;
+            } else if(output > 0 && output < TURRET_MIN_V){
+                //If the output is positive and less than the minimum voltage, set it to the minimum voltage
+                output = TURRET_MIN_V;
+            }
+
+            if(get_angle() < RIGHT_LIMIT || get_angle() > LEFT_LIMIT){
+                //If the turret is at a limit, set the output to 0 to prevent turret damage
+                output = 0;
             }
 
             //If the turret is settled, return 0mV, otherwise return the calculated output:
-            return settled()? 0 : output; 
+            return fabs(angle_error) <= SETTLE_THRESHHOLD? 0 : output; 
         }
 
         /**
          * Asynchronous task loop for turret control
          */
         void task_func() { 
+            //Set motor brake mode to hold
+            motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
+            bool was_settled = false; //Whether or not the turret was settled last loop
             while(true) {
-                //Get the angle error between the turret and the goal
-
                 //Switch for desired control mode
                 switch(state) {
                     case State::DISABLED: //Emergency stop basically
                         motor.move_voltage(0);
                         target_angle = 0;
+                        integral = 0;
                         break;
                     case State::MANUAL: //Manual control
                         motor.move_absolute(target_angle, 100);
+                        integral = 0;
                         break;
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
                         double error = vision::get_error();
                         target_angle = get_angle(false) - error;
                         double target = get_vision_voltage(error);
-                        motor.move_voltage(target);
+                        if(target == 0 && !was_settled){
+                            printf("\nTurret settled\n");
+                            //If the turret is settled, set the target angle to the current angle
+                            motor.brake();
+                            integral = 0;
+                            was_settled = true;
+                        }else{
+                            //Otherwise, move the turret to the target angle
+                            motor.move_voltage(target);
+                            was_settled = false;
+                        }
                         if(TURRET_DEBUG && printCounter++ % 5 == 0){
                             printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
                         }
@@ -272,7 +292,11 @@ namespace turret {
     }
 
     void toggle_vision_aim() {
-        state = (state == State::VISION ? State::MANUAL : State::VISION);
+        if(state == State::VISION) {
+            disable_vision_aim();
+        } else {
+            enable_vision_aim();
+        }
     }
 
     void enable_vision_aim() {
@@ -281,6 +305,7 @@ namespace turret {
 
     void disable_vision_aim() {
         state = State::MANUAL;
+        target_angle = 0.0;
     }
 
     void disable_turret() {
