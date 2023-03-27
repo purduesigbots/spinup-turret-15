@@ -107,15 +107,12 @@ namespace turret {
          */
         double get_vision_voltage(double angle_error){
             //Calculate PID output:
-            double pOut = TURRET_KP * angle_error; //proportional term
             //Anti-windup for integral term:
-            if(TURRET_AW){
-                //Prevents i from increasing if it would just push the total output beyond max motor voltage
-                integral += angle_error * fabs(pOut) < 12000; //(abs value thing is 1 or 0 depenidng on if already saturated)
-            } else{ 
-                //basic version if antiwindup is turned off for some reason
+            if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
                 integral += angle_error;
+                printf("\nIntegral: %f, Angle Error: %f", integral, angle_error);
             }
+            double pOut = TURRET_KP * angle_error; //proportional term
             double iOut = TURRET_KI * integral; //integral term
             double dOut = TURRET_KD * (angle_error - last_error); //derivative term
             last_error = angle_error; //update last error
@@ -128,13 +125,15 @@ namespace turret {
                 last_heading = arms::odom::getHeading(); //update last heading
             }  
 
-            if(output < 0 && output > -TURRET_MIN_V){
-                //If the output is negative and less than the minimum voltage, set it to the minimum voltage
-                output = -TURRET_MIN_V;
-            } else if(output > 0 && output < TURRET_MIN_V){
-                //If the output is positive and less than the minimum voltage, set it to the minimum voltage
-                output = TURRET_MIN_V;
-            }
+            // if(TURRET_MIN_V != 0.0){
+            //     if(output < 0 && output > -TURRET_MIN_V){
+            //         //If the output is negative and less than the minimum voltage, set it to the minimum voltage
+            //         output = -TURRET_MIN_V;
+            //     } else if(output > 0 && output < TURRET_MIN_V){
+            //         //If the output is positive and less than the minimum voltage, set it to the minimum voltage
+            //         output = TURRET_MIN_V;
+            //     }
+            // }
 
             if(get_angle() < RIGHT_LIMIT || get_angle() > LEFT_LIMIT){
                 //If the turret is at a limit, set the output to 0 to prevent turret damage
@@ -150,8 +149,7 @@ namespace turret {
          */
         void task_func() { 
             //Set motor brake mode to hold
-            motor.set_brake_mode(E_MOTOR_BRAKE_HOLD);
-            bool was_settled = false; //Whether or not the turret was settled last loop
+            motor.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
             while(true) {
                 //Switch for desired control mode
                 switch(state) {
@@ -169,17 +167,9 @@ namespace turret {
                         double error = vision::get_error();
                         target_angle = get_angle(false) - error;
                         double target = get_vision_voltage(error);
-                        if(target == 0 && !was_settled){
-                            printf("\nTurret settled\n");
-                            //If the turret is settled, set the target angle to the current angle
-                            motor.brake();
-                            integral = 0;
-                            was_settled = true;
-                        }else{
-                            //Otherwise, move the turret to the target angle
+                        
                             motor.move_voltage(target);
-                            was_settled = false;
-                        }
+                        
                         if(TURRET_DEBUG && printCounter++ % 5 == 0){
                             printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
                         }
