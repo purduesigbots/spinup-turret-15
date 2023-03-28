@@ -127,6 +127,7 @@ void initialize() {
 	flywheel::initialize();
 	roller::init();
 	discCounter::initialize();
+	turret::initialize();
 	pros::Task screenTask(draw_screen, "Debug Daemon");
 	printf("Done initializing!!!\n");
 }

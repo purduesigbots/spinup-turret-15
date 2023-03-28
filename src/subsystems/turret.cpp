@@ -172,7 +172,7 @@ namespace turret {
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
                         if (!vision::vision_not_working()) {
-                            if(is_valid_target() && vision::get_goal_detected()){
+                            if(is_valid_target() /*&& vision::get_goal_detected()*/){
                                 //If the vision system sees a valid target, move the turret to face it
                                 motor.move_voltage(get_vision_voltage(angle_error));
                                 //Update target angle
