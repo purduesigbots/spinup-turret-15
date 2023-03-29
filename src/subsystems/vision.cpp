@@ -76,7 +76,7 @@ namespace vision{
     std::queue<double> heading_queue;
 
     //Debug flag, counter
-    #define VISION_DEBUG true
+    #define VISION_DEBUG false
     int printCounter = 0;
 
     //Shoot while moving flag

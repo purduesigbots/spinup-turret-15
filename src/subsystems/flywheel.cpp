@@ -43,6 +43,7 @@ namespace flywheel {
 
 		//Local const for stopped speed
 		const double STOP = 0.0;
+		#define FLYWHEEL_DEBUG false
 
 		//Local static variable for average speed--current one motor master/slave system overrides this 
 		//with the left motor's speed. I am leaving it here anyways in case we want to return to a two
@@ -59,23 +60,20 @@ namespace flywheel {
 		* The task that controls the flywheel.
 		*/
 		void task_function(void* data) {
-			uint32_t clock = sylib::millis();
 
 			left_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
 			right_flywheel.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
-			bool stopped = false;
-
 			while (1) {
-				// Is there a reason that we are using sylib's delay instead of PROS?
-				sylib::delay_until(&clock, 10);
 				average_speed = left_flywheel.get_velocity();
 
-				// printf("%.2f,%.2f,%.2f\n",
-				//     average_speed,
-				//     targetSpeed,
-				//     left_flywheel.get_applied_voltage()/80.0
-				// );
+				if (FLYWHEEL_DEBUG) {
+					printf("%.2f,%.2f,%.2f\n",
+						average_speed,
+						targetSpeed,
+						left_flywheel.get_applied_voltage()*targetSpeed / 12000
+					);
+				}
 
 				// If the speed is less than or equal to zero, we want to stop the
 				// motors and let them coast. Otherwise, we want them to adjust to the
@@ -88,6 +86,8 @@ namespace flywheel {
 					left_flywheel.set_velocity_custom_controller(targetSpeed);
 					right_flywheel.move_voltage(left_flywheel.get_applied_voltage());
 				}
+
+				pros::delay(10);
 			}
 		}
 	}	
@@ -125,7 +125,7 @@ namespace flywheel {
 	}
 
 	void toggle(double targetSpeed) {
-		if (targetSpeed != STOP) {
+		if (flywheel::targetSpeed == STOP) {
 			start(targetSpeed);
 		} else {
 			stop();
@@ -134,7 +134,7 @@ namespace flywheel {
 
 	bool at_speed() {
 		// Check that the turret's RPM is within 15% of the target speed.
-		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.15;
+		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.1;
 	}
 
 	double current_speed() {

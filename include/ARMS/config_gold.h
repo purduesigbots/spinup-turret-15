@@ -16,10 +16,10 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define LIFT_UP_POS 90
 #define LIFT_DOWN_POS 7
 
-#define FLYWHEEL_THRESHOLD 150
-#define FLYWHEEL_KV 57.7
-#define FLYWHEEL_KP 0.5
-#define FLYWHEEL_KI 0.001
+#define FLYWHEEL_THRESHOLD 100
+#define FLYWHEEL_KV 56.3
+#define FLYWHEEL_KP 0.01
+#define FLYWHEEL_KI 0
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_KH 0
 #define FLYWHEEL_LEFT 5

@@ -94,7 +94,7 @@ void draw_screen() {
 				arms::odom::getPosition().y, 
 				arms::odom::getHeading());
 			pros::lcd::print(3, " Turret Angle: %3.5f", turret::get_angle());
-			pros::lcd::print(4, " Distance to goal: %2.4f", arms::odom::getDistanceError({0, 0}));
+			pros::lcd::print(4, " Distance to goal: %2.4f", vision::get_distance());
 			
 		} else if (screenIndex == 1) {
 			discLift::debug_screen();
@@ -132,7 +132,6 @@ void initialize() {
 	flywheel::initialize();
 	roller::init();
 	discCounter::initialize();
-	turret::initialize();
 	pros::Task screenTask(draw_screen, "Debug Daemon");
 	printf("Done initializing!!!\n");
 	vision::init();
@@ -228,9 +227,9 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_L2) && !master.get_digital(DIGITAL_L1)) {
 			discLift::discLiftUp();
 			if (discLiftCounter < 10) {
-				intake::start(1000);
+				intake::start(100);
 			} else {
-				intake::stop();
+				intake::start(-100);
 			}
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)) {

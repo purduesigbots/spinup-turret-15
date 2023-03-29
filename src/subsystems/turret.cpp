@@ -69,7 +69,7 @@ namespace turret {
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
 
-        #define TURRET_DEBUG true
+        #define TURRET_DEBUG false
         int printCounter = 0;
 
         /*
@@ -110,7 +110,7 @@ namespace turret {
             //Anti-windup for integral term:
             if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
                 integral += angle_error;
-                printf("\nIntegral: %f, Angle Error: %f", integral, angle_error);
+                //printf("\nIntegral: %f, Angle Error: %f", integral, angle_error);
             }
             double pOut = TURRET_KP * angle_error; //proportional term
             double iOut = TURRET_KI * integral; //integral term
