@@ -196,10 +196,12 @@ void opcontrol() {
 	bool use_vision = true; //Default to true--vision will enable on DL button press
 	//State variable: is vision good
 	bool vision_good = false;
+	double manual_angle = 0.0;
 	//Counter for disc lift intaking to avoid jamming
 	int discLiftCounter = 0;
 	//Driver's controller local variable
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::Controller master(CONTROLLER_MASTER);
+	pros::Controller partner(CONTROLLER_PARTNER);
 	
 	/**
 	*
@@ -235,7 +237,17 @@ void opcontrol() {
 		} else if (!master.get_digital(DIGITAL_L1)) {
 			discLift::discLiftDown();
 			turret::disable_vision_aim();
-			turret::goto_angle(0,100,true);
+			turret::goto_angle(manual_angle,100,true);
+		}
+
+		/**
+		 * TURRET ENDGAME CONTROLS
+		 */
+		int partner_x = partner.get_analog(ANALOG_RIGHT_X);
+		int partner_y = partner.get_analog(ANALOG_RIGHT_Y);
+		if (partner_x * partner_x + partner_y * partner_y > 7200) {
+			manual_angle = atan2(partner_y, partner_x) - M_PI_2;
+			manual_angle *= 180 * M_1_PI;
 		}
 
 		/**

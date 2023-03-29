@@ -123,7 +123,7 @@ namespace turret {
                 //Add feedforward term to output (feedforward voltage times change in heading since last calculation)
                 output += -TURRET_FF_V * (arms::odom::getHeading() - last_heading); //Reversed due to motor directions
                 last_heading = arms::odom::getHeading(); //update last heading
-            }  
+            }
 
             if(TURRET_MIN_V != 0.0){
                 if(output < 0 && output > -TURRET_MIN_V){
@@ -159,7 +159,7 @@ namespace turret {
                         integral = 0;
                         break;
                     case State::MANUAL: //Manual control
-                        motor.move_absolute(target_angle, 100);
+                        motor.move_absolute(deg_to_rot(target_angle), 100);
                         integral = 0;
                         break;
                     case State::VISION: //Vision control
