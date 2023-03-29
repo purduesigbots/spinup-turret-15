@@ -65,7 +65,7 @@ namespace turret {
      *
      * @return The angle of the turret in degrees
      */
-    double get_angle();
+    double get_angle(bool radians = false);
 
     /**
      * Returns whether the turret has reached its target angle

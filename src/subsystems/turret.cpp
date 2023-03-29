@@ -1,6 +1,8 @@
 #include "main.h"
+#include "pros/motors.h"
 #include "subsystems/subsystems.hpp"
 #include "ARMS/config.h"
+#include "turret.hpp"
 #include "vision.hpp"
 
 using namespace pros;
@@ -12,12 +14,6 @@ namespace turret {
     * PUBLIC DATA (see header file for documentation)
     *
     */
-
-    enum class Goal {
-        RED,
-        BLUE,
-        BOTH
-    };
 
     namespace{ //Anonymous namespace for private methods and data
 
@@ -38,9 +34,7 @@ namespace turret {
         //Turret speed limit in RPM
         double max_velocity = 0.0; 
         //Whether or not the vision system is working
-        bool vision_working = true; 
-        //arms point containing the location of the last seen (color validated) goal
-        arms::Point last_goal_position = {0, -1000};
+        bool vision_working = true;
 
         //Conversion factor from motor rotations to degrees
         const double ROT_TO_DEG = 37.5;
@@ -49,7 +43,7 @@ namespace turret {
         //Right limit of turret in degrees
         const double RIGHT_LIMIT = -80.0; 
         //How close the turret needs to be to the target angle to be settled
-        const double SETTLE_THRESHHOLD = 1.0; 
+        const double SETTLE_THRESHHOLD = 1.2; 
 
         /**
         * Enumerated class containing the state of the turret
@@ -66,13 +60,6 @@ namespace turret {
             VISION
         };
 
-        //CONTROLLER CONSTANTS
-        const double kP = TURRET_KP;
-        const double kI = TURRET_KI;
-        const double kD = TURRET_KD;
-        const bool use_ff = TURRET_FF;
-        const bool use_antiwindup = TURRET_AW;
-        const double ff_voltage = TURRET_FF_V;
         //Local variables
         double integral = 0;
         double last_error = 0;
@@ -81,7 +68,9 @@ namespace turret {
         //Current state of the turret
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
-        Goal targColor = Goal::BOTH; //Set target color to both by default 
+
+        #define TURRET_DEBUG true
+        int printCounter = 0;
 
         /*
         *
@@ -106,17 +95,7 @@ namespace turret {
          * @return True if the last seen goal is a valid target, false otherwise
          */
         bool is_valid_target(){
-            if(!vision::vision_not_working()){
-                //If vision is working and actively looking at a goal, check the color
-                switch(targColor){
-                    case Goal::RED:
-                        return vision::get_goal_color() == 0;
-                    case Goal::BLUE:
-                        return vision::get_goal_color() == 1;
-                    case Goal::BOTH:
-                        return true;
-                }
-            } 
+            
             return false; //If vision is not working, return false
         }
 
@@ -128,66 +107,71 @@ namespace turret {
          */
         double get_vision_voltage(double angle_error){
             //Calculate PID output:
-            double pOut = kP * angle_error; //proportional term
             //Anti-windup for integral term:
-            if(use_antiwindup){
-                //Prevents i from increasing if it would just push the total output beyond max motor voltage
-                integral += angle_error * fabs(pOut) < 12000; //(abs value thing is 1 or 0 depenidng on if already saturated)
-            } else{ 
-                //basic version if antiwindup is turned off for some reason
+            if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
                 integral += angle_error;
+                printf("\nIntegral: %f, Angle Error: %f", integral, angle_error);
             }
-            double iOut = kI * integral; //integral term
-            double dOut = kD * (angle_error - last_error); //derivative term
+            double pOut = TURRET_KP * angle_error; //proportional term
+            double iOut = TURRET_KI * integral; //integral term
+            double dOut = TURRET_KD * (angle_error - last_error); //derivative term
             last_error = angle_error; //update last error
             double output = pOut + iOut + dOut; //output = sum of PID terms
 
             //Calculate feedforward output:
-            if(use_ff){
+            if(TURRET_FF){
                 //Add feedforward term to output (feedforward voltage times change in heading since last calculation)
-                output += ff_voltage * (arms::odom::getHeading() - last_heading);
+                output += -TURRET_FF_V * (arms::odom::getHeading() - last_heading); //Reversed due to motor directions
                 last_heading = arms::odom::getHeading(); //update last heading
+            }  
+
+            if(TURRET_MIN_V != 0.0){
+                if(output < 0 && output > -TURRET_MIN_V){
+                    //If the output is negative and less than the minimum voltage, set it to the minimum voltage
+                    output = -TURRET_MIN_V;
+                } else if(output > 0 && output < TURRET_MIN_V){
+                    //If the output is positive and less than the minimum voltage, set it to the minimum voltage
+                    output = TURRET_MIN_V;
+                }
+            }
+
+            if(get_angle() < RIGHT_LIMIT || get_angle() > LEFT_LIMIT){
+                //If the turret is at a limit, set the output to 0 to prevent turret damage
+                output = 0;
             }
 
             //If the turret is settled, return 0mV, otherwise return the calculated output:
-            return settled()? 0 : output; 
+            return fabs(angle_error) <= SETTLE_THRESHHOLD? 0 : output; 
         }
 
         /**
          * Asynchronous task loop for turret control
          */
         void task_func() { 
+            //Set motor brake mode to hold
+            motor.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
             while(true) {
-                //Get the angle error between the turret and the goal
-                double angle_error = vision::get_goal_point_gamma();
                 //Switch for desired control mode
                 switch(state) {
                     case State::DISABLED: //Emergency stop basically
                         motor.move_voltage(0);
                         target_angle = 0;
+                        integral = 0;
                         break;
                     case State::MANUAL: //Manual control
                         motor.move_absolute(target_angle, 100);
+                        integral = 0;
                         break;
                     case State::VISION: //Vision control
                         // If the vision system is working, enable vision control
-                        if (!vision::vision_not_working()) {
-                            if(is_valid_target() /*&& vision::get_goal_detected()*/){
-                                //If the vision system sees a valid target, move the turret to face it
-                                motor.move_voltage(get_vision_voltage(angle_error));
-                                //Update target angle
-                                target_angle = motor.get_position() + deg_to_rot(angle_error);
-                            } else {
-                                //If the vision system does not see a valid target, async center the turret
-                                motor.move_absolute(0, 100);
-                                //Update target angle
-                                target_angle = 0.0;
-                            }
-                        } else {
-                            // If the vision system is not working, async center turret
-                            motor.move_absolute(0, 100);
-                            //Update target angle
-                            target_angle = 0.0;
+                        double error = vision::get_error();
+                        target_angle = get_angle(false) - error;
+                        double target = get_vision_voltage(error);
+                        
+                        motor.move_voltage(target);
+                        
+                        if(TURRET_DEBUG && printCounter++ % 5 == 0){
+                            printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
                         }
                         break;
                 }
@@ -237,8 +221,8 @@ namespace turret {
         printf("done\n");
     }
 
-    double get_angle() {
-        return rot_to_deg(motor.get_position());
+    double get_angle(bool radians) {
+        return rot_to_deg(motor.get_position()) * (radians? M_PI/180 : 1);
     }
 
     void goto_angle(double angle, double velocity, bool async) {
@@ -283,14 +267,14 @@ namespace turret {
         } else if(state == State::VISION) {
             pros::lcd::print(1, " State: Vision");
         }
-        if(targColor == Goal::BOTH){
+        if(vision::get_targ_goal() == vision::Goal::BOTH){
             pros::lcd::print(2, " Target Color: Both");
-        } else if(targColor == Goal::RED){
+        } else if(vision::get_targ_goal() == vision::Goal::RED){
             pros::lcd::print(2, " Target Color: Red");
-        } else if(targColor == Goal::BLUE){
+        } else if(vision::get_targ_goal() == vision::Goal::BLUE){
             pros::lcd::print(2, " Target Color: Blue");
         }
-        pros::lcd::print(3, " Vision Status: %s", vision_working ? "OPERATIONAL" : "SUSPENDED, ERROR DETECTED!");
+        pros::lcd::print(3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
         pros::lcd::print(4, " Current Angle: %f", get_angle());
         pros::lcd::print(5, " Target Angle: %f", target_angle);
         pros::lcd::print(6, " Angle Error: %f", get_angle_error());
@@ -298,7 +282,11 @@ namespace turret {
     }
 
     void toggle_vision_aim() {
-        state = (state == State::VISION ? State::MANUAL : State::VISION);
+        if(state == State::VISION) {
+            disable_vision_aim();
+        } else {
+            enable_vision_aim();
+        }
     }
 
     void enable_vision_aim() {
@@ -307,6 +295,7 @@ namespace turret {
 
     void disable_vision_aim() {
         state = State::MANUAL;
+        target_angle = 0.0;
     }
 
     void disable_turret() {

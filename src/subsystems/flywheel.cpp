@@ -125,7 +125,7 @@ namespace flywheel {
 	}
 
 	void toggle(double targetSpeed) {
-		if (targetSpeed != STOP && targetSpeed != flywheel::targetSpeed) {
+		if (targetSpeed != STOP) {
 			start(targetSpeed);
 		} else {
 			stop();
@@ -133,8 +133,8 @@ namespace flywheel {
 	}
 
 	bool at_speed() {
-		// Check that the turret's RPM is within 3% of the target speed.
-		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.20;
+		// Check that the turret's RPM is within 15% of the target speed.
+		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.15;
 	}
 
 	double current_speed() {

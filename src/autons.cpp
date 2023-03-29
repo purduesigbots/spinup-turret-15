@@ -56,7 +56,7 @@ void matchAuto() {
 	arms::chassis::turn(50, arms::THRU);
 	intake::stop();
 	arms::chassis::move({22, 49, 45});
-	vision::set_vision_offset(205); // aim offset for long distance shot
+	// vision::set_vision_offset(205); // aim offset for long distance shot
 	turret::enable_vision_aim();
 	flywheel::fire(3, 8000);
 	turret::disable_vision_aim();
@@ -78,7 +78,7 @@ void matchAuto() {
 	printf("Shooting second shot\n");
 	arms::chassis::turn(290);
 	pros::delay(1500);
-	vision::set_vision_offset(220);
+	// vision::set_vision_offset(220);
 	// turret::enable_vision_aim();
 	flywheel::fire(3, 8000);
 	flywheel::stop();
