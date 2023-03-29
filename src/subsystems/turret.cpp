@@ -168,7 +168,7 @@ namespace turret {
                         target_angle = get_angle(false) - error;
                         double target = get_vision_voltage(error);
                         
-                            motor.move_voltage(target);
+                        motor.move_voltage(target);
                         
                         if(TURRET_DEBUG && printCounter++ % 5 == 0){
                             printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);

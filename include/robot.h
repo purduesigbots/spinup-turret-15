@@ -5,4 +5,4 @@
 #define GOLD    2
 
 // Change this define to change which turret bot you are building.
-#define BOT GOLD
+#define BOT (GOLD)
