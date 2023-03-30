@@ -134,10 +134,18 @@ namespace turret {
                     output = TURRET_MIN_V;
                 }
             }
-
+            
             if(get_angle() < RIGHT_LIMIT || get_angle() > LEFT_LIMIT){
                 //If the turret is at a limit, set the output to 0 to prevent turret damage
                 output = 0;
+            }
+
+            if(motor.get_actual_velocity() > TURRET_MAX_V){
+                //Speeding, slow down
+                output = TURRET_MAX_V; 
+            } else if(motor.get_actual_velocity() < -TURRET_MAX_V){
+                //Speeding negative dir, slow down
+                output = TURRET_MAX_V; 
             }
 
             //If the turret is settled, return 0mV, otherwise return the calculated output:
@@ -195,7 +203,7 @@ namespace turret {
     void calibrate() {
         // Set the motor to move to the left
         printf("Moving turret to the left\n");
-        motor.move(80);
+        motor.move(85);
 
         // Wait until the limit switch is hit. This ensures the turret stops at a 
         // consistent location
@@ -210,7 +218,8 @@ namespace turret {
         pros::delay(100);
         // Now tell the motor to move back to face forward.
         printf("Moving to face forward\n");
-        motor.move_relative(-2.24, 250);
+        double offset = -2.32;
+        motor.move_relative(offset, 250); //Tune left value, more negative is more right offset from limit switch
         pros::delay(1000);
         motor.move(0);
 

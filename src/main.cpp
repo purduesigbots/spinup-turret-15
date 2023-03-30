@@ -1,6 +1,7 @@
 #include "main.h"
 #include "ARMS/config.h"
 #include "comms/comms.hpp"
+#include "pros/misc.h"
 #include "subsystems/subsystems.hpp"
 #include "subsystems/vision.hpp"
 
@@ -159,6 +160,20 @@ void competition_initialize() {
 	//Should we do the arms autonomous selector here?
 }
 
+pros::Controller master(CONTROLLER_MASTER);
+
+void joystick() {
+	while(true) {
+		double axis1 = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+		double axis2 = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+		double axis4 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+		double axis3 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+
+		printf("%f | %f | %f | %f\n", axis1, axis2, axis3, axis4);
+		pros::delay(75);
+	}
+}
+
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -200,9 +215,8 @@ void opcontrol() {
 	//Counter for disc lift intaking to avoid jamming
 	int discLiftCounter = 0;
 	//Driver's controller local variable
-	pros::Controller master(CONTROLLER_MASTER);
+	// pros::Task jt(joystick);
 	pros::Controller partner(CONTROLLER_PARTNER);
-	
 	/**
 	*
 	* DRIVER CONTROL LOOP

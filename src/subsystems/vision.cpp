@@ -76,20 +76,35 @@ namespace vision{
     std::queue<double> heading_queue;
 
     //Debug flag, counter
-    #define VISION_DEBUG false
+    #define VISION_DEBUG true
     int printCounter = 0;
 
     //Shoot while moving flag
     #define SHOOT_WHILE_MOVING false
 
     //Odom guessing flag
-    #define ODOM_GUESS_FLAG false
+    #define ODOM_GUESS_FLAG true
 
     /**
     *
     * PRIVATE METHODS
     *
     */
+
+    /**
+    * Constrains an inputted angle (radians) to the -pi --> pi regime
+    *
+    * @return An equivalent angle (radians) where -pi <= angle < pi
+    */
+    double constrainAngle(double angle){
+        while(angle >= M_PI){
+          angle -= 2 * M_PI;
+        }
+        while(angle < -M_PI){
+          angle += 2 * M_PI;
+        }
+        return angle;
+    }
 
     /**
     * Checks if all points in the queue are within a certain distance of each other (indicating a stopped robot)
@@ -106,11 +121,17 @@ namespace vision{
         arms::Point point2 = temp.front();
         //Use distance formula to calculate distance between point 1 and point 2
         double distance = sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
-        if(distance > .5){
+        if(distance > .001){
           return false; //Return false if any of the points is farther than a half inch from another
         }
+
+        //Check omega
+        double omega = fabs(angle_queue.front() - angle_queue.back());
+        if(omega > 0.001){ //Threshold is in radians per second 
+          return false;
+        }
       }
-      return true; //Return true if all points are within .5" of one another
+      return true; //Return true if all points are within .5" of one another and not really turing much
     }
 
     /**
@@ -139,7 +160,7 @@ namespace vision{
     */
     double get_camera_distance(){
       double dist;
-      if(left <= 30 || right <= 30){
+      if(left <= 5 || right <= 5){
         //If the bounding box is against the frame, we are unlikely to be aiming at the CENTER
         //of the goal, so we return -1 to indicate failure to calculate.
         //NOTE: This eliminates an edge case for half goal detection (YAY!)
@@ -174,11 +195,11 @@ namespace vision{
       double inch_error = pixel_to_inch * (.5 * IMAGE_DIM - (left + 0.5 * width));
 
       //Calculate turret angle error (theta)
-      turret_error = atan(inch_error / distance); //radians
+      turret_error = constrainAngle(atan(inch_error / distance)); //radians
 
       //Only allow update to occur if turret error is less than 10 degrees
       //Prevent update if not settled (want to only do this when we are still and have a good picture of goal)
-      if(fabs(turret_error) < 10.0 && robot_is_settled()){ 
+      if(fabs(turret_error) < 4.0 && robot_is_settled()){ 
         //Calculate camera x and y
         double corr_bot_y = position_queue.front().y;
         double corr_bot_x = position_queue.front().x;
@@ -195,7 +216,7 @@ namespace vision{
         double goal_y = cam_y + distance * sin(corr_heading_rad + corr_turret_angle + turret_error);
         double goal_x = cam_x + distance * cos(corr_heading_rad + corr_turret_angle + turret_error);
         if(VISION_DEBUG && (printCounter + 1) % 5 == 0){
-          printf("Heading: %3.2f, Total %3.2f, Turret: %3.2f\n", corr_heading_rad * 180/M_PI, (corr_heading_rad + corr_turret_angle + turret_error) * 180 / M_PI, corr_turret_angle * 180 / M_PI);
+          // printf("Heading: %3.2f, Total %3.2f, Turret: %3.2f\n", corr_heading_rad * 180/M_PI, (corr_heading_rad + corr_turret_angle + turret_error) * 180 / M_PI, corr_turret_angle * 180 / M_PI);
         }
         //Update goal location
         goal_location = {goal_x, goal_y};
@@ -244,13 +265,13 @@ namespace vision{
         //current robot location, current goal location, and current turret angle
         //Test values: goal {x: 5, y: 125}, robot {x: 20, y: 30}, turret angle: 0, heading: 90
         turret_error = 
-          atan((goal_location.y - arms::odom::getPosition().y) / (goal_location.x - arms::odom::getPosition().x)) 
-          + arms::odom::getHeading(true) 
+          atan2((goal_location.y - arms::odom::getPosition().y) , (goal_location.x - arms::odom::getPosition().x)) 
+          - arms::odom::getHeading(true) 
           - turret::get_angle(true);
-        return -turret_error; //reversed to follow convention
+        return constrainAngle(turret_error); //reversed to follow convention
       }
       //don't update turret error if we can see the goal; update_goal_position_and_turret_error() does that.
-      return turret_error; 
+      return turret_error; //NOTE: TURRET ERROR WAS ALREADY CONSTRAINED IF WE REACH THIS RETURN
     }
     /**
     * Asynchronous task function for vision subsystem
@@ -305,9 +326,10 @@ namespace vision{
         if(VISION_DEBUG && printCounter % 5 == 0){
           printf("------------------------\n");
           printf("LEFT: %d, RIGHT %d\n", left, right);
-          printf("Color: %d\n", color);
-          printf("Width: %3d, Height: %3d\n", width, height);
+          // printf("Color: %d\n", color);
+          // printf("Width: %3d, Height: %3d\n", width, height);
           printf("Camera Distance: %f\n", cameraDistance);
+          printf("Turret Heading: %3.2f\n", turret::get_angle());
           printf("Goal X: %3.2f, Goal Y: %3.2f\n", goal_location.x, goal_location.y);
           printf("VISION ERROR: %f\n", get_error());
         }

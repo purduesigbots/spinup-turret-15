@@ -35,6 +35,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_FF true //switch for turn feedforward
 #define TURRET_FF_V 4000.0 //feedforward voltage (mV)
 #define TURRET_MIN_V 0 //minimum voltage to move(mV)
+#define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
 #define DEFLECTOR_PISTON {{ADI_EXPANDER, 'c'}}
 #define ENDGAME_PISTON {{ADI_EXPANDER, 'f'}}
@@ -55,9 +56,9 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  6.31 // The distance between left and right wheels (or tracker wheels)
+  5.925 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
-  4.75 // Distance from middle wheel to the robot turning center
+  6.25 // Distance from middle wheel to the robot turning center
 
 // Sensors
 #define IMU_PORT 0                           // Port 0 for disabled
