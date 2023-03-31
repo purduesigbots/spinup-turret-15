@@ -118,7 +118,8 @@ namespace discLift {
         pros::lcd::print(1, " Lift Position: %3.2f", lift_motor.get_position());
         pros::lcd::print(2, " Lift Velocity: %3.2f", lift_motor.get_actual_velocity());
         pros::lcd::print(3, " Lift Current: %3d", lift_motor.get_current_draw());
-        pros::lcd::print(4, " Lifted: %s", lifted?"true":"false");
-        pros::lcd::print(5, " Reached Speed: %s", reachedSpeed?"true":"false");
+        pros::lcd::print(4, " Lift Temperature: %3.2f", lift_motor.get_temperature());
+        pros::lcd::print(5, " Lifted: %s", lifted?"true":"false");
+        pros::lcd::print(6, " Reached Speed: %s", reachedSpeed?"true":"false");
     }
 }

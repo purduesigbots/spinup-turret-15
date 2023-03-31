@@ -57,7 +57,7 @@ namespace flywheel {
 		bool autoSpeed = false;
 
 		//Distance at which to enable the deflector
-		const double deflector_threshold = 40.0; //CORY TUNE THIS AS DESIRED
+		const double deflector_threshold = 80.0; //CORY TUNE THIS AS DESIRED
 
 		/**
 		*
@@ -82,6 +82,7 @@ namespace flywheel {
 				*
 				*
 				*/
+				calculated_speed = (0.0048 * distance * distance) - (0.3448 * distance) + 115.39;
 
 			}else{
 				deflector::down();
@@ -92,6 +93,7 @@ namespace flywheel {
 				*
 				*
 				*/
+				calculated_speed = (0.4704 * distance) + 88.511;
 			}
 			return calculated_speed;
 		}
