@@ -5,6 +5,7 @@
 #include "subsystems/subsystems.hpp"
 #include "comms/comms.hpp"
 #include "turret.hpp"
+#include "vision.hpp"
 #include <cstddef>
 
 /**
@@ -141,15 +142,15 @@ namespace vision{
     * @return true if the color is a valid target, false if not
     */
     bool is_valid_target(int color){
+        if(!is_working()) return false;
         if(target_color == Goal::BOTH){
-          return color == 1 || color == 2;
+          return color == 1 || color == 0;
         } else if(target_color == Goal::RED){
           return color == 1;
         } else if(target_color == Goal::BLUE){
-          return color == 2;
-        } else{
-          return false;
+          return color == 0;
         }
+        return false;
     }
 
     /**
@@ -387,8 +388,8 @@ namespace vision{
   }
 
   bool is_working(){
-    //Color = 1 if red, 2 if blue, 3 if no goal but recieving data, 0 if no data
-    return color != 0; 
+    //Color = 1 if red, 0 if blue, 3 if no goal but recieving data, 0 and all other values 0 if no data
+    return !(color == 0 && width == 0 && height == 0);
   }
 
   double get_distance(){
