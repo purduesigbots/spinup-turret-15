@@ -324,10 +324,10 @@ void opcontrol() {
 			flywheel::toggle(120);
 		}
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::change_target_speed(10);
+			flywheel::change_target_speed(1);
 		}
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::change_target_speed(-5);
+			flywheel::change_target_speed(-1);
 		}
 		if(counter % 50 == 0){
 			master.print(1, 0, "Flywheel Speed: %3d", int(flywheel::target_speed()));

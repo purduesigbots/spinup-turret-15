@@ -52,12 +52,12 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define GEARSET pros::E_MOTOR_GEAR_600 // RPM of chassis motors
 
 // Ticks per inch
-#define TPI 310.00       // Encoder ticks per inch of forward robot movement
-#define MIDDLE_TPI 310.0 // Ticks per inch for the middle wheel
+#define TPI 320.00       // Encoder ticks per inch of forward robot movement
+#define MIDDLE_TPI 320.0 // Ticks per inch for the middle wheel
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  5.925 // The distance between left and right wheels (or tracker wheels)
+  5.75 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
   6.25 // Distance from middle wheel to the robot turning center
 
