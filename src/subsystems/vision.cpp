@@ -68,6 +68,8 @@ namespace vision{
 
     //Estimated goal location
     arms::Point goal_location = {0, -1000}; //Set to 0, -1000 to indicate no goal seen yet
+    arms::Point red_goal_location = {0, -1000};
+    arms::Point blue_goal_location = {0, -1000};
 
     //Queue of odom states
     std::queue<arms::Point> position_queue;
@@ -221,6 +223,8 @@ namespace vision{
         }
         //Update goal location
         goal_location = {goal_x, goal_y};
+        if(color == 1) red_goal_location = goal_location;
+        else if(color == 2) blue_goal_location = goal_location;
 
       }
     }
@@ -263,8 +267,30 @@ namespace vision{
     double calculate_turret_error_odom(double cameraDistance){
       if(cameraDistance == -1 && ODOM_GUESS_FLAG){
         //If we failed to calculate the camera distance, calculate turret error based on 
-        //current robot location, current goal location, and current turret angle
-        //Test values: goal {x: 5, y: 125}, robot {x: 20, y: 30}, turret angle: 0, heading: 90
+        //current robot location, current goal location, and current turret angle.
+
+        //If in skills/practice mode:
+        //  1. Check if we valid odom locations for BOTH red and blue goals
+        //  2. If so, calculate turret error for both goals
+        //  3. Choose the goal with the smallest turret error and set goal location to that goal for final calculation
+        //If the first check fails, we will use the last known goal location
+        if(target_color == Goal::BOTH && blue_goal_location.y != -1000 && red_goal_location.y != -1000){
+          double turret_error_blue = 
+            atan2((blue_goal_location.y - arms::odom::getPosition().y) , (blue_goal_location.x - arms::odom::getPosition().x)) 
+            - arms::odom::getHeading(true) 
+            - turret::get_angle(true);
+          double turret_error_red = 
+            atan2((red_goal_location.y - arms::odom::getPosition().y) , (red_goal_location.x - arms::odom::getPosition().x)) 
+            - arms::odom::getHeading(true) 
+            - turret::get_angle(true);
+          turret_error_blue = constrainAngle(turret_error_blue);
+          turret_error_red = constrainAngle(turret_error_red);
+          if(fabs(turret_error_blue) <= fabs(turret_error_red)){
+            goal_location = blue_goal_location;
+          } else{
+            goal_location = red_goal_location;
+          }
+        } 
         turret_error = 
           atan2((goal_location.y - arms::odom::getPosition().y) , (goal_location.x - arms::odom::getPosition().x)) 
           - arms::odom::getHeading(true) 
