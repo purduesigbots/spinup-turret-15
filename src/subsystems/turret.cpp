@@ -125,6 +125,8 @@ namespace turret {
                 last_heading = arms::odom::getHeading(); //update last heading
             }
 
+            
+
             if(TURRET_MIN_V != 0.0){
                 if(output < 0 && output > -TURRET_MIN_V){
                     //If the output is negative and less than the minimum voltage, set it to the minimum voltage

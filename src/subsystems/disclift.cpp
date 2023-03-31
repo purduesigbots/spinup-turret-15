@@ -103,8 +103,9 @@ namespace discLift {
             pros::delay(10);
         }
         lift_motor.tare_position();
-        lift_motor.move_absolute(20, 100);
-        while(lift_motor.get_position() < 20){
+        double offset = LIFT_HOME_OFFSET;
+        lift_motor.move_absolute(offset, 100);
+        while(lift_motor.get_position() < offset){
             pros::delay(10);
         }
         lift_motor.move(0);
@@ -116,7 +117,7 @@ namespace discLift {
         pros::lcd::print(0, "Disc Lift Info: ");
         pros::lcd::print(1, " Lift Position: %3.2f", lift_motor.get_position());
         pros::lcd::print(2, " Lift Velocity: %3.2f", lift_motor.get_actual_velocity());
-        pros::lcd::print(3, " Lift Current: %3.2f", lift_motor.get_current_draw());
+        pros::lcd::print(3, " Lift Current: %3d", lift_motor.get_current_draw());
         pros::lcd::print(4, " Lifted: %s", lifted?"true":"false");
         pros::lcd::print(5, " Reached Speed: %s", reachedSpeed?"true":"false");
     }

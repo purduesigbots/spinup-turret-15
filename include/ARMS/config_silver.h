@@ -18,6 +18,7 @@ constants for the SILVER robot.
 #define LIFT_MOTOR 16
 #define LIFT_UP_POS 110
 #define LIFT_DOWN_POS 7
+#define LIFT_HOME_OFFSET 20
 
 #define FLYWHEEL_THRESHOLD 200
 #define FLYWHEEL_KV 58
