@@ -1,6 +1,9 @@
+#include "deflector.hpp"
+#include "flywheel.hpp"
 #include "main.h"
 #include "ARMS/config.h"
 #include "subsystems/subsystems.hpp"
+#include "vision.hpp"
 
 using namespace pros;
 
@@ -50,11 +53,48 @@ namespace flywheel {
 		//motor system in the future. - JBH 3/17/23
 		static double average_speed;
 
+		//State variable for whether or not auto speed mode is on
+		bool autoSpeed = false;
+
+		//Distance at which to enable the deflector
+		const double deflector_threshold = 40.0; //CORY TUNE THIS AS DESIRED
+
 		/**
 		*
 		* PRIVATE METHODS
 		*
 		*/
+
+		/**
+		* Calculates the speed at which to run the flywheel given a distance from the goal
+		*
+		* @return the speed on the 0-200 sylib regime at which the flywheel should be run
+		*/
+		double calculate_speed(double distance){
+			double calculated_speed = 0;
+			//Deflector code
+			if(distance <= deflector_threshold){
+				deflector::up();
+				/*
+				*
+				*
+				* CORY CODE GOES HERE--interpolation with deflector
+				*
+				*
+				*/
+
+			}else{
+				deflector::down();
+				/*
+				*
+				*
+				* CORY CODE GOES HERE--interpolatio without deflector
+				*
+				*
+				*/
+			}
+			return calculated_speed;
+		}
 
 		/**
 		* The task that controls the flywheel.
@@ -66,6 +106,10 @@ namespace flywheel {
 
 			while (1) {
 				average_speed = left_flywheel.get_velocity();
+
+				if(autoSpeed){
+					targetSpeed = calculate_speed(vision::get_distance());
+				}
 
 				if (FLYWHEEL_DEBUG) {
 					printf("%.2f,%.2f,%.2f\n",
@@ -245,6 +289,10 @@ namespace flywheel {
 
 	void fireControl_driver(bool enable) {
 		indexer.move_voltage(12000 * enable); // sets to 12000 if enable is true, 0 if false
+	}
+
+	void set_auto_speed_mode(bool enable) {
+		autoSpeed = enable;
 	}
 
 	void debug_screen() {

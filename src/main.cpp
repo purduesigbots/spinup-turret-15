@@ -2,6 +2,7 @@
 #include "ARMS/config.h"
 #include "comms/comms.hpp"
 #include "pros/misc.h"
+#include "subsystems/flywheel.hpp"
 #include "subsystems/subsystems.hpp"
 #include "subsystems/vision.hpp"
 
@@ -188,17 +189,7 @@ void joystick() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
-	//Further initialization business--competition + not competition
-	// turret::goto_angle(0, 250, true);
-	// turret::disable_vision_aim();
-
-	//Further initialization business--ONLY competition
-	if(pros::competition::is_connected()){
-		flywheel::start(115);
-		deflector::up();
-	}
-
+	
 	/**
 	*
 	* LOCAL VARIABLES
@@ -209,6 +200,8 @@ void opcontrol() {
 	int counter = 0;
 	//State variable: should be using vision aim
 	bool use_vision = true; //Default to true--vision will enable on DL button press
+	//State variable: should be using auto speed
+	bool use_auto_speed = true;
 	//State variable: is vision good
 	bool vision_good = false;
 	double manual_angle = 0.0;
@@ -217,6 +210,18 @@ void opcontrol() {
 	//Driver's controller local variable
 	// pros::Task jt(joystick);
 	pros::Controller partner(CONTROLLER_PARTNER);
+
+	//Further initialization business--competition + not competition
+	// turret::goto_angle(0, 250, true);
+	flywheel::set_auto_speed_mode(use_auto_speed);
+
+	//Further initialization business--ONLY competition
+	if(pros::competition::is_connected()){
+		flywheel::start(115);
+		deflector::up();
+	}
+
+	
 	/**
 	*
 	* DRIVER CONTROL LOOP
@@ -298,9 +303,6 @@ void opcontrol() {
 			intake::stop();
 			roller::move(0);
 		}
-		if (master.get_digital_new_press(DIGITAL_B)) { //intake arm
-			intake::toggle_arm();
-		}
 
 		/**
 		*
@@ -323,11 +325,16 @@ void opcontrol() {
 		}
 		if (master.get_digital_new_press(DIGITAL_UP)) {
 			flywheel::change_target_speed(10);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());
 		}
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
 			flywheel::change_target_speed(-5);
-			master.print(1, 1, "Flywheel speed: %.1f", flywheel::target_speed());
+		}
+		if(counter % 50 == 0){
+			master.print(1, 0, "Flywheel Speed: %3d", int(flywheel::target_speed()));
+		}
+		if (master.get_digital_new_press(DIGITAL_B)) { //Auto speed toggle
+			flywheel::set_auto_speed_mode(!use_auto_speed);
+			use_auto_speed = !use_auto_speed;
 		}
 		/**
 		*

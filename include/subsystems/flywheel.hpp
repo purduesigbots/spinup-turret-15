@@ -125,4 +125,9 @@ namespace flywheel {
     * Renders the flywheel subsystem's debug screen to the LLEMU display.
     */
     void debug_screen();
+
+    /**
+    * Sets the state of the auto speed flag to whatever boolean is passed into the method
+    */
+    void set_auto_speed_mode(bool enable);
 }
