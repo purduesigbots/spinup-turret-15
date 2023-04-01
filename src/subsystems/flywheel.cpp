@@ -298,11 +298,11 @@ namespace flywheel {
 	}
 
 	void debug_screen() {
-		pros::lcd::print(0, "Flywheel Info:");
-		pros::lcd::print(1, " Cur Speed: %3.2f, Tgt: %3.2f", current_speed(), target_speed());
-		pros::lcd::print(2, " At Speed?: %s", at_speed()? "True" : "False");
-		pros::lcd::print(3, " Left temp: %3.2f", left_flywheel.get_temperature());
-		pros::lcd::print(4, " Right temp: %3.2f", right_flywheel.get_temperature());
-		pros::lcd::print(5, " (Applied) R: %5d L: %5d", right_flywheel.get_voltage(), left_flywheel.get_applied_voltage());
+		lcd2::pages::print_line(3, 0, "Flywheel Info:");
+		lcd2::pages::print_line(3, 1, " Cur Speed: %3.2f, Tgt: %3.2f", current_speed(), target_speed());
+		lcd2::pages::print_line(3, 2, " At Speed?: %s", at_speed()? "True" : "False");
+		lcd2::pages::print_line(3, 3, " Left temp: %3.2f", left_flywheel.get_temperature());
+		lcd2::pages::print_line(3, 4, " Right temp: %3.2f", right_flywheel.get_temperature());
+		lcd2::pages::print_line(3, 5, " (Applied) R: %5d L: %5d", right_flywheel.get_voltage(), left_flywheel.get_applied_voltage());
 	}
 }
