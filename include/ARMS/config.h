@@ -27,7 +27,7 @@ inline void init() {
             TRACKING_KP, MIN_ERROR, LEAD_PCT);
 
   const char *b[] = {AUTONS, ""};
-  selector::init(HUE, DEFAULT, b);
+  //selector::init(HUE, DEFAULT, b);
 }
 
 } // namespace arms

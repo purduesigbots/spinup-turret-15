@@ -80,33 +80,21 @@ void on_right_button() {
  * Renders debug screens to LLEMU
  */
 void draw_screen() {
-	pros::lcd::initialize();
-	pros::lcd::set_background_color(LV_COLOR_BLACK);
-	pros::lcd::set_text_color(LV_COLOR_WHITE);
-	pros::lcd::register_btn0_cb(on_left_button);
-	pros::lcd::register_btn2_cb(on_right_button);
 
 	while (true) {
-		pros::lcd::clear();
-		if (screenIndex == 0) {
-			pros::lcd::print(0, "General Info:");
-			pros::lcd::print(1, "Robot: %s", BOT == GOLD ? "Goldilocks" : "Octavio \"Octane\" Silva");
-			pros::lcd::print(2, " X: %2.4f, Y: %2.4f, H: %2.4f)", 
-				arms::odom::getPosition().x, 
-				arms::odom::getPosition().y, 
-				arms::odom::getHeading());
-			pros::lcd::print(3, " Turret Angle: %3.5f", turret::get_angle());
-			pros::lcd::print(4, " Distance to goal: %2.4f", vision::get_distance());
-			
-		} else if (screenIndex == 1) {
-			discLift::debug_screen();
-		} else if (screenIndex == 2) {
-			turret::debug_screen();
-		} else if (screenIndex == 3) {
-			flywheel::debug_screen();
-		} else if (screenIndex == 4){
-			discCounter::debug_screen();
-		}
+		lcd2::pages::print_line(0, 0, "General Info:");
+		lcd2::pages::print_line(0, 1, "Robot: %s", BOT == GOLD ? "Goldilocks" : "Octavio \"Octane\" Silva");
+		lcd2::pages::print_line(0, 2, " X: %2.4f, Y: %2.4f, H: %2.4f)", 
+			arms::odom::getPosition().x, 
+			arms::odom::getPosition().y, 
+			arms::odom::getHeading());
+		lcd2::pages::print_line(0, 3, " Turret Angle: %3.5f", turret::get_angle());
+		lcd2::pages::print_line(0, 4, " Distance to goal: %2.4f", vision::get_distance());
+
+		discLift::debug_screen();
+		turret::debug_screen();
+		flywheel::debug_screen();
+		discCounter::debug_screen();
 		pros::delay(10);
 	}
 }
@@ -125,6 +113,15 @@ void draw_screen() {
  */
 void initialize() {
 	printf("\nHELLO THERE");
+	const char* autons[] = {AUTONS, ""};
+	const char* pages[] = {"General", "DiscLift", "Turret", "Flywheel", "DiscCounter", ""};
+	lcd2::lcd2_parameters parameters = {
+		autons,
+		DEFAULT,
+		false,
+		pages
+	};
+	lcd2::initialize(parameters);
 	turret::initialize();
 	sylib::initialize();
 	discLift::home();

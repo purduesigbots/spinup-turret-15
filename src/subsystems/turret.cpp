@@ -269,27 +269,27 @@ namespace turret {
     }
 
     void debug_screen() {
-        pros::lcd::print(0, "TURRET");
+        lcd2::pages::print_line(2, 0, "TURRET");
         if(state == State::DISABLED) {
-            pros::lcd::print(1, " State: Disabled");
+            lcd2::pages::print_line(2, 1, " State: Disabled");
             return;
         } else if(state == State::MANUAL) {
-            pros::lcd::print(1, " State: Manual");
+            lcd2::pages::print_line(2, 1, " State: Manual");
         } else if(state == State::VISION) {
-            pros::lcd::print(1, " State: Vision");
+            lcd2::pages::print_line(2, 1, " State: Vision");
         }
         if(vision::get_targ_goal() == vision::Goal::BOTH){
-            pros::lcd::print(2, " Target Color: Both");
+            lcd2::pages::print_line(2, 2, " Target Color: Both");
         } else if(vision::get_targ_goal() == vision::Goal::RED){
-            pros::lcd::print(2, " Target Color: Red");
+            lcd2::pages::print_line(2, 2, " Target Color: Red");
         } else if(vision::get_targ_goal() == vision::Goal::BLUE){
-            pros::lcd::print(2, " Target Color: Blue");
+            lcd2::pages::print_line(2, 2, " Target Color: Blue");
         }
-        pros::lcd::print(3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
-        pros::lcd::print(4, " Current Angle: %f", get_angle());
-        pros::lcd::print(5, " Target Angle: %f", target_angle);
-        pros::lcd::print(6, " Angle Error: %f", get_angle_error());
-        pros::lcd::print(7, " Settled: %s", settled() ? "True" : "False");
+        lcd2::pages::print_line(2, 3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
+        lcd2::pages::print_line(2, 4, " Current Angle: %f", get_angle());
+        lcd2::pages::print_line(2, 5, " Target Angle: %f", target_angle);
+        lcd2::pages::print_line(2, 6, " Angle Error: %f", get_angle_error());
+        lcd2::pages::print_line(2, 7, " Settled: %s", settled() ? "True" : "False");
     }
 
     void toggle_vision_aim() {
