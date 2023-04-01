@@ -39,7 +39,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
 #define DEFLECTOR_PISTON {{ADI_EXPANDER, 'c'}}
-#define ENDGAME_PISTON {{ADI_EXPANDER, 'f'}}
+#define ENDGAME_PISTON {{ADI_EXPANDER, 'b'}}
 
 #define IRIS_PORT 8
 

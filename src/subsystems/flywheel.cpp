@@ -73,8 +73,7 @@ namespace flywheel {
 		double calculate_speed(double distance){
 			double calculated_speed = 0;
 			//Deflector code
-			if(distance <= deflector_threshold){
-				deflector::up();
+			if(deflector::is_up()){
 				/*
 				*
 				*
@@ -85,7 +84,6 @@ namespace flywheel {
 				calculated_speed = (0.0048 * distance * distance) - (0.3448 * distance) + 115.39;
 
 			}else{
-				deflector::down();
 				/*
 				*
 				*

@@ -87,6 +87,22 @@ void matchAuto() {
 	flywheel::set_target_speed(0);
 }
 
+void discRushAuto() {
+	arms::odom::reset({35.5, 17}, 90);
+	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+
+	flywheel::start(131);
+	discCounter::setNum(0);
+	deflector::down();
+	intake::start(100);
+	turret::goto_angle(11, 100, true);
+	arms::chassis::move({35.5, 21}, 50, arms::THRU);
+	discCounter::expect(3, 2000);
+	flywheel::fire(3, 3000);
+	
+	//arms::chassis::turn(191);
+}
+
 /**
 * Subsystem test routine
 */
@@ -198,6 +214,6 @@ void autonomous() {
 		}
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
-		skillsAuto();
+		discRushAuto();
 	}
 }
