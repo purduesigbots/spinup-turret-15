@@ -43,6 +43,7 @@ namespace flywheel {
 		
 		//Local variable for target speed
 		double targetSpeed = 0;
+		double calculated_speed_offset = 0;
 
 		//Local const for stopped speed
 		const double STOP = 0.0;
@@ -91,7 +92,7 @@ namespace flywheel {
 				*
 				*
 				*/
-				calculated_speed = (0.4704 * distance) + 88.511;
+				calculated_speed = (0.0013 * distance * distance) + (0.1299 * distance) + 110.99;
 			}
 			return calculated_speed;
 		}
@@ -108,7 +109,7 @@ namespace flywheel {
 				average_speed = left_flywheel.get_velocity();
 
 				if(autoSpeed){
-					targetSpeed = calculate_speed(vision::get_distance());
+					targetSpeed = calculate_speed(vision::get_distance()) + calculated_speed_offset;
 				}
 
 				if (FLYWHEEL_DEBUG) {
@@ -157,7 +158,11 @@ namespace flywheel {
 	}
 
 	void change_target_speed(double amount) {
-		flywheel::targetSpeed += amount;
+		if (autoSpeed) {
+			calculated_speed_offset += amount;
+		} else {
+			flywheel::targetSpeed += amount;
+		}
 
 		if (flywheel::targetSpeed <= STOP) {
 			flywheel::targetSpeed = STOP;
