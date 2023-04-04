@@ -88,19 +88,26 @@ void matchAuto() {
 }
 
 void discRushAuto() {
+	using namespace arms::chassis;
 	arms::odom::reset({35.5, 17}, 90);
-	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	flywheel::start(131);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(100);
 	turret::goto_angle(11, 100, true);
-	arms::chassis::move({35.5, 21}, 50, arms::THRU);
-	discCounter::expect(3, 2000);
-	flywheel::fire(3, 3000);
+	move({35.5, 21}, 50, arms::THRU);
+	move({35.5, 19}, arms::REVERSE);
+	move({35.5, 24});
+	discCounter::expect(3, 3000);
+	pros::delay(1000);
+	flywheel::fire(3, 5000);
 	
-	//arms::chassis::turn(191);
+	move({35.5, 12}, arms::REVERSE);
+	turn(142);
+	intake::start(100);
+	move({29, 16}, 50);
 }
 
 /**

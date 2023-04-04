@@ -228,6 +228,7 @@ namespace flywheel {
 			if (timeout > 0 && pros::millis() - startTime >= timeout) {
 				return true;
 			}
+			discLift::discLiftHold();
 			pros::delay(10);
 		}
 		return false;

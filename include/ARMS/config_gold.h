@@ -7,7 +7,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define INTAKE_PISTON {{ADI_EXPANDER, 'a'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
-#define INTAKE_LINE 'H'
+#define INTAKE_LINE 'g'
 
 #define ROLLER_MOTOR 6
 #define ROLLER_OPTICAL 5
@@ -28,7 +28,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define INDEXER_PORT 14
 
 #define TURRET_MOTOR 7
-#define TURRET_LIMIT_SWITCH 'g'
+#define TURRET_LIMIT_SWITCH 'h'
 #define TURRET_KP 340 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KI 3 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KD 50 //ONLY TUNE WITH A DISC IN THE ROBOT
