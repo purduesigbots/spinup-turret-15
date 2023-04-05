@@ -168,6 +168,10 @@ namespace vision{
         //of the goal, so we return -1 to indicate failure to calculate.
         //NOTE: This eliminates an edge case for half goal detection (YAY!)
         dist = -1;
+        if(is_working() && color != 3){
+          //If we are seeing a goal at all, return -2 to indicate that we are seeing a partial goal against the frame
+          dist = -2;
+        }
       } else if(width / height > 2 && is_valid_target(color)){
         //If the width to height ratio is greater than 2, we are likely seeing half a goal.
         //NO edge cases for thinking it's half a goal when it's not.
@@ -179,7 +183,8 @@ namespace vision{
         //We are seeing a valid target. It is not half a goal. It is not against the frame.
         //There are no remaining edge cases. We calculate distance as normal.
         dist = GOAL_RADIUS + (FOCAL_LENGTH * GOAL_HEIGHT_FULL * IMAGE_DIM) / (height * SENSOR_HEIGHT);
-      } else{
+      }
+      else{
         //If we are not seeing a valid target, we return -1 to indicate failure to calculate
         dist = -1;
       }
@@ -237,10 +242,9 @@ namespace vision{
     */
     double calculate_distance(double cameraDistance){
       //Attempt to calculate camera distance
-      if(cameraDistance != -1){
+      if(cameraDistance != -1 && cameraDistance != -2){
         //If we successfully calculated the camera distance, perform
         //an update of the goal location and return the distance
-        distance = cameraDistance;
         update_goal_position_and_turret_error();
 
         //Return distance
@@ -261,7 +265,7 @@ namespace vision{
         //Return distance
         return distance;
       }
-      return -1; //Return -1 if no goal saved and/or none in sight
+      return cameraDistance;
     }
 
     double calculate_turret_error_odom(double cameraDistance){
@@ -296,8 +300,26 @@ namespace vision{
           - arms::odom::getHeading(true) 
           - turret::get_angle(true);
         return constrainAngle(turret_error); //reversed to follow convention
+      } else if(cameraDistance == -2){
+        //If we are in the edge case where we are seeing a goal against the frame,
+        //we calculate the error based on odom distance to goal point and how wide 
+        //the goal would be if we could see the whole thing compared to how wide it is
+        //in the image. We then use this error as turret_error.
+        //We do not update the goal location in this case. That will be accomplished once
+        //this edge case kicks the camera's view of the goal fully into frame.
+        //Calculate pixel to inch ratio for this frame
+        double pixel_to_inch = distance > DISTANCE_SWITCH_THRESHOLD? 
+          GOAL_HEIGHT_FULL / width: 
+          GOAL_HEIGHT_HALF / width;
+
+        //Calculate the inch error
+        double inch_error = right > 5? 
+          pixel_to_inch * (.5 * IMAGE_DIM + (right + 0.5 * pixel_to_inch * GOAL_WIDTH)):
+          pixel_to_inch * (.5 * IMAGE_DIM - (left - 0.5 * pixel_to_inch * GOAL_WIDTH));
+
+        //Calculate turret angle error (theta)
+        turret_error = constrainAngle(atan(inch_error / distance)); //radians
       }
-      //don't update turret error if we can see the goal; update_goal_position_and_turret_error() does that.
       return turret_error; //NOTE: TURRET ERROR WAS ALREADY CONSTRAINED IF WE REACH THIS RETURN
     }
     /**
