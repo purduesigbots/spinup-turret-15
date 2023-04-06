@@ -92,22 +92,51 @@ void discRushAuto() {
 	arms::odom::reset({35.5, 17}, 90);
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
-	flywheel::start(131);
+	// first 3 stack
+	flywheel::start(133);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(100);
-	turret::goto_angle(11, 100, true);
-	move({35.5, 21}, 50, arms::THRU);
+	turret::goto_angle(9, 200, true);
+	move({35.5, 22}, 50, arms::THRU);
 	move({35.5, 19}, arms::REVERSE);
 	move({35.5, 24});
-	discCounter::expect(3, 3000);
-	pros::delay(1000);
+	move({35.5, 19}, arms::REVERSE);
+	pros::delay(500);
 	flywheel::fire(3, 5000);
 	
+	// line disks, roller
 	move({35.5, 12}, arms::REVERSE);
 	turn(142);
 	intake::start(100);
-	move({29, 16}, 50);
+	move({29, 16});
+	move({35.5, 12}, arms::REVERSE);
+	turn(180);
+	move({21.5,10});
+	move({33, 12}, arms::REVERSE);
+	turn(95);
+	roller::move(25);
+	move({33,6}, arms::REVERSE);
+	roller::move(0);
+	return;
+
+	// preload, shoot
+	move({38,12});
+	turn(0);
+	intake::start(100);
+	flywheel::start(132);
+	turret::goto_angle(39, 200, true);
+	move({50,9});
+	turn(73);
+	move({55,21}); 
+	flywheel::fire(3, 5000);
+
+	// second 3 stack
+	intake::start(100);
+	turret::goto_angle(41, 200, true);
+	move({58,31}, 20, arms::THRU);
+	pros::delay(500);
+	flywheel::fire(3, 5000);
 }
 
 /**
@@ -223,4 +252,5 @@ void autonomous() {
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
 		discRushAuto();
 	}
+	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

@@ -340,15 +340,18 @@ void opcontrol() {
 		*/
 		if (!vision::is_working()) {
 			vision_good = false;
-			if (counter % 5 == 0) {
+			if (counter % 50 == 10) {
 				master.print(0, 0, "Vision Bad");
 			}
-		} else if (!vision_good && counter % 5 == 0) {
+		} else if (!vision_good && counter % 50 == 10) {
 			master.clear_line(0);
 			vision_good = true;
 		}
 		if(master.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
+		}
+		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5) {
+			master.rumble("-");
 		}
 
 		/**

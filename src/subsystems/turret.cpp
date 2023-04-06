@@ -211,7 +211,7 @@ namespace turret {
         // consistent location
         printf("Waiting for limit switch\n");
         pros::delay(200);
-        while(!limit_switch.get_value() && motor.get_current_draw() < 1500) {
+        while(!limit_switch.get_value() && motor.get_current_draw() < 2000) {
             pros::delay(20);
         }
 
@@ -221,7 +221,7 @@ namespace turret {
         pros::delay(100);
         // Now tell the motor to move back to face forward.
         printf("Moving to face forward\n");
-        double offset = -2.25;
+        double offset = -2.1;
         motor.move_relative(offset, 250); //Tune left value, more negative is more right offset from limit switch
         pros::delay(1000);
         motor.move(0);

@@ -31,7 +31,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_LIMIT_SWITCH 'h'
 #define TURRET_KP 340 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KI 3 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KD 50 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KD 60 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_AW true //switch for anti integral windup
 #define TURRET_FF true //switch for turn feedforward
 #define TURRET_FF_V 4000.0 //feedforward voltage (mV)
@@ -74,13 +74,13 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling
 #define SETTLE_THRESH_ANGULAR 1 // amount of angular movement for settling
 #define SETTLE_TIME 500         // amount of time to count as settled
-#define LINEAR_KP 5
-#define LINEAR_KI 0.01
-#define LINEAR_KD 1.7
-#define TRACKING_KP 80 // point tracking turning strength
+#define LINEAR_KP 7
+#define LINEAR_KI 0
+#define LINEAR_KD 14
+#define TRACKING_KP 60 // point tracking turning strength
 #define ANGULAR_KP 5
 #define ANGULAR_KI 0
-#define ANGULAR_KD 35
+#define ANGULAR_KD 39
 #define MIN_ERROR                                                              \
   5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)

@@ -210,7 +210,7 @@ namespace flywheel {
 			}
 			pros::delay(10);
 		}
-		pros::delay(1000); //do it a second time to make sure it's settled in 
+		pros::delay(500); //do it a second time to make sure it's settled in 
 		while (!at_speed()) {
 			// timeout check
 			if (timeout > 0 && pros::millis() - startTime >= timeout) {
@@ -239,10 +239,10 @@ namespace flywheel {
 		uint32_t startTime = pros::millis();
 		uint32_t endTime = startTime + timeout;
 		int numberFired = 0;
-		intake::start(600);
+		intake::start(100);
 		discLift::discLiftUp();
 		pros::delay(460);
-		intake::stop();
+		intake::start(-50);
 
 		// While we haven't fired all the discs we want to fire
 		while (numberFired < numDiscs) {

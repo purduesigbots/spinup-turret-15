@@ -63,7 +63,7 @@ namespace roller {
                         motor.move(-20);
                     }
                 } else {
-                    motor.move(120 * speed);
+                    motor.move_voltage(120 * speed);
                 }
                 pros::delay(10);
             }
