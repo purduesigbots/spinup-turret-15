@@ -15,7 +15,7 @@ namespace discCounter {
         */
 
         // The line sensor being used for detecting the discs.
-        ADIAnalogIn lineSensor(INTAKE_LINE);
+        // ADIAnalogIn lineSensor(INTAKE_LINE);
 
         // The number of discs that the robot currently has. This is made atomic so that
         // we don't get race conditions trying to increment or decrement it.
@@ -54,7 +54,8 @@ namespace discCounter {
         * @return True if the line sensor is currently seeing a disc
         */
         bool seeing_disc() {
-            return lineSensor.get_value() < 2400;
+            // return lineSensor.get_value() < 2400;
+            return false;
         }   
         
         /**
@@ -155,7 +156,7 @@ namespace discCounter {
         lcd2::pages::print_line(4, 0, "Disc Counter Info:");
         lcd2::pages::print_line(4, 1, " Disc Count: %d", disc_count());
         lcd2::pages::print_line(4, 2, " Seeing Disc: %d", seeing_disc());
-        lcd2::pages::print_line(4, 3, " Sensor Value: %d", lineSensor.get_value());
+        //lcd2::pages::print_line(4, 3, " Sensor Value: %d", lineSensor.get_value());
         
         const char* state_str = "";
         switch(state)

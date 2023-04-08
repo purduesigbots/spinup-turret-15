@@ -35,6 +35,7 @@ namespace turret {
         double max_velocity = 0.0; 
         //Whether or not the vision system is working
         bool vision_working = true;
+        int endgame_power = 0;
 
         //Conversion factor from motor rotations to degrees
         const double ROT_TO_DEG = 37.5;
@@ -57,7 +58,8 @@ namespace turret {
         enum class State {
             DISABLED,
             MANUAL,
-            VISION
+            VISION,
+            ENDGAME
         };
 
         //Local variables
@@ -169,10 +171,10 @@ namespace turret {
                         integral = 0;
                         break;
                     case State::MANUAL: //Manual control
-                        motor.move_absolute(deg_to_rot(target_angle), 100);
+                        motor.move_absolute(deg_to_rot(target_angle), max_velocity);
                         integral = 0;
                         break;
-                    case State::VISION: //Vision control
+                    case State::VISION: {//Vision control
                         // If the vision system is working, enable vision control
                         double error = vision::get_error();
                         target_angle = get_angle(false) - error;
@@ -183,6 +185,10 @@ namespace turret {
                         if(TURRET_DEBUG && printCounter++ % 5 == 0){
                             printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
                         }
+                        break;
+                    }
+                    case State::ENDGAME:
+                        motor.move_voltage(120 * endgame_power);
                         break;
                 }
                 //Loop delay
@@ -260,6 +266,10 @@ namespace turret {
         return fabs(get_angle_error()) <= SETTLE_THRESHHOLD;
     }
 
+    void move_endgame(int power) {
+        endgame_power = power;
+    }
+
     void wait_until_settled() {
         // While the target_angle is outside the range we want, we sleep.
         // Once it is within SETTLE_THRESHHOLD degrees of the target angle, we quit
@@ -312,5 +322,9 @@ namespace turret {
 
     void disable_turret() {
         state = State::DISABLED;
+    }
+
+    void enable_endgame() {
+        state = State::ENDGAME;
     }
 } //End namespace turret

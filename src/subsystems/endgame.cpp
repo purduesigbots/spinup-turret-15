@@ -1,5 +1,6 @@
 #include "main.h"
 #include "ARMS/config.h"
+#include "subsystems/pneumatics.hpp"
 
 using namespace pros;
 
@@ -13,8 +14,6 @@ namespace endgame {
         *
         */ 
         
-        //The piston used to deploy the endgame
-        ADIDigitalOut piston(ENDGAME_PISTON);
         //State variable: turns true once the endgame is deployed
         bool is_deployed = false;  
     }
@@ -27,7 +26,16 @@ namespace endgame {
 
     void deploy() {
         is_deployed = true;
-        piston.set_value(true);
+        pneumatics::set_left_endgame(true);
+        pneumatics::set_right_endgame(true);
         std::cout << "Endgame launched" << std::endl;
+    }
+
+    void deploy_left() {
+        pneumatics::set_left_endgame(true);
+    }
+
+    void deploy_right() {
+        pneumatics::set_right_endgame(true);
     }
 }

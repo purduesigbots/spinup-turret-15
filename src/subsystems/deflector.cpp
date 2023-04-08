@@ -11,9 +11,6 @@ namespace deflector {
         * PRIVATE DATA
         *
         */
-
-        //Piston declaration
-        pros::ADIDigitalOut deflector_piston(DEFLECTOR_PISTON);
         
         //Whether or not the deflector is up
         bool isUp = true;
@@ -40,7 +37,7 @@ namespace deflector {
     void toggle(){
         isUp = !isUp; //flip state variable
         //Activate solenoid
-        deflector_piston.set_value(!isUp); //state variable is reversed in relation to piston, hence the not operator
+        pneumatics::set_deflector(!isUp); //state variable is reversed in relation to piston, hence the not operator
     }
 
     bool is_up() {

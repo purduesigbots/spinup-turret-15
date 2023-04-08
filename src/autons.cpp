@@ -21,8 +21,6 @@ void matchAuto() {
 	flywheel::start(167);
 	// DISC COUNTER INIT
 	discCounter::setNum(1);
-	// INTAKE INIT
-	intake::toggle_arm();
 	// DEFLECTOR INIT
 	deflector::down();
 
@@ -175,8 +173,6 @@ void skillsAuto() {
 	flywheel::start(167);
 	// DISC COUNTER INIT
 	discCounter::setNum(1);
-	// INTAKE INIT
-	intake::toggle_arm();
 	// DEFLECTOR INIT
 	deflector::down();
 

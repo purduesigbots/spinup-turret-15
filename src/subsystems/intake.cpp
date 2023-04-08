@@ -23,8 +23,6 @@ namespace intake {
         //Local variable for intake target speed
         double speed = 0;
 
-        //Intake arm piston
-        ADIDigitalOut armPiston(INTAKE_PISTON);
         //State variable; true if the arm is raised, false otherwise
         bool armRaised = true;
 
@@ -71,25 +69,6 @@ namespace intake {
         else {
             stop();
         }
-    }     
-
-    void raise_arm() {
-        if(!armRaised) {
-            toggle_arm();
-        }
-    }
-
-    void lower_arm() {
-        if(armRaised) {
-            toggle_arm();
-        }
-    }
-
-    void toggle_arm() {
-        armRaised = !armRaised;
-        //Set the piston to the opposite of the adjusted state 
-        //(because the piston's logic is inverted)
-        armPiston.set_value(!armRaised);
     }
 
     bool intaking() {

@@ -94,7 +94,6 @@ void draw_screen() {
 		discLift::debug_screen();
 		turret::debug_screen();
 		flywheel::debug_screen();
-		discCounter::debug_screen();
 		pros::delay(10);
 	}
 }
@@ -114,7 +113,7 @@ void draw_screen() {
 void initialize() {
 	printf("\nHELLO THERE");
 	const char* autons[] = {AUTONS, ""};
-	const char* pages[] = {"General", "DiscLift", "Turret", "Flywheel", "DiscCounter", ""};
+	const char* pages[] = {"General", "DiscLift", "Turret", "Flywheel", ""};
 	lcd2::lcd2_parameters parameters = {
 		autons,
 		DEFAULT,
@@ -201,7 +200,6 @@ void opcontrol() {
 	bool use_auto_speed = true;
 	//State variable: is vision good
 	bool vision_good = false;
-	double manual_angle = 0.0;
 	//Counter for disc lift intaking to avoid jamming
 	int discLiftCounter = 0;
 	//Driver's controller local variable
@@ -217,6 +215,7 @@ void opcontrol() {
 		flywheel::start(115);
 		deflector::up();
 	}
+	turret::goto_angle(0,200,true);
 
 	
 	/**
@@ -252,8 +251,9 @@ void opcontrol() {
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)) {
 			discLift::discLiftDown();
-			turret::disable_vision_aim();
-			turret::goto_angle(manual_angle,100,true);
+			if (use_vision) {
+				turret::disable_vision_aim();
+			}
 		}
 
 		/**
@@ -262,8 +262,18 @@ void opcontrol() {
 		int partner_x = partner.get_analog(ANALOG_RIGHT_X);
 		int partner_y = partner.get_analog(ANALOG_RIGHT_Y);
 		if (partner_x * partner_x + partner_y * partner_y > 7200) {
-			manual_angle = atan2(partner_y, partner_x) - M_PI_2;
-			manual_angle *= 180 * M_1_PI;
+			if (!use_vision) {
+				turret::enable_endgame();
+			}
+		}
+		turret::move_endgame(-partner_x);
+		
+		if (partner.get_digital(DIGITAL_R1)) {
+			endgame::deploy_right();
+		}
+
+		if (partner.get_digital(DIGITAL_L1)) {
+			endgame::deploy_left();
 		}
 
 		/**
@@ -273,16 +283,6 @@ void opcontrol() {
 		*/
 		if (master.get_digital_new_press(DIGITAL_LEFT)) {
 			deflector::toggle();
-		}
-
-		/**
-		*
-		* ENDGAME CONTROLS
-		*
-		*/
-		if (master.get_digital_new_press(DIGITAL_RIGHT)) {
-			std::cout << "Launching Endgame" << std::endl;
-			endgame::deploy();
 		}
 
 		/**

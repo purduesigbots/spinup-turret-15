@@ -75,6 +75,13 @@ namespace turret {
     bool settled();
 
     /**
+     * Move the turret at the specified power during endgame.
+     * 
+     * @param power 
+     */
+    void move_endgame(int power);
+
+    /**
      * Blocks the calling thread until the turret reaches its target angle 
      */
     void wait_until_settled();
@@ -103,5 +110,11 @@ namespace turret {
      * Disables the turret entirely
      */
     void disable_turret();
+
+
+    /**
+     * Enable endgame control
+     */
+    void enable_endgame();
 
 }

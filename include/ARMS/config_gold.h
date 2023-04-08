@@ -4,10 +4,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #pragma once
 
 #define ADI_EXPANDER 15
-#define INTAKE_PISTON {{ADI_EXPANDER, 'a'}}
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
-#define INTAKE_LINE 'g'
 
 #define ROLLER_MOTOR 6
 #define ROLLER_OPTICAL 5
@@ -38,8 +36,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_MIN_V 0 //minimum voltage to move(mV)
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
-#define DEFLECTOR_PISTON {{ADI_EXPANDER, 'c'}}
-#define ENDGAME_PISTON {{ADI_EXPANDER, 'b'}}
+#define PNEUMATICS_PORT 'g'
 
 #define IRIS_PORT 8
 
