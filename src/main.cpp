@@ -209,6 +209,7 @@ void opcontrol() {
 	//Further initialization business--competition + not competition
 	// turret::goto_angle(0, 250, true);
 	flywheel::set_auto_speed_mode(use_auto_speed);
+	deflector::up();
 
 	//Further initialization business--ONLY competition
 	if(pros::competition::is_connected()){
@@ -347,7 +348,7 @@ void opcontrol() {
 			master.clear_line(0);
 			vision_good = true;
 		}
-		if(master.get_digital_new_press(DIGITAL_Y) || master.get_digital_new_press(DIGITAL_Y)){
+		if(master.get_digital_new_press(DIGITAL_Y) || partner.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
 		}
 		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5) {

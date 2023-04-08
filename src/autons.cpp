@@ -96,10 +96,11 @@ void discRushAuto() {
 	deflector::down();
 	intake::start(100);
 	turret::goto_angle(9, 200, true);
-	move({35.5, 22}, 50, arms::THRU);
+	move({35.5, 22}, 60, arms::THRU);
 	move({35.5, 19}, arms::REVERSE);
 	move({35.5, 24});
 	move({35.5, 19}, arms::REVERSE);
+	turn(90);
 	pros::delay(500);
 	flywheel::fire(3, 5000);
 	
@@ -235,14 +236,20 @@ void skillsAuto() {
 * Implements autonomous selector (if competition is connected).
 */
 void autonomous() {
+	int auton = lcd2::selector::get_auton();
 	if(pros::competition::is_connected()){
+		if (auton > 0) {
+			vision::set_targ_goal(vision::Goal::RED);
+		} else if (auton < 0) {
+			vision::set_targ_goal(vision::Goal::BLUE);
+		}
 		//Switch based on auton selector for matches
-		switch (arms::selector::auton) {
+		switch (auton) {
 			case 0:
 				// skillsAuto();
 				break;
 			default:
-				matchAuto();
+				discRushAuto();
 				break;
 		}
 	} else{

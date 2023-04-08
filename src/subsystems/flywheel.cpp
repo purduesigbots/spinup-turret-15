@@ -43,11 +43,11 @@ namespace flywheel {
 		
 		//Local variable for target speed
 		double targetSpeed = 0;
-		double calculated_speed_offset = 0;
+		double calculated_speed_offset = -3;
 
 		//Local const for stopped speed
 		const double STOP = 0.0;
-		#define FLYWHEEL_DEBUG false
+		#define FLYWHEEL_DEBUG true
 
 		//Local static variable for average speed--current one motor master/slave system overrides this 
 		//with the left motor's speed. I am leaving it here anyways in case we want to return to a two
