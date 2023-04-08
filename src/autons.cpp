@@ -118,10 +118,9 @@ void discRushAuto() {
 	roller::move(25);
 	move({33,6}, arms::REVERSE);
 	roller::move(0);
-	return;
 
 	// preload, shoot
-	move({38,12});
+	move({33,12});
 	turn(0);
 	intake::start(100);
 	flywheel::start(132);
@@ -133,7 +132,7 @@ void discRushAuto() {
 
 	// second 3 stack
 	intake::start(100);
-	turret::goto_angle(41, 200, true);
+	turret::enable_vision_aim();
 	move({58,31}, 20, arms::THRU);
 	pros::delay(500);
 	flywheel::fire(3, 5000);
