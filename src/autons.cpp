@@ -112,10 +112,12 @@ void discRushAuto() {
 	turn(180);
 	move({21.5,10});
 	move({33, 12}, arms::REVERSE);
-	turn(95);
-	roller::move(25);
-	move({33,6}, arms::REVERSE);
+	turn(110, 80);
+	roller::move(65);
+	tank(-40,-40);
+	pros::delay(600);
 	roller::move(0);
+	return;
 
 	// preload, shoot
 	move({33,12});

@@ -347,7 +347,7 @@ void opcontrol() {
 			master.clear_line(0);
 			vision_good = true;
 		}
-		if(master.get_digital_new_press(DIGITAL_Y)){
+		if(master.get_digital_new_press(DIGITAL_Y) || master.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
 		}
 		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5) {

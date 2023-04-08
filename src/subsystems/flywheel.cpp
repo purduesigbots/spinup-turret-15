@@ -241,9 +241,9 @@ namespace flywheel {
 		int numberFired = 0;
 		intake::start(100);
 		discLift::discLiftUp();
-		if (vision::is_working()) {
-			turret::enable_vision_aim();
-		}
+		// if (vision::is_working()) {
+		// 	turret::enable_vision_aim();
+		// }
 		pros::delay(460);
 		intake::start(-50);
 
