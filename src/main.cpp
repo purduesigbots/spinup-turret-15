@@ -4,6 +4,7 @@
 #include "pros/misc.h"
 #include "subsystems/flywheel.hpp"
 #include "subsystems/subsystems.hpp"
+#include "subsystems/turret.hpp"
 #include "subsystems/vision.hpp"
 
 #define FLYWHEEL_GRAPHING false
@@ -308,7 +309,7 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed()) {
+			if (flywheel::at_speed() && (!use_vision || (use_vision && fabs(vision::get_error()) < .75))) {
 				flywheel::fireControl_driver(true);
 			} else {
 				//set to false for rpm babysitter

@@ -4,7 +4,9 @@
 #include "ARMS/config.h"
 #include "turret.hpp"
 #include "vision.hpp"
-
+#define TURRET_KP 800 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KI 4 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT
 using namespace pros;
 
 namespace turret {
@@ -26,8 +28,6 @@ namespace turret {
         //Turret's motor, uses robot specific config for port
         Motor motor(TURRET_MOTOR, E_MOTOR_GEARSET_06, false, E_MOTOR_ENCODER_ROTATIONS);
         
-        //Turret's limit switch, uses robot specific config for port
-        ADIDigitalIn limit_switch(TURRET_LIMIT_SWITCH);
 
         //Target angle for turret to face
         double target_angle = 0.0; 
@@ -44,7 +44,7 @@ namespace turret {
         //Right limit of turret in degrees
         const double RIGHT_LIMIT = -80.0; 
         //How close the turret needs to be to the target angle to be settled
-        const double SETTLE_THRESHHOLD = 1.2; 
+        const double SETTLE_THRESHHOLD = 0; 
 
         /**
         * Enumerated class containing the state of the turret
@@ -71,7 +71,7 @@ namespace turret {
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
 
-        #define TURRET_DEBUG false
+        #define TURRET_DEBUG true
         int printCounter = 0;
 
         /*
@@ -108,6 +108,8 @@ namespace turret {
          * @return The voltage to apply to the turret motor (mV)
          */
         double get_vision_voltage(double angle_error){
+            //Convert to sqrt curve
+            angle_error = sqrt(fabs(angle_error)) * (angle_error < 0 ? -1 : 1);
             //Calculate PID output:
             //Anti-windup for integral term:
             if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
@@ -129,7 +131,7 @@ namespace turret {
 
             
 
-            if(TURRET_MIN_V != 0.0){
+            if(TURRET_MIN_V != 0){
                 if(output < 0 && output > -TURRET_MIN_V){
                     //If the output is negative and less than the minimum voltage, set it to the minimum voltage
                     output = -TURRET_MIN_V;
@@ -139,7 +141,7 @@ namespace turret {
                 }
             }
             
-            if(get_angle() < RIGHT_LIMIT || get_angle() > LEFT_LIMIT){
+            if((get_angle() < RIGHT_LIMIT && output < 0) || (get_angle() > LEFT_LIMIT && output > 0)){
                 //If the turret is at a limit, set the output to 0 to prevent turret damage
                 output = 0;
             }
@@ -152,8 +154,14 @@ namespace turret {
                 output = TURRET_MAX_V; 
             }
 
+            if(fabs(angle_error) <= SETTLE_THRESHHOLD){
+                //If the turret is settled, set the integral term to 0
+                integral = 0;
+                output = 0;
+            }
+
             //If the turret is settled, return 0mV, otherwise return the calculated output:
-            return fabs(angle_error) <= SETTLE_THRESHHOLD? 0 : output; 
+            return output; 
         }
 
         /**
@@ -216,8 +224,8 @@ namespace turret {
         // Wait until the limit switch is hit. This ensures the turret stops at a 
         // consistent location
         printf("Waiting for limit switch\n");
-        pros::delay(200);
-        while(!limit_switch.get_value() && motor.get_current_draw() < 2000) {
+        pros::delay(500);
+        while(fabs(motor.get_actual_velocity()) > 1) {
             pros::delay(20);
         }
 
@@ -227,7 +235,7 @@ namespace turret {
         pros::delay(100);
         // Now tell the motor to move back to face forward.
         printf("Moving to face forward\n");
-        double offset = -2.1;
+        double offset = -2.15;
         motor.move_relative(offset, 250); //Tune left value, more negative is more right offset from limit switch
         pros::delay(1000);
         motor.move(0);
@@ -300,7 +308,7 @@ namespace turret {
         lcd2::pages::print_line(2, 4, " Current Angle: %f", get_angle());
         lcd2::pages::print_line(2, 5, " Target Angle: %f", target_angle);
         lcd2::pages::print_line(2, 6, " Angle Error: %f", get_angle_error());
-        lcd2::pages::print_line(2, 7, " Settled: %s", settled() ? "True" : "False");
+        lcd2::pages::print_line(2, 7, " Settled: %s, Temp: %2.0f", settled() ? "True" : "False", motor.get_temperature());
     }
 
     void toggle_vision_aim() {
@@ -313,6 +321,7 @@ namespace turret {
 
     void enable_vision_aim() {
         state = State::VISION;
+        integral = 0;
     }
 
     void disable_vision_aim() {

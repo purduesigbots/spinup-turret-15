@@ -44,6 +44,8 @@ namespace vision{
     int width;
     int distance = -1;
     double turret_error = 0;
+    double inch_error = 0;
+    int odom_settled_time = 0;
 
     //Image constants
     const double IMAGE_DIM = 416;
@@ -53,6 +55,7 @@ namespace vision{
     const double GOAL_WIDTH = 15.73;
     const double GOAL_RADIUS = 8; //So that we calculate the center of the goal not the edge of it
     const double FOCAL_LENGTH = 0.5;
+    const double FOV = 81 * M_PI / 180; //81 degrees in radians
 
     // Important, this is the size of the physical sensor, not its height off the
     // ground!
@@ -60,8 +63,8 @@ namespace vision{
     const double SENSOR_HEIGHT = 0.3074803;
 
     //y distance between turret center of rotation and robot center of rotation (negative means turret COR is behind robot COR)
-    const double Y_OFFSET_TURET_ROT = -1.5; 
-    const double TURRET_CAMERA_RADIUS = 4.5; //radius of turret camera from turret COR
+    const double Y_OFFSET_TURET_ROT = -1; 
+    const double TURRET_CAMERA_RADIUS = 4.75; //radius of turret camera from turret COR
 
     //Target goal
     Goal target_color = Goal::BOTH; //default to both goal colors
@@ -95,6 +98,26 @@ namespace vision{
     */
 
     /**
+    * Calculate the angular coordinates of a pixel location in an image 
+    * based on the field of view of the camera
+    *
+    * @param pixelCoord The pixel coordinate to calculate the angle for
+    * @param imageDim The dimension of the image in pixels
+    * @param cameraFov The field of view of the camera in degrees
+    * @return The angle of the pixel location in radians
+    */
+    float pixelToAngle(float pixelCoord, int imageDim, float cameraFov) {
+        // Calculate the horizontal angle of view for the camera based on its field of view
+        float hFov = cameraFov * (M_PI / 180.0); // Convert degrees to radians
+
+        // Calculate the angle of the pixel location relative to the center of the image in the horizontal direction
+        float xAngle = (pixelCoord - imageDim / 2.0) * hFov / imageDim;
+
+        // Return the resulting angle in radians
+        return xAngle;
+    }
+
+    /**
     * Constrains an inputted angle (radians) to the -pi --> pi regime
     *
     * @return An equivalent angle (radians) where -pi <= angle < pi
@@ -123,8 +146,8 @@ namespace vision{
         temp.pop();
         arms::Point point2 = temp.front();
         //Use distance formula to calculate distance between point 1 and point 2
-        double distance = sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
-        if(distance > .001){
+        double point_distance = sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2));
+        if(point_distance > .001){
           return false; //Return false if any of the points is farther than a half inch from another
         }
 
@@ -168,6 +191,10 @@ namespace vision{
         //of the goal, so we return -1 to indicate failure to calculate.
         //NOTE: This eliminates an edge case for half goal detection (YAY!)
         dist = -1;
+        if(is_working() && color != 3){
+          //If we are seeing a goal at all, return -2 to indicate that we are seeing a partial goal against the frame
+          // dist = -2;
+        }
       } else if(width / height > 2 && is_valid_target(color)){
         //If the width to height ratio is greater than 2, we are likely seeing half a goal.
         //NO edge cases for thinking it's half a goal when it's not.
@@ -179,7 +206,9 @@ namespace vision{
         //We are seeing a valid target. It is not half a goal. It is not against the frame.
         //There are no remaining edge cases. We calculate distance as normal.
         dist = GOAL_RADIUS + (FOCAL_LENGTH * GOAL_HEIGHT_FULL * IMAGE_DIM) / (height * SENSOR_HEIGHT);
-      } else{
+        dist *= 1.02; //"shit happens" corrective factor - JBH 4/7/23
+      }
+      else{
         //If we are not seeing a valid target, we return -1 to indicate failure to calculate
         dist = -1;
       }
@@ -192,13 +221,22 @@ namespace vision{
     */
     void update_goal_position_and_turret_error(){
       //Calculate pixel to inch ratio for this frame
-      double pixel_to_inch = GOAL_WIDTH / width;
+      double pixel_to_inch = width / GOAL_WIDTH;
 
-      //Calculate the inch error
-      double inch_error = pixel_to_inch * (.5 * IMAGE_DIM - (left + 0.5 * width));
+      //Calculate pixel error
+      double center_pixel = left + (width/2.0);
+
+      //Calculate the height of the goal in inches
+      double goal_height_inches = height/pixel_to_inch;
+
+      //Calculate distance to goal
+      double goal_distance = tan(FOV / 2.0);
+
+      //Calculate inch error
+      double inch_error = (center_pixel - (IMAGE_DIM / 2)) / goal_distance;
 
       //Calculate turret angle error (theta)
-      turret_error = constrainAngle(atan(inch_error / distance)); //radians
+      turret_error = constrainAngle(atan(inch_error)); //radians
 
       //Only allow update to occur if turret error is less than 10 degrees
       //Prevent update if not settled (want to only do this when we are still and have a good picture of goal)
@@ -224,7 +262,7 @@ namespace vision{
         //Update goal location
         goal_location = {goal_x, goal_y};
         if(color == 1) red_goal_location = goal_location;
-        else if(color == 2) blue_goal_location = goal_location;
+        else if(color == 0) blue_goal_location = goal_location;
 
       }
     }
@@ -237,14 +275,13 @@ namespace vision{
     */
     double calculate_distance(double cameraDistance){
       //Attempt to calculate camera distance
-      if(cameraDistance != -1){
+      if(cameraDistance > 0){
         //If we successfully calculated the camera distance, perform
         //an update of the goal location and return the distance
-        distance = cameraDistance;
         update_goal_position_and_turret_error();
 
         //Return distance
-        return distance;
+        return cameraDistance;
       } else if (goal_location.y != -1000){
         //Calculate based on saved goal location, including offset for camera
         //Calculate camera x and y
@@ -261,11 +298,11 @@ namespace vision{
         //Return distance
         return distance;
       }
-      return -1; //Return -1 if no goal saved and/or none in sight
+      return cameraDistance;
     }
 
     double calculate_turret_error_odom(double cameraDistance){
-      if(cameraDistance == -1 && ODOM_GUESS_FLAG){
+      if(cameraDistance < 0 && ODOM_GUESS_FLAG){
         //If we failed to calculate the camera distance, calculate turret error based on 
         //current robot location, current goal location, and current turret angle.
 
@@ -296,8 +333,27 @@ namespace vision{
           - arms::odom::getHeading(true) 
           - turret::get_angle(true);
         return constrainAngle(turret_error); //reversed to follow convention
+      } else if(cameraDistance == -2){
+        //If we are in the edge case where we are seeing a goal against the frame,
+        //we calculate the error based on odom distance to goal point and how wide 
+        //the goal would be if we could see the whole thing compared to how wide it is
+        //in the image. We then use this error as turret_error.
+        //We do not update the goal location in this case. That will be accomplished once
+        //this edge case kicks the camera's view of the goal fully into frame.
+        //Calculate pixel to inch ratio for this frame
+        double pixel_to_inch = distance > DISTANCE_SWITCH_THRESHOLD? 
+          GOAL_HEIGHT_FULL / width: 
+          GOAL_HEIGHT_HALF / width;
+
+        //Calculate the inch error
+        double inch_error = right > 5? 
+          pixel_to_inch * (.5 * IMAGE_DIM + (right + 0.5 * pixel_to_inch * GOAL_WIDTH)):
+          pixel_to_inch * (.5 * IMAGE_DIM - (left - 0.5 * pixel_to_inch * GOAL_WIDTH));
+
+        inch_error *= 0.5; //Corrective factor...??
+        //Calculate turret angle error (theta)
+        // turret_error = constrainAngle(atan(inch_error / distance)); //radians
       }
-      //don't update turret error if we can see the goal; update_goal_position_and_turret_error() does that.
       return turret_error; //NOTE: TURRET ERROR WAS ALREADY CONSTRAINED IF WE REACH THIS RETURN
     }
     /**
@@ -351,9 +407,9 @@ namespace vision{
 
         //Debug statements
         if(VISION_DEBUG && printCounter % 5 == 0){
-          printf("------------------------\n");
-          printf("LEFT: %d, RIGHT %d\n", left, right);
-          // printf("Color: %d\n", color);
+          printf("---------------------------------------------------------\n");
+          printf("LEFT: %d, RIGHT %d, WIDTH %d, HEIGHT %d\n", left, right, width, height);
+          printf("Color: %1d, Distance: %3d\n", color, distance);
           // printf("Width: %3d, Height: %3d\n", width, height);
           printf("Camera Distance: %f\n", cameraDistance);
           printf("Turret Heading: %3.2f\n", turret::get_angle());
@@ -377,7 +433,7 @@ namespace vision{
   double get_error(){
     if(SHOOT_WHILE_MOVING && robot_is_settled()){
       //If we are not moving we do not have to lead our shot. Return turret's theta error in degrees
-      return turret_error * 180 / M_PI;
+      return inch_error;
     } else if(SHOOT_WHILE_MOVING){
       //If we are moving, we have to lead our shot. 
       //Calculate the x and y velocities of the robot
@@ -405,7 +461,7 @@ namespace vision{
       return turret_error * 180 / M_PI;
     } else{
       //If we are moving and we are not allowed to shoot while moving, return standard error
-      return turret_error * 180 / M_PI;
+      return inch_error;
     }
   }
 

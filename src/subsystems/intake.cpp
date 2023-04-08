@@ -23,24 +23,7 @@ namespace intake {
         //Local variable for intake target speed
         double speed = 0;
 
-        //State variable; true if the arm is raised, false otherwise
-        bool armRaised = true;
-
-        /**
-        *
-        * PRIVATE METHODS
-        *
-        */
-
-        /**
-        * Whether or not the intake arm is raised
-        *
-        * @return true if the arm is raised, false otherwise
-        */
-        bool arm_raised() {
-            return armRaised;
-        }
-    }   
+    } //End anonymous namespace
 
     /**
     *
@@ -69,7 +52,7 @@ namespace intake {
         else {
             stop();
         }
-    }
+    }     
 
     bool intaking() {
         return speed > 0.0;
