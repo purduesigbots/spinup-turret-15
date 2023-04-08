@@ -29,9 +29,6 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 #define TURRET_MOTOR 7
 #define TURRET_LIMIT_SWITCH 'h'
-#define TURRET_KP 340 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KI 3 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KD 50 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_AW true //switch for anti integral windup
 #define TURRET_FF true //switch for turn feedforward
 #define TURRET_FF_V 4000.0 //feedforward voltage (mV)

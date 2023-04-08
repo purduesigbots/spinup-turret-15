@@ -28,21 +28,6 @@ namespace intake {
     void toggle(double speed);
 
     /**
-    * Raises the intake's arm 
-    */
-    void raise_arm();
-
-    /**
-    * Lowers the intake's arm
-    */
-    void lower_arm();
-
-    /**
-    * Toggles the intake's arm 
-    */
-    void toggle_arm();
-
-    /**
     * Returns whether the intake is intaking or not.
     * 
     * @return True if the intake is intaking. 
