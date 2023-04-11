@@ -43,11 +43,11 @@ namespace flywheel {
 		
 		//Local variable for target speed
 		double targetSpeed = 0;
-		double calculated_speed_offset = -3;
+		double calculated_speed_offset = 0;
 
 		//Local const for stopped speed
 		const double STOP = 0.0;
-		#define FLYWHEEL_DEBUG true
+		#define FLYWHEEL_DEBUG false
 
 		//Local static variable for average speed--current one motor master/slave system overrides this 
 		//with the left motor's speed. I am leaving it here anyways in case we want to return to a two
@@ -82,7 +82,7 @@ namespace flywheel {
 				*
 				*
 				*/
-				calculated_speed = (0.0048 * distance * distance) - (0.3448 * distance) + 115.39;
+				calculated_speed = (0.0048 * distance * distance) - (0.3448 * distance) + 112.39;
 
 			}else{
 				/*
@@ -210,14 +210,7 @@ namespace flywheel {
 			}
 			pros::delay(10);
 		}
-		pros::delay(500); //do it a second time to make sure it's settled in 
-		while (!at_speed()) {
-			// timeout check
-			if (timeout > 0 && pros::millis() - startTime >= timeout) {
-				return true;
-			}
-			pros::delay(10);
-		}
+		pros::delay(200);
 		return false;
 	}
 
@@ -241,9 +234,6 @@ namespace flywheel {
 		int numberFired = 0;
 		intake::start(100);
 		discLift::discLiftUp();
-		// if (vision::is_working()) {
-		// 	turret::enable_vision_aim();
-		// }
 		pros::delay(460);
 		intake::start(-50);
 
@@ -293,7 +283,6 @@ namespace flywheel {
 		intake::stop();
 		discLift::discLiftDown();
 		indexer.move_voltage(0);
-		turret::disable_vision_aim();
 		return numberFired;
 	}
 
