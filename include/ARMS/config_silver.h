@@ -15,7 +15,7 @@ constants for the SILVER robot.
 #define LIFT_MOTOR 16
 #define LIFT_UP_POS 110
 #define LIFT_DOWN_POS 7
-#define LIFT_HOME_OFFSET 20
+#define LIFT_HOME_OFFSET 11
 
 #define FLYWHEEL_THRESHOLD 200
 #define FLYWHEEL_KV 58
@@ -37,7 +37,8 @@ constants for the SILVER robot.
 
 
 #define DEFLECTOR_PISTON 'h'
-#define ENDGAME_PISTON {{ADI_EXPANDER_PORT, 'a'}}
+#define LEFT_ENDGAME {{ADI_EXPANDER_PORT, 'g'}}
+#define RIGHT_ENDGAME {{ADI_EXPANDER_PORT, 'h'}}
 
 #define IRIS_PORT 6
 

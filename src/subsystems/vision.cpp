@@ -193,7 +193,7 @@ namespace vision{
         dist = -1;
         if(is_working() && color != 3){
           //If we are seeing a goal at all, return -2 to indicate that we are seeing a partial goal against the frame
-          // dist = -2;
+          dist = -2;
         }
       } else if(width / height > 2 && is_valid_target(color)){
         //If the width to height ratio is greater than 2, we are likely seeing half a goal.
@@ -341,6 +341,8 @@ namespace vision{
         //We do not update the goal location in this case. That will be accomplished once
         //this edge case kicks the camera's view of the goal fully into frame.
         //Calculate pixel to inch ratio for this frame
+
+        /** ACTUALLY CORRECT MATH
         double pixel_to_inch = distance > DISTANCE_SWITCH_THRESHOLD? 
           GOAL_HEIGHT_FULL / width: 
           GOAL_HEIGHT_HALF / width;
@@ -351,6 +353,8 @@ namespace vision{
           pixel_to_inch * (.5 * IMAGE_DIM - (left - 0.5 * pixel_to_inch * GOAL_WIDTH));
 
         inch_error *= 0.5; //Corrective factor...??
+        */
+        turret_error = right > 5? -0.2 : 0.2; //+- 12ish degrees depending on direction
         //Calculate turret angle error (theta)
         // turret_error = constrainAngle(atan(inch_error / distance)); //radians
       }
@@ -462,6 +466,9 @@ namespace vision{
     } else{
       //If we are moving and we are not allowed to shoot while moving, return standard error
       return inch_error;
+    }
+    if(!is_working() || color == 3){
+      return -100;
     }
   }
 

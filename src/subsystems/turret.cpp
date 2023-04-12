@@ -4,7 +4,7 @@
 #include "ARMS/config.h"
 #include "turret.hpp"
 #include "vision.hpp"
-#define TURRET_KP 800 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KP 1000 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KI 4 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT
 using namespace pros;

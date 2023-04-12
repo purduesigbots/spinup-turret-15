@@ -186,6 +186,8 @@ void joystick() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+
+	printf("\n\nINITIALIZATION COMPLETE\n\n");
 	
 	/**
 	*
@@ -198,7 +200,7 @@ void opcontrol() {
 	//State variable: should be using vision aim
 	bool use_vision = true; //Default to true--vision will enable on DL button press
 	//State variable: should be using auto speed
-	bool use_auto_speed = true;
+	bool use_auto_speed = false;
 	//State variable: is vision good
 	bool vision_good = false;
 	//Counter for disc lift intaking to avoid jamming
@@ -323,10 +325,10 @@ void opcontrol() {
 			flywheel::toggle(120);
 		}
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::change_target_speed(1);
+			flywheel::change_target_speed(5);
 		}
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::change_target_speed(-1);
+			flywheel::change_target_speed(-5);
 		}
 		if(counter % 50 == 0){
 			master.print(1, 0, "Flywheel Speed: %3d", int(flywheel::target_speed()));
@@ -352,8 +354,8 @@ void opcontrol() {
 		if(master.get_digital_new_press(DIGITAL_Y) || partner.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
 		}
-		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5) {
-			master.rumble("-");
+		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5 && master.get_digital(DIGITAL_L2)) {
+			partner.rumble("-");
 		}
 
 		/**
