@@ -4,7 +4,7 @@ constants for the SILVER robot.
 */
 #pragma once
 
-#define ADI_EXPANDER_PORT 2
+#define ADI_EXPANDER_PORT 4
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
 #define INTAKE_LINE 'g'
@@ -17,10 +17,10 @@ constants for the SILVER robot.
 #define LIFT_DOWN_POS 7
 #define LIFT_HOME_OFFSET 11
 
-#define FLYWHEEL_THRESHOLD 200
-#define FLYWHEEL_KV 58
-#define FLYWHEEL_KP 20
-#define FLYWHEEL_KI 0.001
+#define FLYWHEEL_THRESHOLD 100
+#define FLYWHEEL_KV 56.3
+#define FLYWHEEL_KP 0.01
+#define FLYWHEEL_KI 0
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_KH 0
 #define FLYWHEEL_LEFT 8
@@ -31,7 +31,7 @@ constants for the SILVER robot.
 #define TURRET_MOTOR 7
 #define TURRET_AW true  // switch for anti integral windup
 #define TURRET_FF true  // switch for turn feedforward
-#define TURRET_FF_V 4000.0 // feedforward voltage (mV)
+#define TURRET_FF_V 3000.0 // feedforward voltage (mV)
 #define TURRET_MIN_V 0 //minimum voltage to move(mV)
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 

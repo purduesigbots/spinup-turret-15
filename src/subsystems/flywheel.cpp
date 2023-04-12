@@ -47,7 +47,7 @@ namespace flywheel {
 
 		//Local const for stopped speed
 		const double STOP = 0.0;
-		#define FLYWHEEL_DEBUG true
+		#define FLYWHEEL_DEBUG false
 
 		//Local static variable for average speed--current one motor master/slave system overrides this 
 		//with the left motor's speed. I am leaving it here anyways in case we want to return to a two
@@ -181,9 +181,9 @@ namespace flywheel {
 		}
 	}
 
-	bool at_speed() {
-		// Check that the turret's RPM is within 20% of the target speed.
-		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.2;
+	bool at_speed(float pct) {
+		// Check that the turret's RPM is within % of the target speed.
+		return std::abs(targetSpeed - average_speed) / targetSpeed < (pct/100);
 	}
 
 	double current_speed() {

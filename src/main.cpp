@@ -167,7 +167,7 @@ void joystick() {
 		double axis4 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
 		double axis3 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 
-		printf("%f | %f | %f | %f\n", axis1, axis2, axis3, axis4);
+		// printf("%f | %f | %f | %f\n", axis1, axis2, axis3, axis4);
 		pros::delay(75);
 	}
 }
@@ -200,7 +200,7 @@ void opcontrol() {
 	//State variable: should be using vision aim
 	bool use_vision = true; //Default to true--vision will enable on DL button press
 	//State variable: should be using auto speed
-	bool use_auto_speed = false;
+	bool use_auto_speed = true;
 	//State variable: is vision good
 	bool vision_good = false;
 	//Counter for disc lift intaking to avoid jamming
@@ -311,7 +311,7 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed() && (!use_vision || (use_vision && fabs(vision::get_error()) < .75))) {
+			if (flywheel::at_speed(5) && (!use_vision || (use_vision && fabs(vision::get_error()) < .25))) {
 				flywheel::fireControl_driver(true);
 			} else {
 				//set to false for rpm babysitter

@@ -51,7 +51,8 @@ namespace vision{
     const double IMAGE_DIM = 416;
     const double GOAL_HEIGHT_FULL = 13.87;
     const double DISTANCE_SWITCH_THRESHOLD = 40; //ESTIMATE
-    const double GOAL_HEIGHT_HALF = 4; //ESTIMATE
+    const double GOAL_HEIGHT_HALF = 10; //ESTIMATE
+    const double GOAL_WIDTH_HALF = 12; //ESTIMATE
     const double GOAL_WIDTH = 15.73;
     const double GOAL_RADIUS = 8; //So that we calculate the center of the goal not the edge of it
     const double FOCAL_LENGTH = 0.5;
@@ -82,7 +83,7 @@ namespace vision{
     std::queue<double> heading_queue;
 
     //Debug flag, counter
-    #define VISION_DEBUG false
+    #define VISION_DEBUG true
     int printCounter = 0;
 
     //Shoot while moving flag
@@ -195,13 +196,13 @@ namespace vision{
           //If we are seeing a goal at all, return -2 to indicate that we are seeing a partial goal against the frame
           dist = -2;
         }
-      } else if(width / height > 2 && is_valid_target(color)){
+      } else if(width > height && is_valid_target(color)){
         //If the width to height ratio is greater than 2, we are likely seeing half a goal.
         //NO edge cases for thinking it's half a goal when it's not.
         //So, if we think it's half a goal due to w/h ratio and it's a valid target,
         //then we operate under the assumption that it's half a goal and we calculate distance
         //as such:
-        dist = GOAL_RADIUS + (FOCAL_LENGTH * GOAL_HEIGHT_HALF * IMAGE_DIM) / (height * SENSOR_HEIGHT);
+        dist = -1; //Does not work because it's too close--use odom distance
       } else if(is_valid_target(color)){
         //We are seeing a valid target. It is not half a goal. It is not against the frame.
         //There are no remaining edge cases. We calculate distance as normal.
@@ -221,22 +222,13 @@ namespace vision{
     */
     void update_goal_position_and_turret_error(){
       //Calculate pixel to inch ratio for this frame
-      double pixel_to_inch = width / GOAL_WIDTH;
+      double pixel_to_inch = GOAL_WIDTH / width;
 
-      //Calculate pixel error
-      double center_pixel = left + (width/2.0);
-
-      //Calculate the height of the goal in inches
-      double goal_height_inches = height/pixel_to_inch;
-
-      //Calculate distance to goal
-      double goal_distance = tan(FOV / 2.0);
-
-      //Calculate inch error
-      double inch_error = (center_pixel - (IMAGE_DIM / 2)) / goal_distance;
+      //Calculate the inch error
+      inch_error = pixel_to_inch * (.5 * IMAGE_DIM - (left + 0.5 * width));
 
       //Calculate turret angle error (theta)
-      turret_error = constrainAngle(atan(inch_error)); //radians
+      turret_error = constrainAngle(atan(inch_error / distance)); //radians
 
       //Only allow update to occur if turret error is less than 10 degrees
       //Prevent update if not settled (want to only do this when we are still and have a good picture of goal)
@@ -302,7 +294,7 @@ namespace vision{
     }
 
     double calculate_turret_error_odom(double cameraDistance){
-      if(cameraDistance < 0 && ODOM_GUESS_FLAG){
+      if((cameraDistance < 0 || turret_error == -1000) && ODOM_GUESS_FLAG){
         //If we failed to calculate the camera distance, calculate turret error based on 
         //current robot location, current goal location, and current turret angle.
 
@@ -405,6 +397,7 @@ namespace vision{
         color = communication->get_data(GOAL_COLOR);
 
         //Update distance
+        turret_error = -1000;
         double cameraDistance = get_camera_distance();
         distance = calculate_distance(cameraDistance);
         turret_error = calculate_turret_error_odom(cameraDistance);
@@ -415,7 +408,7 @@ namespace vision{
           printf("LEFT: %d, RIGHT %d, WIDTH %d, HEIGHT %d\n", left, right, width, height);
           printf("Color: %1d, Distance: %3d\n", color, distance);
           // printf("Width: %3d, Height: %3d\n", width, height);
-          printf("Camera Distance: %f\n", cameraDistance);
+          printf("Camera Distance: %f, inch error: %f\n", cameraDistance, inch_error);
           printf("Turret Heading: %3.2f\n", turret::get_angle());
           printf("Goal X: %3.2f, Goal Y: %3.2f\n", goal_location.x, goal_location.y);
           printf("VISION ERROR: %f\n", get_error());
@@ -437,7 +430,7 @@ namespace vision{
   double get_error(){
     if(SHOOT_WHILE_MOVING && robot_is_settled()){
       //If we are not moving we do not have to lead our shot. Return turret's theta error in degrees
-      return inch_error;
+      return turret_error * 180 / M_PI;
     } else if(SHOOT_WHILE_MOVING){
       //If we are moving, we have to lead our shot. 
       //Calculate the x and y velocities of the robot
@@ -465,10 +458,10 @@ namespace vision{
       return turret_error * 180 / M_PI;
     } else{
       //If we are moving and we are not allowed to shoot while moving, return standard error
-      return inch_error;
+      return turret_error * 180 / M_PI;
     }
     if(!is_working() || color == 3){
-      return -100;
+      return 0;
     }
   }
 

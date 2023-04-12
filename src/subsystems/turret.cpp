@@ -4,9 +4,9 @@
 #include "ARMS/config.h"
 #include "turret.hpp"
 #include "vision.hpp"
-#define TURRET_KP 1000 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KI 4 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KP 1300 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 1000)
+#define TURRET_KI 6 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: OG 4)
+#define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 250)
 using namespace pros;
 
 namespace turret {
@@ -189,7 +189,7 @@ namespace turret {
                         double target = get_vision_voltage(error);
                         
                         motor.move_voltage(target);
-                        
+
                         if(TURRET_DEBUG && printCounter++ % 5 == 0){
                             printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
                         }
