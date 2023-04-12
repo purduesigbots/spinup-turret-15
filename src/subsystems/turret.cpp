@@ -263,7 +263,7 @@ namespace turret {
         double get_vision_voltage(double angle_error){
             //Convert to sqrt curve
             angle_error = sqrt(fabs(angle_error)) * (angle_error < 0 ? -1 : 1);
-            if( !robot_model.isInit()){
+            if(!robot_model.isInit()){
                 VectorXd x(6);
                 x << 0,0,0,0,arms::odom::getHeading(true),0;
                 robot_model.set_x(x);
@@ -365,13 +365,15 @@ namespace turret {
                         motor.move_voltage(120 * endgame_power);
                         break;
                 }
-                VectorXd u = VectorXd(3);
-                double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
-                double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
-                u <<  left_volt_drive, right_volt_drive, prev_voltage;
-                robot_model.update(u);
+                if(TURRET_FF && printCounter > 10){
+                    VectorXd u = VectorXd(3);
+                    double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
+                    double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
+                    u <<  left_volt_drive, right_volt_drive, prev_voltage;
+                    robot_model.update(u);
+                    prev_voltage = motor.get_voltage();
+                }
                 //Loop delay
-                prev_voltage = motor.get_voltage();
                 pros::delay(10);
             }
         }
