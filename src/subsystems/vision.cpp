@@ -488,4 +488,8 @@ namespace vision{
     return target_color;
   }
 
+  arms::Point get_goal_pos(){
+    return goal_location;
+  }
+
 } //End namespace vision
