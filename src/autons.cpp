@@ -91,17 +91,18 @@ void discRushAuto() {
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	// first 3 stack
-	flywheel::start(135);
+	flywheel::start(140);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(100);
 	turret::goto_angle(10, 200, true);
-	move({35.5, 22}, 60, arms::THRU);
+	move({35.5, 21}, 60, arms::THRU);
 	move({35.5, 19}, arms::REVERSE);
 	move({35.5, 24}, 30, arms::THRU);
 	move({35.5, 19}, arms::REVERSE);
 	turn(90);
-	flywheel::fire(3, 5000);
+	//flywheel::fire(3, 5000);
+	pros::delay(4000);
 	
 	// line disks, roller
 	move({35.5, 12}, arms::REVERSE);
@@ -123,19 +124,21 @@ void discRushAuto() {
 	move({33,12});
 	turn(0);
 	intake::start(100);
-	flywheel::start(135);
+	//flywheel::start(135);
 	turret::goto_angle(45, 200, true);
 	move({50,9});
 	turn(73);
-	move({55,21});
 	turret::enable_vision_aim();
-	flywheel::fire(3, 5000);
+	move({55,21});
+	//flywheel::fire(3, 5000);
+	pros::delay(4000);
 
 	// second 3 stack
 	intake::start(100);
 	move({58,31}, 20, arms::THRU);
 	pros::delay(500);
-	flywheel::fire(3, 5000);
+	//flywheel::fire(3, 5000);
+	pros::delay(4000);
 	
 	intake::start(100);
 	move({58,50});
@@ -143,7 +146,21 @@ void discRushAuto() {
 	turn(170);
 	move({55,44});
 	move({63,43}, arms::REVERSE);
-	flywheel::fire(2,3000);
+	//flywheel::fire(2,3000);
+	pros::delay(3000);
+	turret::disable_vision_aim();
+
+	move({76,35}, arms::REVERSE);
+	turn(34);
+	move({84,40});
+	move({76,35}, arms::REVERSE);
+	turn(0);
+	move({83,35});
+	move({76,35}, arms::REVERSE);
+	turn(-30);
+	move({83,30});
+	turn(0);
+	pros::delay(4000);
 }
 
 /**

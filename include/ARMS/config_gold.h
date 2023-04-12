@@ -77,7 +77,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TRACKING_KP 60 // point tracking turning strength
 #define ANGULAR_KP 5
 #define ANGULAR_KI 0
-#define ANGULAR_KD 39
+#define ANGULAR_KD 47
 #define MIN_ERROR                                                              \
   5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)
