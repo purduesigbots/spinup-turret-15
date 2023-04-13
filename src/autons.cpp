@@ -91,41 +91,40 @@ void discRushAuto() {
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	// first 3 stack
-	flywheel::start(135);
+	flywheel::start(150);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(5);
-	turret::goto_angle(10, 200, true);
-	move({35.5, 20.5}, 100, 1, arms::THRU);
+	turret::goto_angle(8, 200, true);
+	move({35.5, 20.7}, 100, 1, arms::THRU);
 	intake::start(-100);
 	pros::delay(50);
 	intake::start(100);
-	pros::delay(1000);
-	move({35.5, 19}, arms::REVERSE);
+	pros::delay(500);
+	move({35.5, 17}, 100, 1, arms::REVERSE);
+	move({35.5, 22}, 100, 1);
+	move({35.5, 12}, arms::REVERSE);
 	turn(90);
 	flywheel::fire(3, 4000);
 	
 	// line disks, roller
-	move({35.5, 12}, arms::REVERSE);
+	flywheel::start(150);
 	turn(142);
 	intake::start(100);
 	move({29, 16});
-	move({35.5, 12}, arms::REVERSE);
-	turn(180);
-	move({21.5,10});
-	move({33, 12}, arms::REVERSE);
-	turn(110);
+	turn(125);
 	roller::move(65);
 	tank(-40,-40);
-	pros::delay(600);
+	pros::delay(1000);
 	roller::move(0);
 	tank(0,0);
+	move({21.5,10, 180});
+
 
 	// preload, shoot
-	move({33,12});
+	move({33,12}, arms::REVERSE);
 	turn(0);
 	intake::start(100);
-	//flywheel::start(135);
 	turret::goto_angle(45, 200, true);
 	move({50,9});
 	turn(73);
@@ -135,32 +134,35 @@ void discRushAuto() {
 
 	// second 3 stack
 	intake::start(100);
-	move({58,31}, 20, arms::THRU);
+	move({58,33}, 20, 1, arms::THRU);
 	pros::delay(500);
 	flywheel::fire(3, 4000);
+	turret::disable_vision_aim();
+	turret::goto_angle(-50, 200, true);
 	
 	// other line disks
+	flywheel::start(147);
 	intake::start(100);
-	move({58,50}, 100, 5);
+	move({58,49}, 100, 5);
 	move({63,43}, arms::REVERSE);
 	turn(170);
+	turret::enable_vision_aim();
 	move({55,44});
 	move({63,43}, arms::REVERSE);
-	flywheel::fire(3,3000);
+	flywheel::fire(3,4000);
 	turret::disable_vision_aim();
+	turret::goto_angle(-60, 200, true);
 
 	// low goal disks
-	move({76,35}, 100, 5, arms::REVERSE);
-	turn(34);
+	flywheel::start(150);
+	move({83,55}, 100, 5, arms::REVERSE);
+	turn(270);
 	intake::start(100);
-	move({84,40});
-	move({76,35}, arms::REVERSE);
-	turn(0);
-	move({83,35});
-	move({76,35}, arms::REVERSE);
-	turn(-30);
-	move({83,30});
-	turn(90);
+	move({91,16});
+	turn(180);
+	turret::enable_vision_aim();
+	flywheel::fire(3, 4000);
+	turret::disable_vision_aim();
 }
 
 /**
@@ -261,12 +263,12 @@ void skillsAuto() {
 */
 void autonomous() {
 	int auton = lcd2::selector::get_auton();
+	if (auton > 0) {
+		vision::set_targ_goal(vision::Goal::RED);
+	} else if (auton < 0) {
+		vision::set_targ_goal(vision::Goal::BLUE);
+	}
 	if(pros::competition::is_connected()){
-		if (auton > 0) {
-			vision::set_targ_goal(vision::Goal::RED);
-		} else if (auton < 0) {
-			vision::set_targ_goal(vision::Goal::BLUE);
-		}
 		//Switch based on auton selector for matches
 		switch (auton) {
 			case 0:

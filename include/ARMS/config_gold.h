@@ -18,7 +18,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define FLYWHEEL_THRESHOLD 100
 #define FLYWHEEL_KV 56.3
 #define FLYWHEEL_KP 0.01
-#define FLYWHEEL_KI 0
+#define FLYWHEEL_KI 0.005
 #define FLYWHEEL_KD 0
 #define FLYWHEEL_KH 0
 #define FLYWHEEL_LEFT 5
@@ -71,9 +71,9 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling
 #define SETTLE_THRESH_ANGULAR 1 // amount of angular movement for settling
 #define SETTLE_TIME 250         // amount of time to count as settled
-#define LINEAR_KP 8
-#define LINEAR_KI 0.01
-#define LINEAR_KD 14
+#define LINEAR_KP 10
+#define LINEAR_KI 0
+#define LINEAR_KD 30
 #define TRACKING_KP 70 // point tracking turning strength
 #define ANGULAR_KP 5
 #define ANGULAR_KI 0
