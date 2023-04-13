@@ -268,7 +268,7 @@ namespace flywheel {
 			}
 
 			// Now that the flywheel is at speed, we start the indexer
-			indexer.move_voltage(0);
+			indexer.move_voltage(-6000);
 			// Update the disc counter and number of discs we've fired
 			numberFired++;
 			discCounter::decrement();

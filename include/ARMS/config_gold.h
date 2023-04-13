@@ -66,18 +66,18 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 // Movement tuning
 #define SLEW_STEP 4             // Smaller number = more slew
-#define LINEAR_EXIT_ERROR 1     // default exit distance for linear movements
-#define ANGULAR_EXIT_ERROR 1    // default exit distance for angular movements
+#define LINEAR_EXIT_ERROR 5     // default exit distance for linear movements
+#define ANGULAR_EXIT_ERROR 5    // default exit distance for angular movements
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling
 #define SETTLE_THRESH_ANGULAR 1 // amount of angular movement for settling
-#define SETTLE_TIME 500         // amount of time to count as settled
-#define LINEAR_KP 7
-#define LINEAR_KI 0
+#define SETTLE_TIME 250         // amount of time to count as settled
+#define LINEAR_KP 8
+#define LINEAR_KI 0.01
 #define LINEAR_KD 14
-#define TRACKING_KP 60 // point tracking turning strength
+#define TRACKING_KP 70 // point tracking turning strength
 #define ANGULAR_KP 5
 #define ANGULAR_KI 0
-#define ANGULAR_KD 47
+#define ANGULAR_KD 37
 #define MIN_ERROR                                                              \
   5 // Minimum distance to target before angular componenet is disabled
 #define LEAD_PCT .6 // Go-to-pose lead distance ratio (0-1)

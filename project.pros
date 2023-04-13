@@ -5,27 +5,27 @@
         "target": "v5",
         "templates": {
             "ARMS": {
-                "location": "/Users/kunwarsahni/Library/Application Support/PROS/templates/ARMS@3.1.1",
+                "location": "C:\\Users\\andre\\AppData\\Roaming\\PROS\\templates\\ARMS@3.1.2",
                 "metadata": {
                     "origin": "local"
                 },
                 "name": "ARMS",
                 "py/object": "pros.conductor.templates.local_template.LocalTemplate",
-                "supported_kernels": "^3.7.2",
+                "supported_kernels": "^3.8.0",
                 "system_files": [
+                    "include\\ARMS\\config.h",
+                    "include\\ARMS\\pid.h",
                     "include\\ARMS\\api.h",
+                    "include\\ARMS\\chassis.h",
+                    "include\\ARMS\\odom.h",
                     "include\\ARMS\\flags.h",
                     "include\\ARMS\\point.h",
-                    "include\\ARMS\\chassis.h",
-                    "firmware\\ARMS.a",
-                    "include\\ARMS\\odom.h",
                     "include\\ARMS\\selector.h",
-                    "include\\ARMS\\config.h",
-                    "include\\ARMS\\pid.h"
+                    "firmware\\ARMS.a"
                 ],
                 "target": "v5",
                 "user_files": [],
-                "version": "3.1.1"
+                "version": "3.1.2"
             },
             "SerialVision": {
                 "location": "/Users/jackhughes/Library/Application Support/PROS/templates/SerialVision@1.0.0",
