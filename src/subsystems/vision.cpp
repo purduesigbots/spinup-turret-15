@@ -427,10 +427,10 @@ namespace vision{
   *
   */
     
-  double get_error(){
+  double get_error(bool radians){
     if(SHOOT_WHILE_MOVING && robot_is_settled()){
       //If we are not moving we do not have to lead our shot. Return turret's theta error in degrees
-      return turret_error * 180 / M_PI;
+      return radians? turret_error : turret_error * 180 / M_PI;;
     } else if(SHOOT_WHILE_MOVING){
       //If we are moving, we have to lead our shot. 
       //Calculate the x and y velocities of the robot
@@ -455,10 +455,10 @@ namespace vision{
       //get angle between the disc velocity and the perpendicular velocity
       turret_error = sin(perp_vel / disc_vel); //radians
       //return the error in degrees
-      return turret_error * 180 / M_PI;
+      return radians? turret_error : turret_error * 180 / M_PI;;
     } else{
       //If we are moving and we are not allowed to shoot while moving, return standard error
-      return turret_error * 180 / M_PI;
+      return radians? turret_error : turret_error * 180 / M_PI;
     }
     if(!is_working() || color == 3){
       return 0;

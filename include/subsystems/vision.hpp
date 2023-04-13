@@ -31,7 +31,7 @@ namespace vision {
      * 
      * @return The aim error of the vision system
      */
-    double get_error();
+    double get_error(bool radians = false);
 
     /**
     * Sets the goal targetting mode (color).
