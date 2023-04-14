@@ -275,12 +275,12 @@ void autonomous() {
 				// skillsAuto();
 				break;
 			default:
-				discRushAuto();
+				// discRushAuto();
 				break;
 		}
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
-		discRushAuto();
+		// discRushAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

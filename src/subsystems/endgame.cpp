@@ -1,6 +1,7 @@
+#include "ARMS/config_silver.h"
 #include "main.h"
 #include "ARMS/config.h"
-#include "subsystems/pneumatics.hpp"
+#include "pros/adi.hpp"
 
 using namespace pros;
 
@@ -16,6 +17,9 @@ namespace endgame {
         
         //State variable: turns true once the endgame is deployed
         bool is_deployed = false;  
+
+        pros::ADIDigitalOut leftEndgame (LEFT_ENDGAME);
+        pros::ADIDigitalOut rightEndgame (RIGHT_ENDGAME);
     }
     
     /**
@@ -26,16 +30,16 @@ namespace endgame {
 
     void deploy() {
         is_deployed = true;
-        pneumatics::set_left_endgame(true);
-        pneumatics::set_right_endgame(true);
+        leftEndgame.set_value(true);
+        rightEndgame.set_value(true);
         std::cout << "Endgame launched" << std::endl;
     }
 
     void deploy_left() {
-        pneumatics::set_left_endgame(true);
+        leftEndgame.set_value(true);
     }
 
     void deploy_right() {
-        pneumatics::set_right_endgame(true);
+        rightEndgame.set_value(true);
     }
 }

@@ -31,7 +31,7 @@ namespace vision {
      * 
      * @return The aim error of the vision system
      */
-    double get_error();
+    double get_error(bool radians = false);
 
     /**
     * Sets the goal targetting mode (color).
@@ -61,5 +61,12 @@ namespace vision {
     * if there's no goal saved or in view.
     */
     double get_distance();
+
+     /**
+    * Gets the goal position of the target goal seen by vision
+    *
+    * @return The goal position in inches
+    */
+    arms::Point get_goal_pos();
 }
 

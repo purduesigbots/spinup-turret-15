@@ -73,7 +73,7 @@ namespace flywheel {
     *
     * @return Whether the flywheel has reached its target RPM or not
     */
-    bool at_speed();
+    bool at_speed(float pct = 20);
 
     /**
     * Gets the current RPM that the flywheel is running at.

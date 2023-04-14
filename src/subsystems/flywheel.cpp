@@ -181,9 +181,9 @@ namespace flywheel {
 		}
 	}
 
-	bool at_speed() {
-		// Check that the turret's RPM is within 20% of the target speed.
-		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.2;
+	bool at_speed(float pct) {
+		// Check that the turret's RPM is within % of the target speed.
+		return std::abs(targetSpeed - average_speed) / targetSpeed < (pct/100);
 	}
 
 	double current_speed() {
