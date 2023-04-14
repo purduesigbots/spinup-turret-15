@@ -1,6 +1,5 @@
-#include "main.h"
-#include "ARMS/config.h"
-#include "subsystems/pneumatics.hpp"
+#include "robot.h"
+#include "subsystems.hpp"
 
 using namespace pros;
 
@@ -16,6 +15,11 @@ namespace endgame {
         
         //State variable: turns true once the endgame is deployed
         bool is_deployed = false;  
+        #if !USING_BEN_PNEUMATICS
+            pros::ADIDigitalOut leftEndgame (LEFT_ENDGAME);
+            pros::ADIDigitalOut rightEndgame (RIGHT_ENDGAME);
+            pros::ADIDigitalOut blocker (BLOCKER);
+        #endif
     }
     
     /**
@@ -26,16 +30,37 @@ namespace endgame {
 
     void deploy() {
         is_deployed = true;
-        pneumatics::set_left_endgame(true);
-        pneumatics::set_right_endgame(true);
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_left_endgame(true);
+            pneumatics::set_right_endgame(true);
+        #else
+            leftEndgame.set_value(true);
+            rightEndgame.set_value(true);
+        #endif
         std::cout << "Endgame launched" << std::endl;
     }
 
     void deploy_left() {
-        pneumatics::set_left_endgame(true);
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_left_endgame(true);
+        #else 
+            leftEndgame.set_value(true);
+        #endif
     }
 
     void deploy_right() {
-        pneumatics::set_right_endgame(true);
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_right_endgame(true);
+        #else
+            rightEndgame.set_value(true);
+        #endif
+    }
+
+    void deploy_blocker() {
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_blocker(true);
+        #else
+            blocker.set_value(true);
+        #endif
     }
 }

@@ -1,5 +1,7 @@
+#include "robot.h"
 #include "main.h"
 #include "ARMS/config.h"
+#include "pros/adi.hpp"
 #include "subsystems/subsystems.hpp"
 
 namespace deflector {
@@ -14,6 +16,10 @@ namespace deflector {
         
         //Whether or not the deflector is up
         bool isUp = true;
+
+        #if !USING_BEN_PNEUMATICS
+            pros::ADIDigitalOut deflectorPiston (DEFLECTOR);
+        #endif
     }
     
     /**
@@ -37,7 +43,11 @@ namespace deflector {
     void toggle(){
         isUp = !isUp; //flip state variable
         //Activate solenoid
-        pneumatics::set_deflector(!isUp); //state variable is reversed in relation to piston, hence the not operator
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_deflector(!isUp);
+        #else
+            deflectorPiston.set_value(!isUp); //state variable is reversed in relation to piston, hence the not operator
+        #endif
     }
 
     bool is_up() {

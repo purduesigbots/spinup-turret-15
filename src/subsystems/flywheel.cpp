@@ -3,7 +3,17 @@
 #include "main.h"
 #include "ARMS/config.h"
 #include "subsystems/subsystems.hpp"
+#include "sylib/pros_includes.h"
 #include "vision.hpp"
+
+
+#define FLYWHEEL_THRESHOLD 80
+#define FLYWHEEL_KV 61
+#define FLYWHEEL_KP 15
+#define FLYWHEEL_KI 0.001
+#define FLYWHEEL_KD 0
+#define FLYWHEEL_KH 0
+
 
 using namespace pros;
 
@@ -36,7 +46,7 @@ namespace flywheel {
 		//SYLIB motor object for left flywheel motor
 		sylib::Motor left_flywheel(FLYWHEEL_LEFT, 200, false, motor_speed_controller);
 		//PROS motor object f or right flywheel motor; will be slaved to SYLIB's calculation for the left motor
-		pros::Motor right_flywheel(FLYWHEEL_RIGHT, pros::E_MOTOR_GEARSET_18, true);
+		sylib::Motor right_flywheel(FLYWHEEL_RIGHT, 200, true, motor_speed_controller);
 
 		//The motor used to control the indexer
 		pros::Motor indexer(INDEXER_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -103,7 +113,7 @@ namespace flywheel {
 		void task_function(void* data) {
 
 			left_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
-			right_flywheel.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+			right_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
 
 			while (1) {
 				average_speed = left_flywheel.get_velocity();
@@ -125,11 +135,11 @@ namespace flywheel {
 				// proper speed
 				if (targetSpeed == STOP) {
 					left_flywheel.stop();
-					right_flywheel = 0;
+					right_flywheel.stop();
 				} else {
 					
 					left_flywheel.set_velocity_custom_controller(targetSpeed);
-					right_flywheel.move_voltage(left_flywheel.get_applied_voltage());
+					right_flywheel.set_velocity_custom_controller(targetSpeed);
 				}
 
 				pros::delay(10);
@@ -181,9 +191,9 @@ namespace flywheel {
 		}
 	}
 
-	bool at_speed() {
-		// Check that the turret's RPM is within 20% of the target speed.
-		return std::abs(targetSpeed - average_speed) / targetSpeed < 0.2;
+	bool at_speed(float pct) {
+		// Check that the turret's RPM is within % of the target speed.
+		return std::abs(targetSpeed - average_speed) / targetSpeed < (pct/100);
 	}
 
 	double current_speed() {
@@ -194,7 +204,7 @@ namespace flywheel {
 		if(n == 0){
 			return left_flywheel.get_velocity();
 		}
-		return right_flywheel.get_actual_velocity();
+		return right_flywheel.get_velocity();
 	}
 
 	double target_speed() {
@@ -300,6 +310,6 @@ namespace flywheel {
 		lcd2::pages::print_line(3, 2, " At Speed?: %s", at_speed()? "True" : "False");
 		lcd2::pages::print_line(3, 3, " Left temp: %3.2f", left_flywheel.get_temperature());
 		lcd2::pages::print_line(3, 4, " Right temp: %3.2f", right_flywheel.get_temperature());
-		lcd2::pages::print_line(3, 5, " (Applied) R: %5d L: %5d", right_flywheel.get_voltage(), left_flywheel.get_applied_voltage());
+		// lcd2::pages::print_line(3, 5, " (Applied) R: %5d L: %5d", right_flywheel.get_applied_voltage(), left_flywheel.get_applied_voltage());
 	}
 }

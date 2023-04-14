@@ -4,13 +4,12 @@ constants for the SILVER robot.
 */
 #pragma once
 
-#define INTAKE_PISTON                                                          \
-	{                                                                            \
-		{ 3, 'd' }                                                                 \
-  }
+#define USING_BEN_PNEUMATICS false
+
+#define ADI_EXPANDER_PORT 4
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
-#define INTAKE_LINE 'h'
+#define INTAKE_LINE 'g'
 
 #define ROLLER_MOTOR 10
 #define ROLLER_OPTICAL 5
@@ -18,42 +17,32 @@ constants for the SILVER robot.
 #define LIFT_MOTOR 16
 #define LIFT_UP_POS 110
 #define LIFT_DOWN_POS 7
-#define LIFT_HOME_OFFSET 20
+#define LIFT_HOME_OFFSET 11
 
-#define FLYWHEEL_THRESHOLD 200
-#define FLYWHEEL_KV 58
-#define FLYWHEEL_KP 20
-#define FLYWHEEL_KI 0.001
-#define FLYWHEEL_KD 0
-#define FLYWHEEL_KH 0
+
 #define FLYWHEEL_LEFT 8
 #define FLYWHEEL_RIGHT 9
 #define INDEXER_PORT 15
 
 
-#define TURRET_MOTOR -7
-#define TURRET_LIMIT_SWITCH                                                    \
-	{                                                                            \
-		{ 3, 'h' }                                                                 \
-	}
-#define TURRET_KP 300
-#define TURRET_KI 0.01
-#define TURRET_KD 0
+#define TURRET_MOTOR 7
+#define JOSH_LAT_COMP false
 #define TURRET_AW true  // switch for anti integral windup
 #define TURRET_FF true  // switch for turn feedforward
-#define TURRET_FF_V 0.0 // feedforward voltage (mV)
+#define TURRET_FF_V 3000.0 // feedforward voltage (mV)
+#define TURRET_MIN_V 0 //minimum voltage to move(mV)
+#define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
+#define TURRET_KP 1300 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 1000)
+#define TURRET_KI 6 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: OG 4)
+#define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 250)
 
+#define PNEUMATICS_PORT -1
+#define DEFLECTOR 'h'
+#define LEFT_ENDGAME {{ADI_EXPANDER_PORT, 'g'}}
+#define RIGHT_ENDGAME {{ADI_EXPANDER_PORT, 'h'}}
+#define BLOCKER -1
 
-#define DEFLECTOR_PISTON                                                       \
-	{                                                                            \
-		{ 6, 'a' }                                                                 \
-	}
-#define ENDGAME_PISTON                                                         \
-	{                                                                            \
-		{ 6, 'd' }                                                                 \
-	}
-
-#define IRIS_PORT 2
+#define IRIS_PORT 6
 
 // Debug
 #define ODOM_DEBUG 0

@@ -2,17 +2,11 @@
 #define _ARMS_CONFIG_H_
 
 #include "ARMS/api.h"
+#include "robot.h"
 #include "main.h"
 #include <initializer_list>
 
 namespace arms {
-
-#if BOT == GOLD
-  #include "ARMS/config_gold.h"
-#elif BOT == SILVER
-  #include "ARMS/config_silver.h"
-#endif
-
 
 // Initializer
 inline void init() {

@@ -3,6 +3,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 */
 #pragma once
 
+#define USING_BEN_PNEUMATICS true
+
 #define ADI_EXPANDER 15
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
@@ -26,6 +28,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define INDEXER_PORT 14
 
 #define TURRET_MOTOR 7
+#define JOSH_LAT_COMP false
 #define TURRET_LIMIT_SWITCH 'h'
 #define TURRET_KP 360 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KI 5 //ONLY TUNE WITH A DISC IN THE ROBOT
@@ -37,6 +40,10 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
 #define PNEUMATICS_PORT 'g'
+#define LEFT_ENDGAME 2
+#define RIGHT_ENDGAME 4
+#define BLOCKER 1
+#define DEFLECTOR 3
 
 #define IRIS_PORT 8
 

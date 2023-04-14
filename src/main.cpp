@@ -4,21 +4,22 @@
 #include "pros/misc.h"
 #include "subsystems/flywheel.hpp"
 #include "subsystems/subsystems.hpp"
+#include "subsystems/turret.hpp"
 #include "subsystems/vision.hpp"
+#include "robot.h"
 
-#define FLYWHEEL_GRAPHING false
+#define FLYWHEEL_GRAPHING true
 
 /**
 *
 * COMPILATION SANITY CHECK (DO NOT REMOVE)
 *
 */
-#if BOT == SILVER
-	#warning "Building Sliver Bot"
-#elif BOT == GOLD
-	#warning "Building Gold Bot"
-#else
-	#error "INVALID BOT TYPE!!!! Set BOT to either SILVER or GOLD in robot.h"
+
+#if BOT == GOLD
+	#warning "Building GOLDY"
+#elif BOT == SILVER
+	#warning "Building SILVA"
 #endif
 
 /**
@@ -166,7 +167,7 @@ void joystick() {
 		double axis4 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
 		double axis3 = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 
-		printf("%f | %f | %f | %f\n", axis1, axis2, axis3, axis4);
+		// printf("%f | %f | %f | %f\n", axis1, axis2, axis3, axis4);
 		pros::delay(75);
 	}
 }
@@ -185,6 +186,8 @@ void joystick() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+
+	printf("\n\nINITIALIZATION COMPLETE\n\n");
 	
 	/**
 	*
@@ -308,7 +311,7 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed()) {
+			if (flywheel::at_speed(5) && (!use_vision || (use_vision && fabs(vision::get_error()) < .25))) {
 				flywheel::fireControl_driver(true);
 			} else {
 				//set to false for rpm babysitter
@@ -322,10 +325,10 @@ void opcontrol() {
 			flywheel::toggle(120);
 		}
 		if (master.get_digital_new_press(DIGITAL_UP)) {
-			flywheel::change_target_speed(1);
+			flywheel::change_target_speed(5);
 		}
 		if (master.get_digital_new_press(DIGITAL_DOWN)) {
-			flywheel::change_target_speed(-1);
+			flywheel::change_target_speed(-5);
 		}
 		if(counter % 50 == 0){
 			master.print(1, 0, "Flywheel Speed: %3d", int(flywheel::target_speed()));
@@ -351,8 +354,8 @@ void opcontrol() {
 		if(master.get_digital_new_press(DIGITAL_Y) || partner.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
 		}
-		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5) {
-			master.rumble("-");
+		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5 && master.get_digital(DIGITAL_L2)) {
+			partner.rumble("-");
 		}
 
 		/**
