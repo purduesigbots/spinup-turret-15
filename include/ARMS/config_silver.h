@@ -4,6 +4,8 @@ constants for the SILVER robot.
 */
 #pragma once
 
+#define USING_BEN_PNEUMATICS false
+
 #define ADI_EXPANDER_PORT 4
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
@@ -30,10 +32,11 @@ constants for the SILVER robot.
 #define TURRET_MIN_V 0 //minimum voltage to move(mV)
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
-
-#define DEFLECTOR_PISTON 'h'
+#define PNEUMATICS_PORT -1
+#define DEFLECTOR 'h'
 #define LEFT_ENDGAME {{ADI_EXPANDER_PORT, 'g'}}
 #define RIGHT_ENDGAME {{ADI_EXPANDER_PORT, 'h'}}
+#define BLOCKER -1
 
 #define IRIS_PORT 6
 

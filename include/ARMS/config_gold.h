@@ -3,6 +3,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 */
 #pragma once
 
+#define USING_BEN_PNEUMATICS true
+
 #define ADI_EXPANDER 15
 #define INTAKE_LEFT 11
 #define INTAKE_RIGHT 19
@@ -37,6 +39,10 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
 #define PNEUMATICS_PORT 'g'
+#define LEFT_ENDGAME 2
+#define RIGHT_ENDGAME 4
+#define BLOCKER 1
+#define DEFLECTOR 3
 
 #define IRIS_PORT 8
 

@@ -11,19 +11,6 @@
 
 /**
 *
-* COMPILATION SANITY CHECK (DO NOT REMOVE)
-*
-*/
-#if BOT == SILVER
-	#warning "Building Sliver Bot"
-#elif BOT == GOLD
-	#warning "Building Gold Bot"
-#else
-	#error "INVALID BOT TYPE!!!! Set BOT to either SILVER or GOLD in robot.h"
-#endif
-
-/**
-*
 * DEBUG SCREEN
 *
 */

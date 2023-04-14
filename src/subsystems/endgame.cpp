@@ -1,4 +1,4 @@
-#include "ARMS/config_silver.h"
+#include "robot.h"
 #include "main.h"
 #include "ARMS/config.h"
 #include "pros/adi.hpp"
@@ -17,9 +17,10 @@ namespace endgame {
         
         //State variable: turns true once the endgame is deployed
         bool is_deployed = false;  
-
-        pros::ADIDigitalOut leftEndgame (LEFT_ENDGAME);
-        pros::ADIDigitalOut rightEndgame (RIGHT_ENDGAME);
+        #if !USING_BEN_PNEUMATICS
+            pros::ADIDigitalOut leftEndgame (LEFT_ENDGAME);
+            pros::ADIDigitalOut rightEndgame (RIGHT_ENDGAME);
+        #endif
     }
     
     /**
@@ -30,16 +31,29 @@ namespace endgame {
 
     void deploy() {
         is_deployed = true;
-        leftEndgame.set_value(true);
-        rightEndgame.set_value(true);
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_left_endgame(true);
+            pneumatics::set_right_endgame(true);
+        #else
+            leftEndgame.set_value(true);
+            rightEndgame.set_value(true);
+        #endif
         std::cout << "Endgame launched" << std::endl;
     }
 
     void deploy_left() {
-        leftEndgame.set_value(true);
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_left_endgame(true);
+        #else 
+            leftEndgame.set_value(true);
+        #endif
     }
 
     void deploy_right() {
-        rightEndgame.set_value(true);
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_right_endgame(true);
+        #else
+            rightEndgame.set_value(true);
+        #endif
     }
 }
