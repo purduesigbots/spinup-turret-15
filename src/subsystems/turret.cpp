@@ -93,6 +93,9 @@ class state_space{
         }
         return sign(-error)* target_w;
     }
+
+    /**
+     * DEPRECATED (BREAKS VISION) -- JBH 4/14/23
     float calc_feedforward(float target_x, float target_y, VectorXd u){
         X = arms::odom::getPosition().x;
         Y = arms::odom::getPosition().y;
@@ -121,6 +124,7 @@ class state_space{
     bool isInit(){
         return isInitialized;
     }
+    */
     
 };
 
@@ -260,11 +264,13 @@ namespace turret {
         double get_vision_voltage(double angle_error){
             //Convert to sqrt curve
             angle_error = sqrt(fabs(angle_error)) * (angle_error < 0 ? -1 : 1);
+            /** breaks vision
             if(!robot_model.isInit()){
                 VectorXd x(6);
                 x << 0,0,0,0,arms::odom::getHeading(true),0;
                 robot_model.set_x(x);
             }
+            */
             //Calculate PID output:
             //Anti-windup for integral term:
             if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
@@ -283,15 +289,15 @@ namespace turret {
                 output += -TURRET_FF_V * (arms::odom::getHeading() - last_heading); //Reversed due to motor directions
                 last_heading = arms::odom::getHeading(); //update last heading
                 arms::Point goal_pos = vision::get_goal_pos()/39.37; //in meters
-                VectorXd u = VectorXd(3);
-                double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
-                double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
-                u <<  left_volt_drive, right_volt_drive, prev_voltage/1000.0;
-                double model_feedforward = robot_model.calc_feedforward(goal_pos.x, goal_pos.y, u);
-                output += model_feedforward*1000.0;
-                if(int(left_volt_drive) % 4 == 0){
-                    std::cout <<  "Model_volt" <<model_feedforward <<"LEft drive" << left_volt_drive <<  '\n';
-                }
+                // VectorXd u = VectorXd(3);
+                // double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
+                // double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
+                // u <<  left_volt_drive, right_volt_drive, prev_voltage/1000.0;
+                // double model_feedforward = robot_model.calc_feedforward(goal_pos.x, goal_pos.y, u);
+                // output += model_feedforward*1000.0;
+                // if(int(left_volt_drive) % 4 == 0){
+                //     std::cout <<  "Model_volt" <<model_feedforward <<"LEft drive" << left_volt_drive <<  '\n';
+                // }
             }
 
             if(TURRET_MIN_V != 0.0){
@@ -363,12 +369,12 @@ namespace turret {
                         break;
                 }
                 if(TURRET_FF && printCounter > 10){
-                    VectorXd u = VectorXd(3);
-                    double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
-                    double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
-                    u <<  left_volt_drive, right_volt_drive, prev_voltage;
-                    robot_model.update(u);
-                    prev_voltage = motor.get_voltage();
+                    // VectorXd u = VectorXd(3);
+                    // double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
+                    // double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
+                    // u <<  left_volt_drive, right_volt_drive, prev_voltage;
+                    // robot_model.update(u);
+                    // prev_voltage = motor.get_voltage();
                 }
                 //Loop delay
                 pros::delay(10);
