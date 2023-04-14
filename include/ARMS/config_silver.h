@@ -26,6 +26,7 @@ constants for the SILVER robot.
 
 
 #define TURRET_MOTOR 7
+#define JOSH_LAT_COMP false
 #define TURRET_AW true  // switch for anti integral windup
 #define TURRET_FF true  // switch for turn feedforward
 #define TURRET_FF_V 3000.0 // feedforward voltage (mV)

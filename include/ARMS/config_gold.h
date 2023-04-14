@@ -28,6 +28,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define INDEXER_PORT 14
 
 #define TURRET_MOTOR 7
+#define JOSH_LAT_COMP false
 #define TURRET_LIMIT_SWITCH 'h'
 #define TURRET_KP 360 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KI 5 //ONLY TUNE WITH A DISC IN THE ROBOT
