@@ -478,30 +478,6 @@ namespace turret {
         }
     }
 
-    void debug_screen() {
-        pros::lcd::print(0, "TURRET");
-        if(state == State::DISABLED) {
-            pros::lcd::print(1, " State: Disabled");
-            return;
-        } else if(state == State::MANUAL) {
-            pros::lcd::print(1, " State: Manual");
-        } else if(state == State::VISION) {
-            pros::lcd::print(1, " State: Vision");
-        }
-        if(vision::get_targ_goal() == vision::Goal::BOTH){
-            pros::lcd::print(2, " Target Color: Both");
-        } else if(vision::get_targ_goal() == vision::Goal::RED){
-            pros::lcd::print(2, " Target Color: Red");
-        } else if(vision::get_targ_goal() == vision::Goal::BLUE){
-            pros::lcd::print(2, " Target Color: Blue");
-        }
-        lcd2::pages::print_line(2, 3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
-        lcd2::pages::print_line(2, 4, " Current Angle: %f", get_angle());
-        lcd2::pages::print_line(2, 5, " Target Angle: %f", target_angle);
-        lcd2::pages::print_line(2, 6, " Angle Error: %f", get_angle_error());
-        lcd2::pages::print_line(2, 7, " Settled: %s, Temp: %2.0f", settled() ? "True" : "False", motor.get_temperature());
-    }
-
     void toggle_vision_aim() {
         if(state == State::VISION) {
             disable_vision_aim();
@@ -527,4 +503,29 @@ namespace turret {
     void enable_endgame() {
         state = State::ENDGAME;
     }
+
+    void debug_screen() {
+        pros::lcd::print(0, "TURRET");
+        if(state == State::DISABLED) {
+            pros::lcd::print(1, " State: Disabled");
+            return;
+        } else if(state == State::MANUAL) {
+            pros::lcd::print(1, " State: Manual");
+        } else if(state == State::VISION) {
+            pros::lcd::print(1, " State: Vision");
+        }
+        if(vision::get_targ_goal() == vision::Goal::BOTH){
+            pros::lcd::print(2, " Target Color: Both");
+        } else if(vision::get_targ_goal() == vision::Goal::RED){
+            pros::lcd::print(2, " Target Color: Red");
+        } else if(vision::get_targ_goal() == vision::Goal::BLUE){
+            pros::lcd::print(2, " Target Color: Blue");
+        }
+        lcd2::pages::print_line(2, 3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
+        lcd2::pages::print_line(2, 4, " Current Angle: %f", get_angle());
+        lcd2::pages::print_line(2, 5, " Target Angle: %f", target_angle);
+        lcd2::pages::print_line(2, 6, " Angle Error: %f", get_angle_error());
+        lcd2::pages::print_line(2, 7, " Settled: %s, Temp: %2.0f", settled() ? "True" : "False", motor.get_temperature());
+    }
+
 } //End namespace turret
