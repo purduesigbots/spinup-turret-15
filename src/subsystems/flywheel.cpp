@@ -235,7 +235,7 @@ namespace flywheel {
 		intake::start(100);
 		discLift::discLiftUp();
 		pros::delay(460);
-		intake::start(-50);
+		intake::start(-100);
 
 		// While we haven't fired all the discs we want to fire
 		while (numberFired < numDiscs) {

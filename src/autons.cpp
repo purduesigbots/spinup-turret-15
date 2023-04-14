@@ -101,8 +101,8 @@ void discRushAuto() {
 	pros::delay(50);
 	intake::start(100);
 	pros::delay(500);
-	move({35.5, 17}, 100, 1, arms::REVERSE);
-	move({35.5, 22}, 100, 1);
+	move({35.5, 19}, 100, 1, arms::REVERSE);
+	move({35.5, 24}, 100, 1);
 	move({35.5, 12}, arms::REVERSE);
 	turn(90);
 	flywheel::fire(3, 4000);
@@ -115,7 +115,7 @@ void discRushAuto() {
 	turn(125);
 	roller::move(65);
 	tank(-40,-40);
-	pros::delay(1000);
+	pros::delay(800);
 	roller::move(0);
 	tank(0,0);
 	move({21.5,10, 180});
@@ -126,15 +126,15 @@ void discRushAuto() {
 	turn(0);
 	intake::start(100);
 	turret::goto_angle(45, 200, true);
-	move({50,9});
-	turn(73);
+	move({50,9}, arms::THRU);
+	move({55,23});
 	turret::enable_vision_aim();
-	move({55,21});
+	pros::delay(500);
 	flywheel::fire(3, 4000);
 
 	// second 3 stack
 	intake::start(100);
-	move({58,33}, 20, 1, arms::THRU);
+	move({58,38}, 30, 1, arms::THRU);
 	pros::delay(500);
 	flywheel::fire(3, 4000);
 	turret::disable_vision_aim();
@@ -143,11 +143,11 @@ void discRushAuto() {
 	// other line disks
 	flywheel::start(147);
 	intake::start(100);
-	move({58,49}, 100, 5);
+	move({58,49}, 70, 1, arms::THRU);
 	move({63,43}, arms::REVERSE);
 	turn(170);
 	turret::enable_vision_aim();
-	move({55,44});
+	move({55,44}, 70, 1, arms::THRU);
 	move({63,43}, arms::REVERSE);
 	flywheel::fire(3,4000);
 	turret::disable_vision_aim();
@@ -155,10 +155,10 @@ void discRushAuto() {
 
 	// low goal disks
 	flywheel::start(150);
-	move({83,55}, 100, 5, arms::REVERSE);
+	move({84,61}, arms::REVERSE);
 	turn(270);
 	intake::start(100);
-	move({91,16});
+	move({91,18});
 	turn(180);
 	turret::enable_vision_aim();
 	flywheel::fire(3, 4000);
