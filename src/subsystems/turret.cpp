@@ -7,9 +7,6 @@
 #include "ARMS/config.h"
 #include "turret.hpp"
 #include "vision.hpp"
-#define TURRET_KP 1300 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 1000)
-#define TURRET_KI 6 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: OG 4)
-#define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 250)
 using namespace pros;
 #undef __ARM_NEON__
 #undef __ARM_NEON

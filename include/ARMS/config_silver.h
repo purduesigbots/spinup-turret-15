@@ -21,7 +21,7 @@ constants for the SILVER robot.
 
 
 #define FLYWHEEL_LEFT 8
-#define FLYWHEE    L_RIGHT 9
+#define FLYWHEEL_RIGHT 9
 #define INDEXER_PORT 15
 
 
@@ -31,6 +31,9 @@ constants for the SILVER robot.
 #define TURRET_FF_V 3000.0 // feedforward voltage (mV)
 #define TURRET_MIN_V 0 //minimum voltage to move(mV)
 #define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
+#define TURRET_KP 1300 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 1000)
+#define TURRET_KI 6 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: OG 4)
+#define TURRET_KD 250 //ONLY TUNE WITH A DISC IN THE ROBOT (Last Working: 250)
 
 #define PNEUMATICS_PORT -1
 #define DEFLECTOR 'h'

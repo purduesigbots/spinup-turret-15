@@ -1,7 +1,5 @@
 #include "robot.h"
-#include "main.h"
-#include "ARMS/config.h"
-#include "pros/adi.hpp"
+#include "subsystems.hpp"
 
 using namespace pros;
 
@@ -20,6 +18,7 @@ namespace endgame {
         #if !USING_BEN_PNEUMATICS
             pros::ADIDigitalOut leftEndgame (LEFT_ENDGAME);
             pros::ADIDigitalOut rightEndgame (RIGHT_ENDGAME);
+            pros::ADIDigitalOut blocker (BLOCKER);
         #endif
     }
     
@@ -54,6 +53,14 @@ namespace endgame {
             pneumatics::set_right_endgame(true);
         #else
             rightEndgame.set_value(true);
+        #endif
+    }
+
+    void deploy_blocker() {
+        #if USING_BEN_PNEUMATICS
+            pneumatics::set_blocker(true);
+        #else
+            blocker.set_value(true);
         #endif
     }
 }

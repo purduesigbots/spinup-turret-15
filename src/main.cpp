@@ -6,8 +6,21 @@
 #include "subsystems/subsystems.hpp"
 #include "subsystems/turret.hpp"
 #include "subsystems/vision.hpp"
+#include "robot.h"
 
 #define FLYWHEEL_GRAPHING true
+
+/**
+*
+* COMPILATION SANITY CHECK (DO NOT REMOVE)
+*
+*/
+
+#if BOT == GOLD
+	#warning "Building GOLDY"
+#elif BOT == SILVER
+	#warning "Building SILVA"
+#endif
 
 /**
 *

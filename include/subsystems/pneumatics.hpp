@@ -1,4 +1,5 @@
 #pragma once
+#include "robot.h"
 #if USING_BEN_PNEUMATICS
     namespace pneumatics {
         void set_deflector(bool state);

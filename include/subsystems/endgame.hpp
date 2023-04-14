@@ -19,4 +19,9 @@ namespace endgame {
      * Deploys the right endgame
      */
     void deploy_right();
+
+    /**
+     * Deploys the endgame blocker
+     */
+    void deploy_endgame_blocker();
 }
