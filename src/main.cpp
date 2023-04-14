@@ -7,7 +7,7 @@
 #include "subsystems/turret.hpp"
 #include "subsystems/vision.hpp"
 
-#define FLYWHEEL_GRAPHING false
+#define FLYWHEEL_GRAPHING true
 
 /**
 *

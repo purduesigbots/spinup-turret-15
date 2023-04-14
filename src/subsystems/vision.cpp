@@ -334,7 +334,6 @@ namespace vision{
         //this edge case kicks the camera's view of the goal fully into frame.
         //Calculate pixel to inch ratio for this frame
 
-        /** ACTUALLY CORRECT MATH
         double pixel_to_inch = distance > DISTANCE_SWITCH_THRESHOLD? 
           GOAL_HEIGHT_FULL / width: 
           GOAL_HEIGHT_HALF / width;
@@ -344,11 +343,9 @@ namespace vision{
           pixel_to_inch * (.5 * IMAGE_DIM + (right + 0.5 * pixel_to_inch * GOAL_WIDTH)):
           pixel_to_inch * (.5 * IMAGE_DIM - (left - 0.5 * pixel_to_inch * GOAL_WIDTH));
 
-        inch_error *= 0.5; //Corrective factor...??
-        */
-        turret_error = right > 5? -0.2 : 0.2; //+- 12ish degrees depending on direction
+
         //Calculate turret angle error (theta)
-        // turret_error = constrainAngle(atan(inch_error / distance)); //radians
+        turret_error = constrainAngle(atan(inch_error / distance)); //radians
       }
       return turret_error; //NOTE: TURRET ERROR WAS ALREADY CONSTRAINED IF WE REACH THIS RETURN
     }

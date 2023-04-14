@@ -40,7 +40,7 @@ namespace discLift {
         //Prevents lifted from changing back to false momentariily, once it's set it stays until 
         //the lift is lifted AND the flyweel detects a shot.
         if(!lifted){
-            lifted = lift_motor.get_actual_velocity() < 2 && lift_motor.get_position() > 12;
+            lifted = lift_motor.get_actual_velocity() < 1 && lift_motor.get_position() > 15;
             if(lifted){
                 liftedPos = lift_motor.get_position();
             }
@@ -68,7 +68,7 @@ namespace discLift {
     
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        if(lift_motor.get_position() < LIFT_UP_POS){
+        if(lift_motor.get_position() < LIFT_UP_POS + 6){
             lift_motor.move_voltage(7000);
             // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             // lift_motor.brake();

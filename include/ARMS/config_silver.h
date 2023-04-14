@@ -17,14 +17,9 @@ constants for the SILVER robot.
 #define LIFT_DOWN_POS 7
 #define LIFT_HOME_OFFSET 11
 
-#define FLYWHEEL_THRESHOLD 100
-#define FLYWHEEL_KV 56.3
-#define FLYWHEEL_KP 0.01
-#define FLYWHEEL_KI 0
-#define FLYWHEEL_KD 0
-#define FLYWHEEL_KH 0
+
 #define FLYWHEEL_LEFT 8
-#define FLYWHEEL_RIGHT 9
+#define FLYWHEE    L_RIGHT 9
 #define INDEXER_PORT 15
 
 
