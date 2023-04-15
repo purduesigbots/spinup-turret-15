@@ -83,7 +83,7 @@ namespace vision{
     std::queue<double> heading_queue;
 
     //Debug flag, counter
-    #define VISION_DEBUG true
+    #define VISION_DEBUG false
     int printCounter = 0;
 
     //Shoot while moving flag
@@ -338,14 +338,9 @@ namespace vision{
           GOAL_HEIGHT_FULL / width: 
           GOAL_HEIGHT_HALF / width;
 
-        //Calculate the inch error
-        double inch_error = right > 5? 
-          pixel_to_inch * (.5 * IMAGE_DIM + (right + 0.5 * pixel_to_inch * GOAL_WIDTH)):
-          pixel_to_inch * (.5 * IMAGE_DIM - (left - 0.5 * pixel_to_inch * GOAL_WIDTH));
-
-
-        //Calculate turret angle error (theta)
-        turret_error = constrainAngle(atan(inch_error / distance)); //radians
+        //Approximate simple version of turret error
+        turret_error = constrainAngle((M_PI / 180) * (right > 5? -10 : 10));
+        return turret_error;
       }
       return turret_error; //NOTE: TURRET ERROR WAS ALREADY CONSTRAINED IF WE REACH THIS RETURN
     }

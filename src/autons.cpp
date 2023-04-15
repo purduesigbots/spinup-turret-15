@@ -1,6 +1,7 @@
 #include "main.h"
 #include "ARMS/api.h"
 #include "subsystems/subsystems.hpp"
+#include "subsystems/vision.hpp"
 
 /**
 *
@@ -281,6 +282,7 @@ void autonomous() {
 		}
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
+		vision::set_targ_goal(vision::Goal::BLUE);
 		discRushAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
