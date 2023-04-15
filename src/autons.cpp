@@ -91,11 +91,11 @@ void discRushAuto() {
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	// first 3 stack
-	flywheel::start(150);
+	flywheel::start(140);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(5);
-	turret::goto_angle(8, 200, true);
+	turret::goto_angle(9, 200, true);
 	move({35.5, 20.7}, 100, 1, arms::THRU);
 	intake::start(-100);
 	pros::delay(50);
@@ -108,7 +108,7 @@ void discRushAuto() {
 	flywheel::fire(3, 4000);
 	
 	// line disks, roller
-	flywheel::start(150);
+	flywheel::start(140);
 	turn(142);
 	intake::start(100);
 	move({29, 16});
@@ -125,14 +125,15 @@ void discRushAuto() {
 	move({33,12}, arms::REVERSE);
 	turn(0);
 	intake::start(100);
-	turret::goto_angle(45, 200, true);
+	turret::goto_angle(49, 200, true);
 	move({50,9}, arms::THRU);
-	move({55,23});
+	move({55,22});
 	turret::enable_vision_aim();
 	pros::delay(500);
 	flywheel::fire(3, 4000);
 
 	// second 3 stack
+	flywheel::start(140);
 	intake::start(100);
 	move({58,38}, 30, 1, arms::THRU);
 	pros::delay(500);
@@ -141,13 +142,13 @@ void discRushAuto() {
 	turret::goto_angle(-50, 200, true);
 	
 	// other line disks
-	flywheel::start(147);
+	flywheel::start(140);
 	intake::start(100);
-	move({58,49}, 70, 1, arms::THRU);
+	move({58,49}, 50, 1, arms::THRU);
 	move({63,43}, arms::REVERSE);
 	turn(170);
 	turret::enable_vision_aim();
-	move({55,44}, 70, 1, arms::THRU);
+	move({55,44}, 50, 1, arms::THRU);
 	move({63,43}, arms::REVERSE);
 	flywheel::fire(3,4000);
 	turret::disable_vision_aim();
@@ -155,8 +156,8 @@ void discRushAuto() {
 
 	// low goal disks
 	flywheel::start(150);
-	move({84,61}, arms::REVERSE);
-	turn(270);
+	move({83,63}, arms::REVERSE);
+	turn(280);
 	intake::start(100);
 	move({91,18});
 	turn(180);
@@ -272,15 +273,15 @@ void autonomous() {
 		//Switch based on auton selector for matches
 		switch (auton) {
 			case 0:
-				// skillsAuto();
+				skillsAuto();
 				break;
 			default:
-				// discRushAuto();
+				discRushAuto();
 				break;
 		}
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
-		// discRushAuto();
+		discRushAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
