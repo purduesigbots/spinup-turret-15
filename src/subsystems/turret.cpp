@@ -12,14 +12,6 @@
 #include "Eigen/Dense"
 #include "Eigen/Core"
 
-#define TURRET_KP 800 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KI 5 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KD 200 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_AW true //switch for anti integral windup
-#define TURRET_FF true //switch for turn feedforward
-#define TURRET_FF_V 4000.0 //feedforward voltage (mV)
-#define TURRET_MIN_V 565 //minimum voltage to move(mV)
-#define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
 
 using namespace pros;
 

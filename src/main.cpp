@@ -366,7 +366,7 @@ void opcontrol() {
 		if (master.get_digital_new_press(DIGITAL_X)) {
 			//Run auto if competition not connected
 			if(!pros::competition::is_connected()){
-				autonomous();
+				// autonomous();
 			}
 		}
 		

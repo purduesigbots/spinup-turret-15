@@ -6,16 +6,6 @@
 #include "sylib/pros_includes.h"
 #include "vision.hpp"
 
-#define FLYWHEEL_THRESHOLD 100
-#define FLYWHEEL_KV 54
-#define FLYWHEEL_KP 0.03
-#define FLYWHEEL_KI 0.0032
-#define FLYWHEEL_KD 5
-#define FLYWHEEL_KH 0
-#define FLYWHEEL_LEFT 5
-#define FLYWHEEL_RIGHT 10
-#define INDEXER_PORT 14
-
 using namespace pros;
 
 namespace flywheel {

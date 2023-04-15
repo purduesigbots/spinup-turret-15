@@ -18,10 +18,29 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define LIFT_HOME_OFFSET 10
 
 
+#define FLYWHEEL_THRESHOLD 100
+#define FLYWHEEL_KV 54
+#define FLYWHEEL_KP 0.03
+#define FLYWHEEL_KI 0.0032
+#define FLYWHEEL_KD 5
+#define FLYWHEEL_KH 0
+#define FLYWHEEL_LEFT 5
+#define FLYWHEEL_RIGHT 10
+#define INDEXER_PORT 14
+
 
 #define TURRET_MOTOR 7
 #define JOSH_LAT_COMP false
 #define TURRET_LIMIT_SWITCH 'h'
+#define TURRET_KP 800 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KI 5 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KD 200 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_AW true //switch for anti integral windup
+#define TURRET_FF true //switch for turn feedforward
+#define TURRET_FF_V 4000.0 //feedforward voltage (mV)
+#define TURRET_MIN_V 565 //minimum voltage to move(mV)
+#define TURRET_MAX_V 7000 //maximum allowed velocity out of 600 (rpm)
+
 
 #define PNEUMATICS_PORT 'g'
 #define LEFT_ENDGAME 2

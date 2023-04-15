@@ -282,7 +282,7 @@ void autonomous() {
 		}
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
-		vision::set_targ_goal(vision::Goal::BLUE);
+		// vision::set_targ_goal(vision::Goal::BLUE);
 		discRushAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
