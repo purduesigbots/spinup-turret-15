@@ -81,6 +81,7 @@ namespace turret {
         //Current target color
 
         #define TURRET_DEBUG true
+        #define TURRET_PID_TEST_CYCLE true
         int printCounter = 0;
 
         #if JOSH_LAT_COMP
@@ -275,6 +276,7 @@ namespace turret {
         double get_vision_voltage(double angle_error){
             //Convert to sqrt curve
             angle_error = sqrt(fabs(angle_error)) * (angle_error < 0 ? -1 : 1);
+            
             #if JOSH_LAT_COMP
                 if(!robot_model.isInit()){
                     VectorXd x(6);
@@ -367,6 +369,14 @@ namespace turret {
                     case State::VISION: {//Vision control
                         // If the vision system is working, enable vision control
                         double error = vision::get_error();
+                        #if TURRET_PID_TEST_CYCLE
+                            //Set error to distance to turret angle = 45 deg
+                            error = 45 - get_angle(false);
+                            //Every second switch directions
+                            if((int) pros::millis() % 2000 < 1000){
+                                error *= -1;
+                            }
+                        #endif
                         target_angle = get_angle(false) - error;
                         double target = get_vision_voltage(error);
                         

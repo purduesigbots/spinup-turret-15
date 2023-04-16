@@ -66,7 +66,7 @@ namespace flywheel {
     *
     * @return True if the timeout was reached.
     */
-    bool wait_until_fired(uint32_t timeout);
+    bool wait_until_fired(uint32_t timeout, float pct = 5);
     
     /**
     * Returns whether the flywheel is at its target RPM or not

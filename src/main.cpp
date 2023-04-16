@@ -8,7 +8,8 @@
 #include "subsystems/vision.hpp"
 #include "robot.h"
 
-#define FLYWHEEL_GRAPHING true
+#define FLYWHEEL_GRAPHING false
+#define TURRET_GRAPHING true
 
 /**
 *
@@ -381,6 +382,11 @@ void opcontrol() {
 				pros::millis(), flywheel::current_speed(1),
 				flywheel::current_speed(), flywheel::target_speed());
 		#endif
+		#if TURRET_GRAPHING
+			//Turn graphing utility prints
+			printf("graph_data\n");
+			printf("time (ms), turret error (deg), target (deg)|%d,%.2f,%.2f\n",
+				pros::millis(), turret::get_angle(false), turret::get_angle(false) - vision::get_error(false));
 
 		//LOOP DELAY
 		pros::delay(20);
