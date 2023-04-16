@@ -387,6 +387,7 @@ void opcontrol() {
 			printf("graph_data\n");
 			printf("time (ms), turret error (deg), target (deg)|%d,%.2f,%.2f\n",
 				pros::millis(), turret::get_angle(false), turret::get_angle(false) - vision::get_error(false));
+		#endif
 
 		//LOOP DELAY
 		pros::delay(20);
