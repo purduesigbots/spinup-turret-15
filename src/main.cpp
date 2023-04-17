@@ -8,8 +8,8 @@
 #include "subsystems/vision.hpp"
 #include "robot.h"
 
-#define FLYWHEEL_GRAPHING false
-#define TURRET_GRAPHING true
+#define FLYWHEEL_GRAPHING true
+#define TURRET_GRAPHING false
 
 /**
 *
@@ -312,13 +312,15 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < .75))) {
+			if (flywheel::at_speed(5) && (!use_vision || (use_vision && fabs(vision::get_error()) < .75))) {
 				flywheel::fireControl_driver(true);
-			} else {
-				//set to false for rpm babysitter
+			} else{
 				flywheel::fireControl_driver(false);
 			}
 			discLift::discLiftHold();
+		} else if (master.get_digital(DIGITAL_L2) && (!flywheel::at_speed(5 || !master.get_digital(DIGITAL_L1)))) {
+				//set to false for rpm babysitter
+				flywheel::back_index(50);
 		} else {
 			flywheel::fireControl_driver(false);
 		}

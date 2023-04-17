@@ -8,9 +8,9 @@
 #include <vector>
 
 #define FLYWHEEL_KV 61
-#define FLYWHEEL_KP 10
-#define FLYWHEEL_KI 0.005
-#define FLYWHEEL_KD 10
+#define FLYWHEEL_KP 14
+#define FLYWHEEL_KI 0.003
+#define FLYWHEEL_KD 6
 #define FLYWHEEL_KH 0
 
 using namespace pros;
@@ -117,7 +117,7 @@ namespace flywheel {
 			right_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
 
 			while (1) {
-				average_speed = (left_flywheel.get_velocity() + right_flywheel.get_velocity()) / 2.0;
+				average_speed = right_flywheel.get_velocity(); //right motor sensor broken so we ignore it lol
 				flywheel_speeds.push_back(average_speed);
 				//If the flywheel speed vector is greater than 10, remove the first element
 				if(flywheel_speeds.size() > 10){
@@ -316,6 +316,10 @@ namespace flywheel {
 
 	void set_auto_speed_mode(bool enable) {
 		autoSpeed = enable;
+	}
+
+	void back_index(float pct) {
+		indexer.move_voltage(-(pct/100) * 12000);
 	}
 
 	void debug_screen() {
