@@ -7,11 +7,11 @@
 #include "ARMS/config.h"
 #include "turret.hpp"
 #include "vision.hpp"
+#include <cmath>
 #undef __ARM_NEON__
 #undef __ARM_NEON
 #include "Eigen/Dense"
 #include "Eigen/Core"
-
 
 using namespace pros;
 
@@ -204,25 +204,27 @@ namespace turret {
                     return sign(-error)* target_w;
                 }
 
-                
+                //X AND Y NEED TO BE IN METERS!!!!!!!!!
                 float calc_feedforward(float target_x, float target_y, VectorXd u){
                     X = arms::odom::getPosition().x;
                     Y = arms::odom::getPosition().y;
                     theta = arms::odom::getHeading(true);
                     float target_theta = atan2( target_y - Y, target_x - X);
-                    float target_w = calc_desired_w(target_theta, 0.1); //change dec theta
+                    float target_w = motor.get_actual_velocity()/M_PI / 2 / 12; //calc_desired_w(target_theta, 0.1); //change dec theta
                     VectorXd reference(x.size());
                     reference << x[0], x[1], x[2], x[3], target_theta, target_w;
                     VectorXd x_f = update(u,true);
 
-                    float vl = std::min(std::abs(x_f[1]), 200*4/39.37/60*M_PI)*sign(x_f[1]);
-                    float vr = std::min(std::abs(x_f[3]), 200*4/39.37/60*M_PI)*sign(x_f[3]);
+                    float vl = /*std::min(std::abs(x_f[1]), 200*4/39.37/60*M_PI)*sign*/(x_f[1]);
+                    float vr = /*std::min(std::abs(x_f[3]), 200*4/39.37/60*M_PI)*sign*/(x_f[3]);
                     float fut_x = X + (vl+vr)/2*cos(theta)*dt;
                     float fut_y = Y + (vl+vr)/2*sin(theta)*dt;
+                    
                     x_f[4] = atan2(target_y - fut_y , target_x - fut_x);
-                    x_f[5] = calc_desired_w(x_f[4], 0.08);
+                    x_f[5] = calc_desired_w(x_f[4], 0.001);
 
                     VectorXd output = Binv*(x_f - (A * reference));
+                    std::cout << output[0]<<' ' << output[1]<< ' ' << output[2] <<' '<<u[0] << ' '<< u[1] << ' ' << u[2] << '\n';
                     return output[2];
                 }
                 //not needed
@@ -277,13 +279,7 @@ namespace turret {
             //Convert to sqrt curve
             angle_error = sqrt(fabs(angle_error)) * (angle_error < 0 ? -1 : 1);
             
-            #if JOSH_LAT_COMP
-                if(!robot_model.isInit()){
-                    VectorXd x(6);
-                    x << 0,0,0,0,arms::odom::getHeading(true),0;
-                    robot_model.set_x(x);
-                }
-            #endif
+            
             //Calculate PID output:
             //Anti-windup for integral term:
             if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
@@ -304,13 +300,24 @@ namespace turret {
                 arms::Point goal_pos = vision::get_goal_pos()/39.37; //in meters
                 #if JOSH_LAT_COMP
                     VectorXd u = VectorXd(3);
-                    double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
-                    double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
-                    u <<  left_volt_drive, right_volt_drive, prev_voltage/1000.0;
-                    double model_feedforward = robot_model.calc_feedforward(goal_pos.x, goal_pos.y, u);
-                    output += model_feedforward*1000.0;
+                    int left_volt_drive = arms::chassis::leftMotors->get_voltages()[1];
+                    int right_volt_drive = arms::chassis::rightMotors->get_voltages()[1];
+                    
+                    u <<  left_volt_drive/1000.0, right_volt_drive/1000.0, prev_voltage/1000.0;
+                    double model_feedforward;
+                    if(goal_pos.y != -1000.0){
+                        model_feedforward = robot_model.calc_feedforward(goal_pos.x/39.37, goal_pos.y/39.37, u);
+                    }
+                    else{
+                        model_feedforward = 0;
+                    }
+                    //ignores PID output for testing, DO NOT FORGET TO CHANGE!!!
+                    //__________________________________________________________
+                    output = model_feedforward*1000.0;
+                    //output += model_feedforward * 1000;
                     if(int(left_volt_drive) % 4 == 0){
                         std::cout <<  "Model_volt" <<model_feedforward <<"LEft drive" << left_volt_drive <<  '\n';
+                        std::cout << "rigth motor volts"<< right_volt_drive<<'\n';
                     }
                 #endif
             }
@@ -354,6 +361,13 @@ namespace turret {
         void task_func() { 
             //Set motor brake mode to hold
             motor.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
+            #if JOSH_LAT_COMP
+                if(!robot_model.isInit()){
+                    VectorXd x(6);
+                    x << 0,0,0,0,arms::odom::getHeading(true),0;
+                    robot_model.set_x(x);
+                }
+            #endif
             while(true) {
                 //Switch for desired control mode
                 switch(state) {
@@ -394,9 +408,9 @@ namespace turret {
                 if(TURRET_FF && printCounter > 10){
                     #if JOSH_LAT_COMP
                         VectorXd u = VectorXd(3);
-                        double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0]/1000.0;
-                        double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0]/1000.0;
-                        u <<  left_volt_drive, right_volt_drive, prev_voltage;
+                        double left_volt_drive = arms::chassis::leftMotors->get_voltages()[0];
+                        double right_volt_drive = arms::chassis::rightMotors->get_voltages()[0];
+                        u <<  left_volt_drive/1000, right_volt_drive/1000, prev_voltage/1000;
                         robot_model.update(u);
                         prev_voltage = motor.get_voltage();
                     #endif
