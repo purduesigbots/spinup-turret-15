@@ -24,11 +24,7 @@ constants for the SILVER robot.
 #define FLYWHEEL_RIGHT 9
 #define INDEXER_PORT 15
 #define FLYWHEEL_THRESHOLD 80
-#define FLYWHEEL_KV 61
-#define FLYWHEEL_KP 15
-#define FLYWHEEL_KI 0.001
-#define FLYWHEEL_KD 0
-#define FLYWHEEL_KH 0
+
 
 
 #define TURRET_MOTOR 7
@@ -49,6 +45,7 @@ constants for the SILVER robot.
 #define BLOCKER -1
 
 #define IRIS_PORT 6
+
 
 // Debug
 #define ODOM_DEBUG 0

@@ -9,6 +9,7 @@
 #include "robot.h"
 
 #define FLYWHEEL_GRAPHING true
+#define TURRET_GRAPHING false
 
 /**
 *
@@ -313,11 +314,13 @@ void opcontrol() {
 		if (master.get_digital(DIGITAL_L1)) {
 			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < 2.0))) {
 				flywheel::fireControl_driver(true);
-			} else {
-				//set to false for rpm babysitter
+			} else{
 				flywheel::fireControl_driver(false);
 			}
 			discLift::discLiftHold();
+		} else if (master.get_digital(DIGITAL_L2) && (!flywheel::at_speed(5 || !master.get_digital(DIGITAL_L1)))) {
+				//set to false for rpm babysitter
+				flywheel::back_index(50);
 		} else {
 			flywheel::fireControl_driver(false);
 		}
@@ -380,6 +383,12 @@ void opcontrol() {
 				"target|%d,%.2f,%.2f,%.2f\n",
 				pros::millis(), flywheel::current_speed(1),
 				flywheel::current_speed(), flywheel::target_speed());
+		#endif
+		#if TURRET_GRAPHING
+			//Turn graphing utility prints
+			printf("graph_data\n");
+			printf("time (ms), turret error (deg), target (deg)|%d,%.2f,%.2f\n",
+				pros::millis(), turret::get_angle(false), turret::get_angle(false) - vision::get_error(false));
 		#endif
 
 		//LOOP DELAY

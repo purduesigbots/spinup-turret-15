@@ -5,6 +5,13 @@
 #include "subsystems/subsystems.hpp"
 #include "sylib/pros_includes.h"
 #include "vision.hpp"
+#include <vector>
+
+#define FLYWHEEL_KV 61
+#define FLYWHEEL_KP 14
+#define FLYWHEEL_KI 0.003
+#define FLYWHEEL_KD 6
+#define FLYWHEEL_KH 0
 
 using namespace pros;
 
@@ -29,8 +36,8 @@ namespace flywheel {
 			false,                          // anti-windup enabled
 			36,                            	// anti-windup range
 			false,                         	// p controller bounds threshold enabled
-			3,                             	// p controller bounds cutoff enabled - 5
-			0,                        		// kP2 for when over threshold - 0.25
+			0,                             	// p controller bounds cutoff enabled - 5
+			FLYWHEEL_KP,                        		// kP2 for when over threshold - 0.25
 			FLYWHEEL_THRESHOLD              // range to target to apply max voltage - 10
 		);
 
@@ -57,6 +64,9 @@ namespace flywheel {
 
 		//State variable for whether or not auto speed mode is on
 		bool autoSpeed = false;
+
+		//Flywheel speed vector
+		std::vector<double> flywheel_speeds;
 
 		//Distance at which to enable the deflector
 		const double deflector_threshold = 80.0; //CORY TUNE THIS AS DESIRED
@@ -107,7 +117,12 @@ namespace flywheel {
 			right_flywheel.set_braking_mode(kV5MotorBrakeModeCoast);
 
 			while (1) {
-				average_speed = left_flywheel.get_velocity();
+				average_speed = right_flywheel.get_velocity(); //right motor sensor broken so we ignore it lol
+				flywheel_speeds.push_back(average_speed);
+				//If the flywheel speed vector is greater than 10, remove the first element
+				if(flywheel_speeds.size() > 10){
+					flywheel_speeds.erase(flywheel_speeds.begin());
+				}
 
 				if(autoSpeed){
 					targetSpeed = calculate_speed(vision::get_distance()) + calculated_speed_offset;
@@ -132,7 +147,7 @@ namespace flywheel {
 					left_flywheel.set_velocity_custom_controller(targetSpeed);
 					right_flywheel.set_velocity_custom_controller(targetSpeed);
 				}
-
+			
 				pros::delay(10);
 			}
 		}
@@ -183,8 +198,15 @@ namespace flywheel {
 	}
 
 	bool at_speed(float pct) {
-		// Check that the turret's RPM is within % of the target speed.
-		return std::abs(targetSpeed - average_speed) / targetSpeed < (pct/100);
+		//Return true if the average of the stored flywheel speeds are
+		// within pct percent of the target speed
+		double average = 0;
+		for(int i = 0; i < flywheel_speeds.size(); i++){
+			average += flywheel_speeds[i];
+		}
+		average /= flywheel_speeds.size();
+		return (average >= targetSpeed * (1 - pct * 0.01) 
+			&& average <= targetSpeed * (1 + pct * 0.01));
 	}
 
 	double current_speed() {
@@ -202,17 +224,18 @@ namespace flywheel {
 		return targetSpeed;
 	}
 
-	bool wait_until_at_speed(uint32_t timeout) {
+	bool wait_until_at_speed(uint32_t timeout, float pct) {
 		uint32_t startTime = pros::millis();
-		while (!at_speed()) {
+		while (!at_speed(pct)) {
 			// timeout check
 			if (timeout > 0 && pros::millis() - startTime >= timeout) {
-				return true;
+				return true; //True indicates timeout
 			}
 			pros::delay(10);
 		}
-		pros::delay(200);
-		return false;
+		//False indicates successful speed aquisition within alloted time 
+		// and requested margin of error
+		return false; 
 	}
 
 	bool wait_until_fired(uint32_t timeout) {
@@ -293,6 +316,10 @@ namespace flywheel {
 
 	void set_auto_speed_mode(bool enable) {
 		autoSpeed = enable;
+	}
+
+	void back_index(float pct) {
+		indexer.move_voltage(-(pct/100) * 12000);
 	}
 
 	void debug_screen() {
