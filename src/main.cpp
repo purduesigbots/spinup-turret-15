@@ -311,7 +311,7 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < .75))) {
+			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < 2.0))) {
 				flywheel::fireControl_driver(true);
 			} else {
 				//set to false for rpm babysitter
@@ -355,7 +355,7 @@ void opcontrol() {
 			use_vision = !use_vision;
 		}
 		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5 && master.get_digital(DIGITAL_L2)) {
-			partner.rumble("-");
+			master.rumble("-");
 		}
 
 		/**

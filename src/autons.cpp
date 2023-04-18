@@ -92,12 +92,13 @@ void discRushAuto() {
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	// first 3 stack
-	flywheel::start(140);
+	flywheel::start(150);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(5);
-	turret::goto_angle(9, 200, true);
+	turret::goto_angle(45, 200, true);
 	move({35.5, 20.7}, 100, 1, arms::THRU);
+	turret::goto_angle(9, 200, true);
 	intake::start(-100);
 	pros::delay(50);
 	intake::start(100);
@@ -113,7 +114,7 @@ void discRushAuto() {
 	turn(142);
 	intake::start(100);
 	move({29, 16});
-	turn(125);
+	turn(120);
 	roller::move(65);
 	tank(-40,-40);
 	pros::delay(800);
