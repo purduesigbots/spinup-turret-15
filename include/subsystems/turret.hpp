@@ -49,6 +49,8 @@ namespace turret {
      */
     void goto_angle(double angle, double velocity = 100, bool async = false);
 
+    void goto_global(double angle, double velocity);
+
     /**
      * Tells the turret to go to an angle relative to the robot's heading and
      * the current turret angle. Negative to the right, positive to the left.

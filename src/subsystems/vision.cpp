@@ -35,6 +35,8 @@ namespace vision{
     #define HEIGHT 0b00000011
     #define WIDTH 0b00000100
 
+    #define SMA_LEN 4
+
     //Various local variables
     int left;
     int right;
@@ -42,7 +44,7 @@ namespace vision{
     int color;
     int previous_color;
     int width;
-    int distance = -1;
+    double distance = -1;
     double turret_error = 0;
     double inch_error = 0;
     int odom_settled_time = 0;
@@ -72,8 +74,9 @@ namespace vision{
 
     //Estimated goal location
     arms::Point goal_location = {0, -1000}; //Set to 0, -1000 to indicate no goal seen yet
-    arms::Point red_goal_location = {0, -1000};
     arms::Point blue_goal_location = {0, -1000};
+    arms::Point red_goal_location = {0, -1000};
+    std::deque<arms::Point> sma;
 
     //Queue of odom states
     std::queue<arms::Point> position_queue;
@@ -232,7 +235,7 @@ namespace vision{
 
       //Only allow update to occur if turret error is less than 10 degrees
       //Prevent update if not settled (want to only do this when we are still and have a good picture of goal)
-      if(fabs(turret_error) < 4.0 && robot_is_settled()){ 
+      if(fabs(turret_error) < 10.0 && robot_is_settled()){ 
         //Calculate camera x and y
         double corr_bot_y = position_queue.front().y;
         double corr_bot_x = position_queue.front().x;
@@ -252,10 +255,17 @@ namespace vision{
           // printf("Heading: %3.2f, Total %3.2f, Turret: %3.2f\n", corr_heading_rad * 180/M_PI, (corr_heading_rad + corr_turret_angle + turret_error) * 180 / M_PI, corr_turret_angle * 180 / M_PI);
         }
         //Update goal location
-        goal_location = {goal_x, goal_y};
+        arms::Point current = {goal_x, goal_y};
+        arms::Point sum = goal_location * sma.size();
+        sma.push_front(current);
+        arms::Point last = {0,0};
+        if (sma.size() > SMA_LEN) {
+          last = sma.back();
+          sma.pop_back();
+        }
+        goal_location = (sum + current - last) / sma.size();
         if(color == 1) red_goal_location = goal_location;
         else if(color == 0) blue_goal_location = goal_location;
-
       }
     }
 
@@ -358,6 +368,7 @@ namespace vision{
 
       //Start communications
       communication->start();
+      int no_new_comm_count = 0;
 
       //Main loop
       while(true){
@@ -380,17 +391,25 @@ namespace vision{
           heading_queue.pop();
         }
 
-        //Get data from IRIS
-        left = communication->get_data(LEFT);
-        right = communication->get_data(RIGHT);
-        height = communication->get_data(HEIGHT);
-        width = communication->get_data(WIDTH);
-        previous_color = color;
-        color = communication->get_data(GOAL_COLOR);
+        double cameraDistance = -1;
+
+        if (communication->get_read(WIDTH)) {
+          //Get data from IRIS
+          no_new_comm_count = 0;
+          left = communication->get_data(LEFT);
+          right = communication->get_data(RIGHT);
+          height = communication->get_data(HEIGHT);
+          width = communication->get_data(WIDTH);
+          previous_color = color;
+          color = communication->get_data(GOAL_COLOR);
+          cameraDistance = get_camera_distance();
+        } else {
+          no_new_comm_count++;
+        }
 
         //Update distance
         turret_error = -1000;
-        double cameraDistance = get_camera_distance();
+        cameraDistance = get_camera_distance();
         distance = calculate_distance(cameraDistance);
         turret_error = calculate_turret_error_odom(cameraDistance);
 
@@ -398,12 +417,12 @@ namespace vision{
         if(VISION_DEBUG && printCounter % 5 == 0){
           printf("---------------------------------------------------------\n");
           printf("LEFT: %d, RIGHT %d, WIDTH %d, HEIGHT %d\n", left, right, width, height);
-          printf("Color: %1d, Distance: %3d\n", color, distance);
+          printf("Color: %1d, Distance: %3f\n", color, distance);
           // printf("Width: %3d, Height: %3d\n", width, height);
-          printf("Camera Distance: %f, inch error: %f\n", cameraDistance, inch_error);
+          printf("Camera Distance: %f, inch error: %f\n", distance, inch_error);
           printf("Turret Heading: %3.2f\n", turret::get_angle());
           printf("Goal X: %3.2f, Goal Y: %3.2f\n", goal_location.x, goal_location.y);
-          printf("VISION ERROR: %f\n", get_error());
+          printf("VISION ERROR: %f\n", get_error(false));
         }
         printCounter++;
 

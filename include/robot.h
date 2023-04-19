@@ -5,7 +5,7 @@
 #define GOLD    2
 
 // Change this define to change which turret bot you are building.
-#define BOT (SILVER)
+#define BOT (GOLD)
 
 #if BOT == SILVER
     #include "ARMS/config_silver.h"

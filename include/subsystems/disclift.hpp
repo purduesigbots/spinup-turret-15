@@ -29,6 +29,8 @@ namespace discLift {
      */
     void home();
 
+    int disc_count();
+
     /**
     * Renders the debug screen to the LLEMU display 
     */

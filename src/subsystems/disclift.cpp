@@ -113,6 +113,17 @@ namespace discLift {
         lift_motor.tare_position();
     }
 
+    int disc_count() {
+        int pos = lift_motor.get_position();
+        if (pos > 80) {
+            return 1;
+        } else if (pos > 50) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
     void debug_screen(){
         lcd2::pages::print_line(1, 0, "Disc Lift Info: ");
         lcd2::pages::print_line(1, 1, " Lift Position: %3.2f", lift_motor.get_position());
@@ -121,5 +132,6 @@ namespace discLift {
         lcd2::pages::print_line(1, 4, " Lift Temperature: %3.2f", lift_motor.get_temperature());
         lcd2::pages::print_line(1, 5, " Lifted: %s", lifted?"true":"false");
         lcd2::pages::print_line(1, 6, " Reached Speed: %s", reachedSpeed?"true":"false");
+        lcd2::pages::print_line(1, 7, " Disc Count: %d", disc_count());
     }
 }

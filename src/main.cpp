@@ -8,7 +8,7 @@
 #include "subsystems/vision.hpp"
 #include "robot.h"
 
-#define FLYWHEEL_GRAPHING true
+#define FLYWHEEL_GRAPHING false
 #define TURRET_GRAPHING false
 
 /**
@@ -256,9 +256,9 @@ void opcontrol() {
 			discLiftCounter++;
 		} else if (!master.get_digital(DIGITAL_L1)) {
 			discLift::discLiftDown();
-			if (use_vision) {
-				turret::disable_vision_aim();
-			}
+			// if (use_vision) {
+			// 	turret::disable_vision_aim();
+			// }
 		}
 
 		/**
@@ -356,6 +356,9 @@ void opcontrol() {
 		}
 		if(master.get_digital_new_press(DIGITAL_Y) || partner.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
+			if (!use_vision) {
+				turret::disable_vision_aim();
+			}
 		}
 		if (fabs(vision::get_error()) < 2.0 && counter % 10 == 5 && master.get_digital(DIGITAL_L2)) {
 			master.rumble("-");
@@ -369,7 +372,7 @@ void opcontrol() {
 		if (master.get_digital_new_press(DIGITAL_X)) {
 			//Run auto if competition not connected
 			if(!pros::competition::is_connected()){
-				// autonomous();
+				autonomous();
 			}
 		}
 		

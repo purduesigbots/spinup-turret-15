@@ -28,7 +28,7 @@
                 "version": "3.1.2"
             },
             "SerialVision": {
-                "location": "/Users/jackhughes/Library/Application Support/PROS/templates/SerialVision@1.0.0",
+                "location": "C:\\Users\\andre\\AppData\\Roaming\\PROS\\templates\\SerialVision@1.0.1",
                 "metadata": {
                     "origin": "local"
                 },
@@ -41,7 +41,7 @@
                 ],
                 "target": "v5",
                 "user_files": [],
-                "version": "1.0.0"
+                "version": "1.0.1"
             },
             "kernel": {
                 "location": "C:\\Users\\andre\\AppData\\Roaming\\PROS\\templates\\kernel@3.8.0",

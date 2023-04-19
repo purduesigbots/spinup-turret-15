@@ -50,6 +50,9 @@ namespace turret {
         double last_error = 0;
         //previous heading term
         double last_heading = 0;
+        int kP = 0;
+        double decay = 0.7;
+        bool first_move = false;
 
         //Conversion factor from motor rotations to degrees
         const double ROT_TO_DEG = 37.5;
@@ -79,9 +82,10 @@ namespace turret {
         //Current state of the turret
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
+        bool global_angle = false;
 
         #define TURRET_DEBUG true
-        #define TURRET_PID_TEST_CYCLE true
+        #define TURRET_PID_TEST_CYCLE false
         int printCounter = 0;
 
         #if JOSH_LAT_COMP
@@ -282,13 +286,16 @@ namespace turret {
             
             //Calculate PID output:
             //Anti-windup for integral term:
-            if(!TURRET_AW || (TURRET_AW && fabs(TURRET_KP * angle_error) < 12000)){
+            if(!TURRET_AW || (TURRET_AW && fabs(kP * angle_error) < 12000)){
                 integral += angle_error;
                 //printf("\nIntegral: %f, Angle Error: %f", integral, angle_error);
             }
-            double pOut = TURRET_KP * angle_error; //proportional term
+            double pOut = kP * angle_error; //proportional term
             double iOut = TURRET_KI * integral; //integral term
             double dOut = TURRET_KD * (angle_error - last_error); //derivative term
+            if (std::signbit(angle_error) != std::signbit(last_error)) {
+                kP *= decay;
+            }
             last_error = angle_error; //update last error
             double output = pOut + iOut + dOut; //output = sum of PID terms
 
@@ -350,6 +357,9 @@ namespace turret {
                 integral = 0;
                 output = 0;
             }
+            if (fabs(angle_error) > 5) {
+                kP = TURRET_KP;
+            }
 
             //If the turret is settled, return 0mV, otherwise return the calculated output:
             return output; 
@@ -377,7 +387,17 @@ namespace turret {
                         integral = 0;
                         break;
                     case State::MANUAL: //Manual control
-                        motor.move_absolute(deg_to_rot(target_angle), max_velocity);
+                        if (global_angle) {
+                            double adjusted_angle = target_angle - arms::odom::getHeading();
+                            while (adjusted_angle < -180)
+                                adjusted_angle += 360;
+                            while (adjusted_angle > 180)
+                                adjusted_angle -= 360;
+                            adjusted_angle = std::clamp(adjusted_angle, RIGHT_LIMIT, LEFT_LIMIT);
+                            motor.move_absolute(deg_to_rot(adjusted_angle), max_velocity);
+                        } else {
+                            motor.move_absolute(deg_to_rot(target_angle), max_velocity);
+                        }
                         integral = 0;
                         break;
                     case State::VISION: {//Vision control
@@ -392,12 +412,16 @@ namespace turret {
                             }
                         #endif
                         target_angle = get_angle(false) - error;
+                        if (first_move) {
+                            last_error = error;
+                            first_move = false;
+                        }
                         double target = get_vision_voltage(error);
                         
                         motor.move_voltage(target);
 
                         if(TURRET_DEBUG && printCounter++ % 5 == 0){
-                            printf("\nTurret Error: %3.2f, Target: %5.2f", error, target);
+                            printf("\nTurret Error: %3.2f, Target: %5.2f, kP: %d", error, target, kP);
                         }
                         break;
                     }
@@ -470,12 +494,19 @@ namespace turret {
     void goto_angle(double angle, double velocity, bool async) {
         // Clamp the angle so that we don't try to move to a position that will 
         // harm the ring gear or burn out the motor
+        global_angle = false;
         target_angle = std::clamp(angle, RIGHT_LIMIT, LEFT_LIMIT);
         max_velocity = velocity;
 
         if(!async){
             wait_until_settled();
         }
+    }
+
+    void goto_global(double angle, double velocity) {
+        global_angle = true;
+        target_angle = angle;
+        max_velocity = velocity;
     }
 
     void goto_rel_move(double angle, double velocity, bool async) {
@@ -514,6 +545,8 @@ namespace turret {
     void enable_vision_aim() {
         state = State::VISION;
         integral = 0;
+        kP = TURRET_KP;
+        first_move = true;
     }
 
     void disable_vision_aim() {
@@ -530,21 +563,21 @@ namespace turret {
     }
 
     void debug_screen() {
-        pros::lcd::print(0, "TURRET");
+        lcd2::pages::print_line(2, 0, "TURRET");
         if(state == State::DISABLED) {
-            pros::lcd::print(1, " State: Disabled");
+            lcd2::pages::print_line(2, 1, " State: Disabled");
             return;
         } else if(state == State::MANUAL) {
-            pros::lcd::print(1, " State: Manual");
+            lcd2::pages::print_line(2, 1, " State: Manual");
         } else if(state == State::VISION) {
-            pros::lcd::print(1, " State: Vision");
+            lcd2::pages::print_line(2, 1, " State: Vision");
         }
         if(vision::get_targ_goal() == vision::Goal::BOTH){
-            pros::lcd::print(2, " Target Color: Both");
+            lcd2::pages::print_line(2, 2, " Target Color: Both");
         } else if(vision::get_targ_goal() == vision::Goal::RED){
-            pros::lcd::print(2, " Target Color: Red");
+            lcd2::pages::print_line(2, 2, " Target Color: Red");
         } else if(vision::get_targ_goal() == vision::Goal::BLUE){
-            pros::lcd::print(2, " Target Color: Blue");
+            lcd2::pages::print_line(2, 2, " Target Color: Blue");
         }
         lcd2::pages::print_line(2, 3, " Vision Status: %s", vision::is_working() ? "OPERATIONAL" : "SUSPENDED, NO IRIS DATA!");
         lcd2::pages::print_line(2, 4, " Current Angle: %f", get_angle());
