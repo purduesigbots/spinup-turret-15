@@ -195,63 +195,84 @@ void subsystem_test() {
 * Skils autonomous routine
 */
 void skillsAuto() {
-	using namespace arms;
+	vision::set_targ_goal(vision::Goal::BOTH);
+	using namespace arms::chassis;
+	arms::odom::reset({34,11},45);
 
+	// spin roller
 	flywheel::start(140);
-
-	odom::reset({126, 81}, 180);
-
-	// FLYWHEEL INIT
-	flywheel::start(167);
-	// DISC COUNTER INIT
-	discCounter::setNum(1);
-	// DEFLECTOR INIT
-	deflector::down();
-
-	intake::start(100);
-	chassis::move({106, 84}, 80);
-	chassis::turn(223, 100);
-	chassis::move({82, 58, 223}, 50);
+	turret::goto_angle(70, 200, true);
+	roller::move(-65);
+	tank(-40,-40);
+	intake::start(-100);
 	pros::delay(500);
-	intake::stop();
-	chassis::turn(315);
+	roller::move(0);
+	tank(0,0);
 
-	flywheel::fire(3, 4000);
-
-	chassis::turn(223);
+	// first 3 stack
 	intake::start(100);
-	chassis::move({60, 34, 223}, 60);
+	move({47,24}, 70, arms::THRU);
+	move({64,39}, 30);
+	turret::enable_vision_aim();
 	pros::delay(500);
-	chassis::move({34, 10}, 30);
-	pros::delay(500);
-	intake::stop();
-	chassis::turn(0);
+	flywheel::fire(3, 5000);
 
-	flywheel::fire(3, 4000);
-
+	// 3 disks
+	turret::disable_vision_aim();
+	turret::goto_angle(60, 200, true);
 	intake::start(100);
-	discLift::discLiftDown();
-	chassis::turn(180);
-	chassis::move({12, 10}, 30);
-	pros::delay(1000);
-	chassis::turn(45, 60);
-	chassis::move({24, 24, 45}, 40);
-	pros::delay(1000);
-	intake::stop();
-	pros::delay(1000);
+	move({107,83}, 70);
+	turn(90);
+	turret::enable_vision_aim();
+	move({107,92});
+	flywheel::fire(3, 5000);
 
+	// second 3 stack
+	turret::disable_vision_aim();
+	turret::goto_angle(0, 200, true);
+	intake::start(100);
+	move({107,113}, 40);
+	pros::delay(500);
+	turn(180);
+	turret::enable_vision_aim();
+	move({102, 113});
+	flywheel::fire(3, 5000);
+
+	// third 3 stack
+	intake::start(100);
+	move({79,105},40);
+	pros::delay(500);
+	flywheel::fire(3, 5000);
+
+	// 3 more disks
+	turret::disable_vision_aim();
+	turret::goto_angle(70, 200, true);
+	intake::start(100);
+	turn(220);
+	move({31,59});
+	turn(270);
+	flywheel::fire(3, 5000);
+
+	// fourth 3 stack
+	intake::start(100);
+	turret::goto_angle(-60, 200, true);
+	move({34,32},40);
+	turn(45);
+	flywheel::fire(3,5000);
+
+	// 2 disks
+	intake::start(100);
+	turret::goto_angle(-80, 200, true);
+	move({56,59}, 70);
 	flywheel::fire(2, 4000);
 
+	// 2 more disks
 	intake::start(100);
-	discLift::discLiftDown();
-	chassis::move(10, 60);
-	pros::delay(500);
-	chassis::move({36, 36}, 40);
-	pros::delay(300);
-	intake::start(-100);
-	pros::delay(300);
-	intake::stop();
-	flywheel::fire(3, 4000);
+	move({94,99}, 70);
+	turn(225);
+	flywheel::fire(2, 4000);
+
+	move({120,124}, arms::REVERSE);
 }
 
 /**
@@ -284,7 +305,7 @@ void autonomous() {
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
 		// vision::set_targ_goal(vision::Goal::BLUE);
-		discRushAuto();
+		skillsAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
