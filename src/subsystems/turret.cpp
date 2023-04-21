@@ -82,7 +82,6 @@ namespace turret {
         //Current state of the turret
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
-        bool global_angle = false;
 
         #define TURRET_DEBUG true
         #define TURRET_PID_TEST_CYCLE false
@@ -387,17 +386,7 @@ namespace turret {
                         integral = 0;
                         break;
                     case State::MANUAL: //Manual control
-                        if (global_angle) {
-                            double adjusted_angle = target_angle - arms::odom::getHeading();
-                            while (adjusted_angle < -180)
-                                adjusted_angle += 360;
-                            while (adjusted_angle > 180)
-                                adjusted_angle -= 360;
-                            adjusted_angle = std::clamp(adjusted_angle, RIGHT_LIMIT, LEFT_LIMIT);
-                            motor.move_absolute(deg_to_rot(adjusted_angle), max_velocity);
-                        } else {
-                            motor.move_absolute(deg_to_rot(target_angle), max_velocity);
-                        }
+                        motor.move_absolute(deg_to_rot(target_angle), max_velocity);
                         integral = 0;
                         break;
                     case State::VISION: {//Vision control
@@ -494,7 +483,6 @@ namespace turret {
     void goto_angle(double angle, double velocity, bool async) {
         // Clamp the angle so that we don't try to move to a position that will 
         // harm the ring gear or burn out the motor
-        global_angle = false;
         target_angle = std::clamp(angle, RIGHT_LIMIT, LEFT_LIMIT);
         max_velocity = velocity;
 
@@ -504,8 +492,13 @@ namespace turret {
     }
 
     void goto_global(double angle, double velocity) {
-        global_angle = true;
-        target_angle = angle;
+        double adjusted_angle = angle - arms::odom::getHeading();
+        while (adjusted_angle < -180)
+            adjusted_angle += 360;
+        while (adjusted_angle > 180)
+            adjusted_angle -= 360;
+        adjusted_angle = std::clamp(adjusted_angle, RIGHT_LIMIT, LEFT_LIMIT);
+        target_angle = adjusted_angle;
         max_velocity = velocity;
     }
 
