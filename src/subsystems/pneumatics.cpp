@@ -11,7 +11,7 @@
                     bool state4;
 
                     void update() {
-                        double analog_value = 4;
+                        double analog_value = 2;
                         if (this->state1)
                             analog_value += 63.5;
                         if (this->state2)
