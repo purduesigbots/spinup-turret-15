@@ -28,7 +28,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define JOSH_LAT_COMP false
 #define TURRET_LIMIT_SWITCH 'h'
 #define TURRET_KP 1000 //ONLY TUNE WITH A DISC IN THE ROBOT
-#define TURRET_KI 5 //ONLY TUNE WITH A DISC IN THE ROBOT
+#define TURRET_KI 0 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_KD 200 //ONLY TUNE WITH A DISC IN THE ROBOT
 #define TURRET_AW true //switch for anti integral windup
 #define TURRET_FF true //switch for turn feedforward
