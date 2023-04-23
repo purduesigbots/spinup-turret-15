@@ -81,7 +81,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define LINEAR_KD 30
 #define TRACKING_KP 70 // point tracking turning strength
 #define ANGULAR_KP 5
-#define ANGULAR_KI 0
+#define ANGULAR_KI 0.1
 #define ANGULAR_KD 37
 #define MIN_ERROR                                                              \
   5 // Minimum distance to target before angular componenet is disabled
