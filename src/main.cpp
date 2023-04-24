@@ -312,7 +312,7 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < 2.0))) {
+			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < 12.0))) {
 				flywheel::fireControl_driver(true);
 			} else{
 				flywheel::fireControl_driver(false);
@@ -339,6 +339,9 @@ void opcontrol() {
 		if (master.get_digital_new_press(DIGITAL_B)) { //Auto speed toggle
 			flywheel::set_auto_speed_mode(!use_auto_speed);
 			use_auto_speed = !use_auto_speed;
+			if (!use_auto_speed) {
+				flywheel::start(112);
+			}
 		}
 		/**
 		*
@@ -354,7 +357,7 @@ void opcontrol() {
 			master.clear_line(0);
 			vision_good = true;
 		}
-		if(master.get_digital_new_press(DIGITAL_Y) || partner.get_digital_new_press(DIGITAL_Y)){
+		if(master.get_digital_new_press(DIGITAL_Y)){
 			use_vision = !use_vision;
 			if (!use_vision) {
 				turret::disable_vision_aim();
@@ -374,6 +377,13 @@ void opcontrol() {
 			if(!pros::competition::is_connected()){
 				autonomous();
 			}
+		}
+		if (partner.get_digital_new_press(DIGITAL_Y)) {
+			use_vision = false;
+			turret::disable_vision_aim();
+			use_auto_speed = false;
+			flywheel::set_auto_speed_mode(use_auto_speed);
+			flywheel::start(112);
 		}
 		
 		//Increment controller printing counter

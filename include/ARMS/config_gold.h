@@ -59,7 +59,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 // Tracking wheel distances
 #define TRACK_WIDTH                                                            \
-  5.75 // The distance between left and right wheels (or tracker wheels)
+  5.89 // The distance between left and right wheels (or tracker wheels)
 #define MIDDLE_DISTANCE                                                        \
   6.25 // Distance from middle wheel to the robot turning center
 
@@ -70,7 +70,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
 // Movement tuning
-#define SLEW_STEP 4             // Smaller number = more slew
+#define SLEW_STEP 1             // Smaller number = more slew
 #define LINEAR_EXIT_ERROR 5     // default exit distance for linear movements
 #define ANGULAR_EXIT_ERROR 5    // default exit distance for angular movements
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling

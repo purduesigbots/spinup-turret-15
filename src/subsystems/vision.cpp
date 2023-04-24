@@ -48,6 +48,7 @@ namespace vision{
     double turret_error = 0;
     double inch_error = 0;
     int odom_settled_time = 0;
+    int no_new_comm_count = 0;
 
     //Image constants
     const double IMAGE_DIM = 416;
@@ -368,7 +369,6 @@ namespace vision{
 
       //Start communications
       communication->start();
-      int no_new_comm_count = 0;
 
       //Main loop
       while(true){
@@ -439,6 +439,9 @@ namespace vision{
   */
     
   double get_error(bool radians){
+    if(!is_working()){
+      return 0;
+    }
     if(SHOOT_WHILE_MOVING && robot_is_settled()){
       //If we are not moving we do not have to lead our shot. Return turret's theta error in degrees
       return radians? turret_error : turret_error * 180 / M_PI;;
@@ -471,9 +474,6 @@ namespace vision{
       //If we are moving and we are not allowed to shoot while moving, return standard error
       return radians? turret_error : turret_error * 180 / M_PI;
     }
-    if(!is_working() || color == 3){
-      return 0;
-    }
   }
 
   void init(){
@@ -482,7 +482,7 @@ namespace vision{
 
   bool is_working(){
     //Color = 1 if red, 0 if blue, 3 if no goal but recieving data, 0 and all other values 0 if no data
-    return !(color == 0 && width == 0 && height == 0);
+    return !(color == 0 && width == 0 && height == 0) && no_new_comm_count < 50;
   }
 
   double get_distance(){
