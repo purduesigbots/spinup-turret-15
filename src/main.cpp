@@ -297,10 +297,10 @@ void opcontrol() {
 		*/
 		if (master.get_digital(DIGITAL_R1)) { // intake
 			intake::start(100);
-			roller::move(65);
+			roller::move(100);
 		} else if (master.get_digital(DIGITAL_R2)) { // outake
 			intake::start(-100);
-			roller::move(-65);
+			roller::move(-100);
 		} else if (!master.get_digital(DIGITAL_L2)) { // idle
 			intake::stop();
 			roller::move(0);

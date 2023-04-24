@@ -70,7 +70,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define ENCODER_TYPE arms::odom::ENCODER_ADI // The type of encoders
 
 // Movement tuning
-#define SLEW_STEP 1             // Smaller number = more slew
+#define SLEW_STEP 4             // Smaller number = more slew
 #define LINEAR_EXIT_ERROR 5     // default exit distance for linear movements
 #define ANGULAR_EXIT_ERROR 5    // default exit distance for angular movements
 #define SETTLE_THRESH_LINEAR .5 // amount of linear movement for settling

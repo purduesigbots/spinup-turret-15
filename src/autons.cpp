@@ -117,7 +117,7 @@ void discRushAuto() {
 	intake::start(100);
 	move({29, 16}, 70);
 	turn(120);
-	roller::move(65);
+	roller::move(100);
 	tank(-40,-40);
 	pros::delay(800);
 	roller::move(0);
@@ -208,7 +208,7 @@ void skillsAuto() {
 	// spin roller
 	flywheel::start(110);
 	turret::goto_angle(-62, 200, true);
-	roller::move(-65);
+	roller::move(-100);
 	tank(-20,-20);
 	pros::delay(600);
 	intake::start(-100);
