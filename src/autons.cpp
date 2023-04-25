@@ -122,7 +122,7 @@ void discRushAuto() {
 	pros::delay(800);
 	roller::move(0);
 	tank(0,0);
-	move({19.5,10, 185});
+	move({21.5,10, 185});
 
 
 	// preload, shoot
@@ -162,11 +162,11 @@ void discRushAuto() {
 
 	// low goal disks
 	flywheel::start(140);
-	move({83,16}, arms::REVERSE);
+	move({81,16}, arms::REVERSE);
 	turn(65);
 	intake::start(100);
 	turret::goto_angle(43, 200, true);
-	move({83,45}, 40, 2);
+	move({86,45}, 40);
 	turret::enable_vision_aim();
 	pros::delay(1000);
 	flywheel::fire(3, 4000);
@@ -336,7 +336,7 @@ void autonomous() {
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
 		// vision::set_targ_goal(vision::Goal::BLUE);
-		skillsAuto();
+		discRushAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

@@ -236,7 +236,7 @@ namespace vision{
 
       //Only allow update to occur if turret error is less than 10 degrees
       //Prevent update if not settled (want to only do this when we are still and have a good picture of goal)
-      if(fabs(turret_error) < 10.0 && robot_is_settled()){ 
+      if(fabs(turret_error) < 15.0 && robot_is_settled()){ 
         //Calculate camera x and y
         double corr_bot_y = position_queue.front().y;
         double corr_bot_x = position_queue.front().x;
@@ -265,6 +265,7 @@ namespace vision{
           sma.pop_back();
         }
         goal_location = (sum + current - last) / sma.size();
+        // goal_location = {goal_x,goal_y};
         if(color == 1) red_goal_location = goal_location;
         else if(color == 0) blue_goal_location = goal_location;
       }

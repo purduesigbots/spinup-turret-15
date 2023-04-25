@@ -312,7 +312,7 @@ void opcontrol() {
 		*
 		*/
 		if (master.get_digital(DIGITAL_L1)) {
-			if (flywheel::at_speed(20) && (!use_vision || (use_vision && fabs(vision::get_error()) < 12.0))) {
+			if (flywheel::at_speed(15) && (!use_vision || (use_vision && fabs(vision::get_error()) < 12.0))) {
 				flywheel::fireControl_driver(true);
 			} else{
 				flywheel::fireControl_driver(false);

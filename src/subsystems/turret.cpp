@@ -464,7 +464,7 @@ namespace turret {
         pros::delay(100);
         // Now tell the motor to move back to face forward.
         printf("Moving to face forward\n");
-        double offset = -2.15;
+        double offset = -2.3;
         motor.move_relative(offset, 250); //Tune left value, more negative is more right offset from limit switch
         pros::delay(1000);
         motor.move(0);

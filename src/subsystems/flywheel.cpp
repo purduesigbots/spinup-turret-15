@@ -93,7 +93,7 @@ namespace flywheel {
 				*
 				*
 				*/
-				calculated_speed = (0.0048 * distance * distance) - (0.3448 * distance) + 112.39;
+				calculated_speed = (0.0084 * distance * distance) - (0.5186 * distance) + 108.62;
 
 			}else{
 				/*
@@ -103,7 +103,7 @@ namespace flywheel {
 				*
 				*
 				*/
-				calculated_speed = (0.0016 * distance * distance) + (0.1499 * distance) + 110.99;
+				calculated_speed = (0.0014 * distance * distance) + (0.1695 * distance) + 108.11;
 			}
 			return calculated_speed;
 		}
