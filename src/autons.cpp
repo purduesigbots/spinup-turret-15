@@ -113,7 +113,7 @@ void discRushAuto() {
 	
 	// line disks, roller
 	turret::goto_angle(0, 200, true);
-	flywheel::start(137);
+	flywheel::start(140);
 	intake::start(100);
 	move({29, 16}, 70);
 	turn(120);
@@ -131,7 +131,7 @@ void discRushAuto() {
 	intake::start(100);
 	move({50,9});
 	move({55,21});
-	turret::goto_global(112, 200);
+	turret::goto_global(122, 200);
 	pros::delay(500);
 	turret::enable_vision_aim();
 	flywheel::fire(3, 4000);
@@ -141,7 +141,7 @@ void discRushAuto() {
 	flywheel::start(135);
 	intake::start(100);
 	move({58,38}, 40, 1, arms::THRU);
-	turret::goto_global(120, 200);
+	turret::goto_global(130, 200);
 	pros::delay(1000);
 	turret::enable_vision_aim();
 	flywheel::fire(3, 4000);
@@ -153,7 +153,7 @@ void discRushAuto() {
 	move({57,50}, 50, 2);
 	move({59,41}, arms::REVERSE);
 	move({52,43}, 50, 2);
-	turret::goto_global(145, 200);
+	turret::goto_global(124, 200);
 	move({59,41}, arms::REVERSE);
 	turret::enable_vision_aim();
 	pros::delay(500);
