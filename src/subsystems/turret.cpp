@@ -83,7 +83,7 @@ namespace turret {
         State state = State::MANUAL; //Set state to manual by default
         //Current target color
 
-        #define TURRET_DEBUG true
+        #define TURRET_DEBUG false
         #define TURRET_PID_TEST_CYCLE false
         int printCounter = 0;
 

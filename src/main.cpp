@@ -127,7 +127,8 @@ void initialize() {
 	sylib::initialize();
 	discLift::home();
 	arms::init();
-	arms::odom::reset({0, 0}, 0.0); // start position
+	//arms::odom::reset({0, 0}, 0.0); // start position
+	arms::odom::reset({35.5, 17}, 90);
 	pros::delay(500);
 	flywheel::initialize();
 	roller::init();
@@ -340,7 +341,7 @@ void opcontrol() {
 			flywheel::set_auto_speed_mode(!use_auto_speed);
 			use_auto_speed = !use_auto_speed;
 			if (!use_auto_speed) {
-				flywheel::start(112);
+				flywheel::start(110);
 			}
 		}
 		/**
@@ -383,7 +384,7 @@ void opcontrol() {
 			turret::disable_vision_aim();
 			use_auto_speed = false;
 			flywheel::set_auto_speed_mode(use_auto_speed);
-			flywheel::start(112);
+			flywheel::start(110);
 		}
 		
 		//Increment controller printing counter

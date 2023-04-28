@@ -8,7 +8,7 @@
 #include <vector>
 
 #define FLYWHEEL_KV 61
-#define FLYWHEEL_KP 14
+#define FLYWHEEL_KP 7
 #define FLYWHEEL_KI 0.003
 #define FLYWHEEL_KD 6
 #define FLYWHEEL_KH 0
@@ -55,7 +55,7 @@ namespace flywheel {
 
 		//Local const for stopped speed
 		const double STOP = 0.0;
-		#define FLYWHEEL_DEBUG false
+		#define FLYWHEEL_DEBUG true
 
 		//Local static variable for average speed--current one motor master/slave system overrides this 
 		//with the left motor's speed. I am leaving it here anyways in case we want to return to a two
@@ -93,7 +93,7 @@ namespace flywheel {
 				*
 				*
 				*/
-				calculated_speed = (0.0084 * distance * distance) - (0.5186 * distance) + 108.62;
+				calculated_speed = (0.0084 * distance * distance) - (0.5186 * distance) + 112.62;
 
 			}else{
 				/*
