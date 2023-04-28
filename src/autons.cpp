@@ -272,7 +272,7 @@ void skillsAuto() {
 	turret::goto_angle(70, 200, true);
 	intake::start(100);
 	turn(225);
-	move({34,51}, 70);
+	move({30,64}, 70);
 	turn(270, 100, 2);
 	turret::enable_vision_aim();
 	flywheel::fire(3, 5000);
@@ -307,6 +307,16 @@ void skillsAuto() {
 	move({93,137}, arms::REVERSE);
 }
 
+void rollerOnly() {
+	roller::move(65);
+	arms::chassis::tank(-20,-20);
+	pros::delay(300);
+	intake::start(-100);
+	pros::delay(100);
+	roller::move(0);
+	arms::chassis::tank(0,0);
+}
+
 /**
 *
 * MAIN AUTONOMOUS METHOD
@@ -324,11 +334,15 @@ void autonomous() {
 	} else if (auton < 0) {
 		vision::set_targ_goal(vision::Goal::BLUE);
 	}
-	if(pros::competition::is_connected()){
+	if(true){
 		//Switch based on auton selector for matches
 		switch (auton) {
 			case 0:
 				skillsAuto();
+				break;
+			case 3:
+			case -3:
+				rollerOnly();
 				break;
 			default:
 				discRushAuto();
@@ -337,7 +351,7 @@ void autonomous() {
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
 		// vision::set_targ_goal(vision::Goal::BLUE);
-		skillsAuto();
+		matchAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
