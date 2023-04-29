@@ -38,8 +38,8 @@ This file includes all of the ARMS constants as well as all robot-specific const
 
 
 #define PNEUMATICS_PORT 'g'
-#define LEFT_ENDGAME 2
-#define RIGHT_ENDGAME 4
+#define LEFT_ENDGAME 4
+#define RIGHT_ENDGAME 2
 #define BLOCKER 1
 #define DEFLECTOR 3
 

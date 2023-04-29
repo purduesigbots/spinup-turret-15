@@ -69,7 +69,7 @@ namespace discLift {
     void discLiftHold(){
         lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
         if(lift_motor.get_position() < LIFT_UP_POS + 6){
-            lift_motor.move_voltage(4000);
+            lift_motor.move_voltage(3000);
             // lift_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             // lift_motor.brake();
         } else{

@@ -92,7 +92,7 @@ void discRushAuto() {
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	// first 3 stack
-	flywheel::start(140);
+	flywheel::start(142);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(5);
@@ -113,7 +113,7 @@ void discRushAuto() {
 	
 	// line disks, roller
 	turret::goto_angle(0, 200, true);
-	flywheel::start(140);
+	flywheel::start(143);
 	intake::start(100);
 	move({29, 16}, 70);
 	turn(120);
@@ -148,9 +148,9 @@ void discRushAuto() {
 	turret::disable_vision_aim();
 	
 	// other line disks
-	flywheel::start(130);
+	flywheel::start(133);
 	intake::start(100);
-	move({63,46}, 50, 2);
+	move({62,48}, 50, 2);
 	move({59,41}, arms::REVERSE);
 	turret::goto_angle(-45, 200, true);
 	move({56,41}, 50, 2);
@@ -162,11 +162,11 @@ void discRushAuto() {
 
 	// low goal disks
 	flywheel::start(145);
-	move({87,12}, arms::REVERSE);
+	move({83,12}, arms::REVERSE);
 	turn(65);
 	intake::start(100);
 	turret::goto_angle(43, 200, true);
-	move({91,32}, 40);
+	move({88,34}, 40);
 	turret::enable_vision_aim();
 	pros::delay(1000);
 	flywheel::fire(3, 4000);
@@ -220,7 +220,7 @@ void skillsAuto() {
 	intake::start(100);
 	//flywheel::start(132);
 	move({49,24}, 70, arms::THRU);
-	move({66,37}, 30);
+	move({66,38}, 30);
 	turn(40, 100, 2);
 	//turret::enable_vision_aim();
 	pros::delay(500);
@@ -350,7 +350,7 @@ void autonomous() {
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
 		// vision::set_targ_goal(vision::Goal::BLUE);
-		skillsAuto();
+		discRushAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
