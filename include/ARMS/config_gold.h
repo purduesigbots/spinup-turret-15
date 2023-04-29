@@ -13,7 +13,7 @@ This file includes all of the ARMS constants as well as all robot-specific const
 #define ROLLER_OPTICAL 5
 
 #define LIFT_MOTOR 21
-#define LIFT_UP_POS 90
+#define LIFT_UP_POS 100
 #define LIFT_DOWN_POS 7
 #define LIFT_HOME_OFFSET 10
 

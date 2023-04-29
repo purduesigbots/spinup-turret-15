@@ -55,7 +55,10 @@
                             this->state4 = state;
                             break;
                         }
-                        this->update();
+                        for (int i = 0; i < 5; i++) {
+                            this->update();
+                            pros::delay(2);
+                        }
                     }
 
                     bool get(std::uint8_t pneumatic) {

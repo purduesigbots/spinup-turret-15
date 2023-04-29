@@ -161,7 +161,7 @@ void discRushAuto() {
 	turret::disable_vision_aim();
 
 	// low goal disks
-	flywheel::start(140);
+	flywheel::start(145);
 	move({87,12}, arms::REVERSE);
 	turn(65);
 	intake::start(100);
@@ -206,11 +206,11 @@ void skillsAuto() {
 
 	deflector::up();
 	// spin roller
-	flywheel::start(110);
+	flywheel::start(105);
 	turret::goto_angle(-62, 200, true);
 	roller::move(-100);
 	tank(-20,-20);
-	pros::delay(600);
+	pros::delay(800);
 	intake::start(-100);
 	pros::delay(200);
 	roller::move(0);
@@ -228,9 +228,9 @@ void skillsAuto() {
 	//turret::disable_vision_aim();
 
 	// 3 disks
-	flywheel::start(132);
+	flywheel::start(135);
 	deflector::down();
-	turret::goto_angle(70, 200, true);
+	turret::goto_angle(67, 200, true);
 	intake::start(100);
 	move({112,79}, 70);
 	turn(90, 100, 2);
@@ -244,46 +244,45 @@ void skillsAuto() {
 	//flywheel::start(120);
 	deflector::up();
 	flywheel::start(115);
-	turret::goto_angle(-27, 200, true);
+	turret::goto_angle(-20, 200, true);
 	intake::start(100);
-	move({107,110}, 40);
+	move({109,107}, 40);
 	pros::delay(500);
 	turn(180);
-	//turret::enable_vision_aim();
-	move({100, 106});
-	turn(197, 100, 2);
+	move({102, 106});
+	turn(185, 100, 2);
 	flywheel::fire(3, 5000);
 	//turret::disable_vision_aim();
 
 	// third 3 stack
 	intake::start(100);
+	flywheel::start(105);
 	turret::goto_angle(-32, 200, true);
-	move({80,101},40);
+	move({83,105},40);
 	//turret::enable_vision_aim();
 	turn(195, 100, 2);
 	pros::delay(500);
 	flywheel::fire(3, 5000);
-	return;
 
 	// 3 more disks
 	flywheel::start(137);
 	deflector::down();
 	//turret::disable_vision_aim();
-	turret::goto_angle(70, 200, true);
+	turret::goto_angle(60, 200, true);
 	intake::start(100);
-	turn(225);
-	move({30,64}, 70);
+	turn(220);
+	move({32,62}, 70);
 	turn(270, 100, 2);
-	turret::enable_vision_aim();
+	//turret::enable_vision_aim();
 	flywheel::fire(3, 5000);
-	turret::disable_vision_aim();
+	//turret::disable_vision_aim();
 
 	// fourth 3 stack
 	//flywheel::start(120);
 	intake::start(100);
-	turret::goto_angle(-55, 200, true);
-	move({38,25},40);
-	turn(45, 100, 2);
+	turret::goto_angle(-60, 200, true);
+	move({31,35},40);
+	turn(40, 100, 2);
 	//turret::enable_vision_aim();
 	flywheel::fire(3,5000);
 	//turret::disable_vision_aim();
@@ -291,20 +290,20 @@ void skillsAuto() {
 	// 2 disks
 	intake::start(100);
 	turret::goto_angle(-80, 200, true);
-	move({58,56}, 70);
-	turn(45, 100, 2);
+	move({59,59}, 70);
+	turn(35, 100, 2);
 	flywheel::fire(2, 4000);
-	return;
 
 	// 2 more disks
 	intake::start(100);
-	turret::goto_angle(70, 200, true);
-	move({84,105}, 70);
-	turn(245, 100, 2);
+	turret::goto_angle(65, 200, true);
+	move({101,87}, 70);
+	turn(220, 100, 2);
 	flywheel::fire(2, 4000);
 
 	turret::goto_angle(0, 200, true);
-	move({93,137}, arms::REVERSE);
+	move({132,111}, arms::REVERSE);
+	endgame::deploy();
 }
 
 void rollerOnly() {
@@ -334,7 +333,7 @@ void autonomous() {
 	} else if (auton < 0) {
 		vision::set_targ_goal(vision::Goal::BLUE);
 	}
-	if(true){
+	if(pros::competition::is_connected()){
 		//Switch based on auton selector for matches
 		switch (auton) {
 			case 0:
@@ -351,7 +350,7 @@ void autonomous() {
 	} else{
 		//PLACE DESIRED AUTON FOR TUNING HERE: (will run when competion not connected)
 		// vision::set_targ_goal(vision::Goal::BLUE);
-		matchAuto();
+		skillsAuto();
 	}
 	arms::chassis::setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
