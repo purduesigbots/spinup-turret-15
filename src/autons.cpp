@@ -92,7 +92,7 @@ void discRushAuto() {
 	setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
 	// first 3 stack
-	flywheel::start(142);
+	flywheel::start(148);
 	discCounter::setNum(0);
 	deflector::down();
 	intake::start(5);
